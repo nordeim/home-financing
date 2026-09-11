@@ -5,7 +5,7 @@ IMPORTANT: File is read fresh for every conversation. Be brief and practical.
 # ModFii — Home Financing (Prefab Mortgage Marketplace)
 
 > **Brand:** ModFii — "The #1 Prefab Home Mortgage Platform" — prefab/modular/ADU/tiny-home financing marketplace matching borrowers to prefab-specialist lenders.
-> **Stack:** Next.js 16.3 (App Router) + React 19.3 + TypeScript 5.9 strict + Tailwind CSS v4.3 CSS-first `@theme` + Drizzle ORM 0.45 + PostgreSQL 17 + `pg` + `next/font` (DM Sans + Outfit) + lucide-react + Drizzle Kit 0.31 / `tsx` 4.23 + Vitest 3.2 (unit, 37 tests) + Playwright 1.63 + `@axe-core/playwright` 4.13 (E2E, 44 tests per project — 31 declarations + 14 asset-title variants). Package manager: npm (package-lock.json).
+> **Stack:** Next.js 16.3 (App Router) + React 19.3 + TypeScript 5.9 strict + Tailwind CSS v4.3 CSS-first `@theme` + Drizzle ORM 0.45 + PostgreSQL 17 + `pg` + `next/font` (DM Sans + Outfit) + lucide-react + Drizzle Kit 0.31 / `tsx` 4.23 + Vitest 3.2 (unit, 37 tests) + Playwright 1.63 + `@axe-core/playwright` 4.13 (E2E, 55 tests per project — 42 declarations + 14 asset-title variants). Package manager: npm (package-lock.json).
 > **Repo:** `home-financing` (package.json name `nextjs-postgresql-template` — legacy; brand is **ModFii**). Single app, no monorepo/turborepo.
 
 ---
@@ -269,7 +269,7 @@ drizzle/
   0001_sharp_stick.sql    # alter manufacturers.founded 8→32
   meta/_journal.json
  e2e/
-  smoke.spec.ts / seo.spec.ts / funnel.spec.ts /  # Playwright 44 tests (chromium)
+  smoke.spec.ts / seo.spec.ts / funnel.spec.ts /  # Playwright 55 tests (chromium)
   assets.spec.ts / parity.spec.ts
  playwright.config.ts      # E2E config (prod next start on 3002, reuseExistingServer)
  drizzle.config.ts         # TS config (primary)
@@ -287,7 +287,7 @@ public/
 ### Current State (post-remediation 2026-09-11)
 
 - **Vitest unit runner installed** — `vitest.config.ts` (node env, `@` alias), `src/lib/{calculator,matching,rate-limit,markdown}.test.ts` — **37 tests, all passing** (`npm run test` / `test:watch` / `test:coverage`). Pure/deterministic domains only; DB-touching code stays under Playwright. (`calculator 11 + matching 13 + rate-limit 7 + markdown 6` — markdown pins the 2026-09-11 H4/OOM incident.)
-- **Playwright E2E** — `@playwright/test 1.63.0` + `@axe-core/playwright 4.13.0`, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), **44 tests per project** (31 declarations expanding via 14 asset-title variants): `smoke.spec.ts` (7 — home/nav/footer, get-started via the "Get Started" CTA, calculator, health, 404, axe critical), `seo.spec.ts` (6 — sitemap absolute locs + host-rewrite, robots, title, OG), `funnel.spec.ts` (4 — POST `/api/applications` 400/200 + `x-forwarded-for` isolated, burst 429, UI no-500), `assets.spec.ts` (19 runtime — 14 referenced image assets return 200 + no broken `<img>` on `/`, `/adu-financing`, `/tiny-home-financing`, and the two `/compare/*` alias redirects resolve), `parity.spec.ts` (8 — markdown-OOM regression on H4 articles + wordmark logos + testimonial avatars + learn-hub search/filter/featured/tools + calculator breakdown/PMI + footer Socials/Legal + wizard). With Postgres: 44/44; without DB: 43/44 (funnel valid-payload is the only DB-dependent test).
+- **Playwright E2E** — `@playwright/test 1.63.0` + `@axe-core/playwright 4.13.0`, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), **55 tests per project** (42 declarations expanding via 14 asset-title variants): `smoke.spec.ts` (7 — home/nav/footer, get-started via the "Get Started" CTA, calculator, health, 404, axe critical), `seo.spec.ts` (6 — sitemap absolute locs + host-rewrite, robots, title, OG), `funnel.spec.ts` (4 — POST `/api/applications` 400/200 + `x-forwarded-for` isolated, burst 429, UI no-500), `assets.spec.ts` (19 runtime — 14 referenced image assets return 200 + no broken `<img>` on `/`, `/adu-financing`, `/tiny-home-financing`, and the two `/compare/*` alias redirects resolve), `parity.spec.ts` (19 — markdown-OOM regression on the two H4 articles, wordmark logos + testimonial avatars, learn-hub search/filter/featured/tools, calculator breakdown/PMI, footer Socials/Legal, wizard, plus the pass-3 live-source pins: circle brand mark + two-tone wordmark, always-light header (desktop + mobile), intro eyebrow, closing trust line, no green band, single steps CTA, title-cased eyebrow, 2-item More dropdown, footer copyright + legal-line NMLS link, get-started 3-step band, calculator amber band). With Postgres: 55/55; without DB: 54/55 (funnel valid-payload is the only DB-dependent test).
 - **Manual verification still:** `npm run lint` (now 0 errors / 0 warnings) + `npm run typecheck` + `npm run build` + `curl /api/health`.
 
 ### Target Pyramid (next)
@@ -303,7 +303,7 @@ npm run test:watch   # vitest watch mode
 npm run lint         # eslint . (0 errors / 0 warnings)
 npm run typecheck    # tsc --noEmit (skills excluded)
 npm run build        # next build (requires skills excluded)
-npm run e2e          # playwright --project=chromium (needs build; funnel valid-payload also needs db:setup)
+npm run e2e          # playwright --project=chromium (needs build; funnel happy-path also needs db:setup)
 npm run e2e:all      # playwright chromium+webkit
 ```
 
@@ -325,7 +325,7 @@ npm run lint        # eslint .  (flat config, core-web-vitals; 0 errors / 0 warn
 npm run lint:fix    # eslint . --fix
 npm run typecheck   # tsc --noEmit (skills excluded via tsconfig)
 npm run test        # vitest run (37 unit tests = calculator 11 + matching 13 + rate-limit 7 + markdown 6)
-npm run e2e         # playwright (chromium, 44 tests per project — 31 declarations + 14 asset variants)
+npm run e2e         # playwright (chromium, 55 tests per project — 42 declarations + 14 asset variants)
 ```
 
 - Config: `eslint.config.mjs` — `defineConfig([...nextCoreWebVitals, globalIgnores([".next/**","out/**","build/**","next-env.d.ts","skills/**","infrastructure/**"])])`. Keep flat config; do not revert to `.eslintrc`. `skills/` + `infrastructure/` are operator-managed and excluded from all checks/tests/compilation.
@@ -490,13 +490,15 @@ App Router Server Components + Route Handlers
 
 - **Tokens:** `src/app/globals.css:@theme` — `background` (cream 40 33% 99), `foreground`/`forest`/`moss` greens (155–150 hue), `primary`/`primary-600` forest, `accent` amber 38 92% 50, `border`/`input`/`ring` muted greens, radii `sm→2xl`, shadow `lift`, ease `brand`. Extend only inside `@theme`.
 - **Typography:** `Outfit` (display/headings, `--font-outfit`) + `DM Sans` (body, `--font-dm-sans`) via `next/font/google` with `variable` + `display: swap`. Apply via `font-sans` / `font-display`.
-- **Header:** fixed `h-16`; on `/` it sits transparent with light text over the dark hero until ~12px of scroll, then transitions to `bg-background/90` + border; interior pages render light from first paint. CTA is a forest "Get Started" pill (never amber).
+- **Header:** fixed `h-16`; **always light** — `bg-background/90` + `backdrop-blur-md` + border in every state (homepage hero included). Live modfii.com never renders a transparent header (computed-style probe 2026-09-12: `rgba(253,253,252,0.8)` + blur at top, scrolled, and mobile — the earlier transparent-over-dark treatment was removed in pass 3). CTA is a forest "Get Started" pill (never amber). Desktop More dropdown = exactly two items (ADU Financing, Tiny Home Financing); the mobile drawer keeps NAV + MORE.
 - **PageHero (`src/components/page-shell.tsx`):** centered interior hero — photo background (one of the five `/images/*.jpg`) under a forest overlay, star eyebrow pill, optional amber `highlight` title line, CTA pair, glass stat chips; `Breadcrumbs` centered inside. All `GuideScreen` pages + learn/glossary/manufacturers flow through it.
-- **Homepage (`src/app/page.tsx`)** mirrors modfii.com section-for-section: photo hero + glass stats card, manufacturer wordmark strip (real logo PNGs in `public/brand/wordmarks/`), "Modular & Prefab Home Loans" intro (4 cards + loan chips, scroll-revealed via `Reveal`), problem/solution (red vs green tinted cards with icons), green-mortgage photo band, 3-step icons + ghost numerals, 5-star testimonials with portrait avatars (`public/images/avatars/`) + savings ledger, "Our Standards" trio, animated FAQ accordions, dotted-pattern closing CTA.
+- **Homepage (`src/app/page.tsx`)** mirrors modfii.com section-for-section: photo hero + glass stats card, manufacturer wordmark strip (real logo PNGs in `public/brand/wordmarks/`), "Modular & Prefab Home Loans" intro ("Your Prefab Financing Partner" eyebrow + 4 cards + loan chips, scroll-revealed via `Reveal`), problem/solution (red vs green tinted cards with icons) + "See Your Options" CTA, 3-step icons + ghost numerals (no section CTA — source has none), 5-star testimonials with portrait avatars (`public/images/avatars/`) + savings ledger, "Our Standards" trio, animated FAQ accordions, dotted-pattern closing CTA with the "No credit impact • 15-minute application • Cancel anytime" trust line. The pass-2 "green sustainability band" was removed in pass 3 — the live source homepage has no such section.
 - **Motion:** `Reveal` (`src/components/reveal.tsx`) lazily reveals the home intro (opacity 0 + translateY, cards also scale 0.95, 300ms, staggered) matching modfii.com; `<details>` accordions animate via `::details-content` in `globals.css` (progressive enhancement, uses `--ease-brand`); `prefers-reduced-motion` forces `[data-reveal]` visible.
-- **Logo:** `public/brand/modfii-logo-icon.svg` is the canonical rotated-square mark used by modfii.com — don't revert to the legacy MD monogram.
+- **Logo:** `public/brand/modfii-logo-icon.svg` is the live modfii.com brand mark — green circle ring + center dot (pass 3, 2026-09-12; replaced the rotated-square variant). Header and footer render the two-tone wordmark `Mod` (foreground) + `Fii` (primary) beside it — don't revert to a single-tone wordmark or the square mark.
 - **Layout rhythm:** `Container` max `1400px`, `px-4 md:px-8`, header `h-16` fixed + `backdrop-blur-md` + `border-b`.
-- **Iconography:** `lucide-react` only (v1.44 has no brand icons — wrap inline SVGs in local components, see `LinkedInIcon`/`TwitterIcon`/`FacebookIcon`/`YouTubeIcon` in `site-footer.tsx`). Footer also carries a Legal column (Privacy/Terms/NMLS) mirroring modfii.com.
+- **Iconography:** `lucide-react` only (v1.44 has no brand icons — wrap inline SVGs in local components, see `LinkedInIcon`/`TwitterIcon`/`FacebookIcon`/`YouTubeIcon` in `site-footer.tsx`). Footer mirrors modfii.com: Legal column (Privacy/Terms/NMLS), copyright without the NMLS number, and a trailing underlined "NMLS Consumer Access" link in the legal line.
+- **Calculator page:** the lower sections (How to Use / Explore / FAQ / Related) sit on a warm `bg-accent/15` band mirroring the source's peach wash.
+- **Get-started:** below the hero sits the source's "Get Financing in 3 Easy Steps" band (numbered green badges, `FileText`/`Handshake`/`Home` icons); the hero eyebrow uses `Sparkles`.
 - **Anti-generic guard:** no purple gradients, no Inter/Roboto fallback without hierarchy, no undifferentiated card grids — editorial intent on every section.
 
 ---
@@ -575,4 +577,4 @@ This project is intentionally static-site-hostable with an optional Postgres bac
 
 ---
 
-*Last generated 2026-09-11 via `claude-md:create`; updated 2026-09-11 (remediation pass 2): markdown H4/OOM fix + regression suites (unit 37, E2E 44 per project), modfii.com visual parity (wordmark logos, testimonial avatars, `Reveal` scroll animations, animated accordions, footer socials + Legal, learn-hub + calculator rebuilds, get-started wizard parity, manufacturers tier bands + A–Z directory); earlier pass: untracked `.env` (real secrets had been committed in `d572d73` — rotate `BETTER_AUTH_SECRET`/`CRON_SECRET`), eslint ignores `skills/**`+`infrastructure/**` (lint 0/0), vitest 31 unit tests, e2e 27 tests incl. `assets.spec.ts` regression guards, six missing images added (`public/images/*.jpg` + `public/brand/og-image.jpg`), canonical logo SVG adopted, compare alias redirects, header/home/footer/PageHero/get-started restyled to mirror modfii.com, `.env.example` moved to `home_financing_*:5434`. Source of truth: package.json, tsconfig, next.config.ts, eslint.config.mjs, drizzle.config.ts/json, docker-compose.yml:5434, src/db, src/lib, src/scripts, e2e, vitest.config.ts. Preserve team-specific conventions when updating.*
+*Last generated 2026-09-11 via `claude-md:create`; updated 2026-09-11 (remediation pass 2); updated 2026-09-12 (remediation pass 3 — live-source parity: circle brand mark + two-tone wordmark, always-light header (transparent-over-dark removed after a computed-style probe), homepage intro eyebrow + closing trust line, green band + duplicate steps CTA removed, get-started "Get Financing in 3 Easy Steps" band, calculator amber sections, footer copyright/legal-line + 2-item More dropdown; calculator-PMI E2E flake root-caused to pre-hydration value-tracker poisoning and pinned with a fresh-navigation retry; counts now 37 unit + 55 E2E per project = 42 declarations + 14 asset variants; earlier passes: markdown H4/OOM fix + regression suites, untracked `.env` (real secrets in `d572d73` — rotate `BETTER_AUTH_SECRET`/`CRON_SECRET`), eslint ignores `skills/**`+`infrastructure/**`, six missing images, compare alias redirects. Source of truth: package.json, tsconfig, next.config.ts, eslint.config.mjs, drizzle.config.ts/json, docker-compose.yml:5434, src/db, src/lib, src/scripts, e2e, vitest.config.ts, live modfii.com probes (`docs/REMEDIATION_PLAN_pass3.md`). Preserve team-specific conventions when updating.*

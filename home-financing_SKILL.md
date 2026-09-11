@@ -1,10 +1,10 @@
-# home-financing (ModFii) — Engineering Skill v1.0.0
+# home-financing (ModFii) — Engineering Skill v1.2.0
 
 **Classification:** Internal Engineering Reference — Reusable Skill Document
 **Status:** DEFINITIVE, PRODUCTION-LOCKED
 **Companion Documents:** `Project_Architecture_Document.md` v1.0 (blueprint) · `CLAUDE.md` (agent spec, ~600 lines) · `AGENTS.md` (cheat-sheet) · `README.md` (operator guide)
-**Last Updated:** 2026-09-12 (v1.1 — docs normalization + H4 fix + parity feat alignment)
-**Project State:** 37 Vitest (11+13+7+6, incl. H4/OOM regression) + 44 Playwright per project (44/44 with DB, 43/44 DB-less — 31 declarations + 14 asset variants) · 43/43 Next build · PG 17 `8/40/50/23/59/5` seeded · `lint 0/0` · `typecheck` pass
+**Last Updated:** 2026-09-12 (v1.2 — remediation pass 3: live-source parity + PMI flake root-cause + counts 37 unit / 55 E2E per project)
+**Project State:** 37 Vitest (11+13+7+6, incl. H4/OOM regression) + 55 Playwright per project (55/55 with DB, 54/55 DB-less — 42 declarations + 14 asset variants) · 43/43 Next build · PG 17 `8/40/50/23/59/5` seeded · `lint 0/0` · `typecheck` pass
 **Audience:** AI Coding Agents, Senior Engineers, Tech Leads, DevOps, Onboarding Engineers
 **Rule:** Every rule in this document traces to a specific file, test, or live probe. Nothing is here "because it's popular."
 
@@ -96,7 +96,7 @@ Pinned from `package.json` (`package-lock.json` is the lockfile, not pnpm) + `do
 | Scripting | `tsx` | `^4.23.13` | Runs `src/scripts/migrate|seed|reset` as ESM. |
 | Lint | ESLint + `eslint-config-next` | `^9.39.5` + `^16.3.4` | Flat config `eslint.config.mjs` + `defineConfig` + `globalIgnores(.next,out,build,next-env,skills,infrastructure)`. |
 | Unit | Vitest | `^3.2.7` (`vitest/config`, `node` env, `include: src/**/*.test.ts`) | Co-located `src/lib/*.test.ts` pure only (calculator 11 + matching 13 + rate-limit 7 + markdown 6 = 37). `37/37` green. |
-| E2E | Playwright + `@axe-core/playwright` | `^1.63.0` + `^4.13.0` | Prod `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `chromium+webkit`, `x-forwarded-for` isolation. `44 per project` — 31 declarations + 14 asset variants (88 with webkit, `44/44` with DB, `43/44` DB-less). `assets 19 runtime` + `parity 8` + `smoke 7` + `seo 6` + `funnel 4`. |
+| E2E | Playwright + `@axe-core/playwright` | `^1.63.0` + `^4.13.0` | Prod `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `chromium+webkit`, `x-forwarded-for` isolation. `55 per project` — 42 declarations + 14 asset variants (110 with webkit, `55/55` with DB, `54/55` DB-less). `assets 19 runtime` + `parity 19` + `smoke 7` + `seo 6` + `funnel 4`. |
 | Package Manager | npm | `package-lock.json` | Single app, no monorepo/turborepo. Gate: `db:setup → lint → typecheck → test → build → e2e`. |
 
 ---
@@ -308,7 +308,7 @@ src/app/** (43 pages: 39 static + 4 dynamic — authors/[authorSlug], learn/[slu
 
 src/components/ (7 files, 3 client islands)
 ├── ui.tsx (primitives — allowed everywhere)
-├── site-header.tsx ("use client") ← fixed h-16, transparent over dark hero, NAV 4 + MORE 4
+├── site-header.tsx ("use client") ← fixed h-16, always-light frosted bar (pass 3 — no transparent state), NAV 4 + MORE 2
 ├── site-footer.tsx (LinkedInIcon local SVG)
 ├── page-shell.tsx (Breadcrumbs + PageHero + GuideView — interior heroes must use this)
 ├── prequal-form.tsx ("use client") ← 13-field funnel
@@ -346,12 +346,12 @@ src/scripts/ (3 lifecycle, all local-guarded)
 └── reset.ts (DROP SCHEMA public,drizzle CASCADE + extensions)
 
 drizzle/ (0000_amusing_thena.sql ~200 lines, 0001_sharp_stick.sql 1 line, meta/_journal.json idx 0,1)
-e2e/ (400 total lines, 44 per project — 31 declarations + 14 asset variants, `parity.spec.ts` 92 LOC pins H4/OOM + parity)
+e2e/ (55 per project — 42 declarations + 14 asset variants, `parity.spec.ts` pins H4/OOM + parity + pass-3 live-source pins)
 ├── smoke.spec.ts (7)
-├── seo.spec.ts (5)
+├── seo.spec.ts (6)
 ├── funnel.spec.ts (4)
 ├── assets.spec.ts (19 runtime — 14 image × 200 + 3 broken-img + 2 alias)
-└── parity.spec.ts (10 — H4/OOM regression + modfii.com visual-parity pins)
+└── parity.spec.ts (19 — H4/OOM regression + visual-parity pins + pass-3 live-source pins)
 ```
 
 **Counts proven:** `grep -r "'use client'" src/components src/app/error.tsx | wc -l` → `6` islands (`site-header`, `prequal-form`, `calculator-app`, `learn-explorer`, `reveal`, `error`). `find src/components -type f | wc -l` → `9` (added `reveal.tsx` + `learn-explorer.tsx`). `find src -type f -name "*.test.ts" | wc -l` → `4` (added `markdown.test.ts` 6). `wc -l src/data/*` → `2771`.
@@ -731,7 +731,7 @@ npm run build
 # → Routes: ○ 36 static + ƒ 7 dynamic
 
 # 6 — E2E (prod next start on 3002, reuseExistingServer, chromium; valid-payload needs DB)
-npm run e2e             # chromium 44/44 per project (31 declarations + 14 asset variants; 43/44 DB-less)
+npm run e2e             # chromium 55/55 per project (42 declarations + 14 asset variants; 54/55 DB-less)
 npm run e2e:all         # chromium + webkit
 
 # 7 — Readiness + content surfaces
@@ -805,14 +805,14 @@ Sibling `scandihaven` occupies `3000` on this dev host. `playwright.config.ts:PO
 
 **Sprint 4 — UX Remediation**
 
-**LL-12. Header transparent over dark hero, not light.**  
-`modfii.com` sits transparent with light text over the dark hero until `scrollY>12`. Interior `PageHero` is `bg-forest` with glass chips — don't reintroduce left-aligned gradient heroes. `overDarkHero = pathname==="/" && !scrolled` + `bg-forest` on CTA when over hero (`af5e080`, `4d1e6ad`).
+**LL-12. Header is always light (pass 3 correction).**  
+Live `modfii.com` renders a light frosted header (`rgba(253,253,252,0.8)` + blur) in every state — top, scrolled, desktop, mobile (computed-style probe 2026-09-12). The earlier `overDarkHero = pathname==="/" && !scrolled` transparent-over-dark treatment was removed in pass 3; don't reintroduce it. Interior `PageHero` is `bg-forest` with glass chips — don't reintroduce left-aligned gradient heroes.
 
 **LL-13. `setState` in effect → lint `react-hooks/set-state-in-effect`.**  
 Resetting `open/moreOpen` via `useEffect(() => setOpen(false), [pathname])` triggered cascading-renders lint. Fixed via adjust-during-render `if(prevPathname!==pathname){ setPrevPathname(pathname); setOpen(false); setMoreOpen(false); }`.
 
-**LL-14. Canonical logo SVG `modfii-logo-icon.svg` rotated-square, not MD monogram.**  
-Legacy `MD` monogram was reverted; `af5e080` adopted `modfii-logo-icon.svg` (rotated-square mark matching `modfii.com`). Don't revert.
+**LL-14. Brand mark is the circle glyph + two-tone wordmark (pass 3 correction).**  
+The header/footer mark is the green circle ring + center dot rendered beside `Mod`(foreground)+`Fii`(primary) — verified against the live source header 2026-09-12. The rotated-square `modfii-logo-icon.svg` file that both sites ship is NOT what the source header renders; pass 3 replaced the file's contents with the circle glyph. Don't revert to a single-tone wordmark or the square mark.
 
 **LL-15. `@theme` sole source — no `tailwind.config.*`.**  
 v4 CSS-first — extending via `@theme` only (`—color-forest/accent/cream`), no `text-[13px]` arbitrary. `ls tailwind.config*` must stay empty.
@@ -896,7 +896,7 @@ Error strings are stable (`Please enter your name.` etc) and rendered as inline 
 
 - Brand tokens extend only inside `@theme` (see §4); no arbitrary values; `cn()` from `ui.tsx` for variant merging.
 - Wrapping/styling `ui.tsx` primitives is allowed; re-implementing them is not.
-- Header transparent over `/` hero until `12px` scroll, then `bg-background/90 + border`; CTA forest pill (never amber header).
+- Header always light (`bg-background/90` + blur in every state, pass 3); CTA forest pill (never amber header).
 - `PageHero` centered photo-backed + star pill + optional `highlight` amber line + CTA pair + glass stat chips — interior heroes must flow through it.
 
 ---
@@ -1446,7 +1446,7 @@ interface Env {
 | ADR-003 | Drizzle ORM `0.45.2` + `pg` Pool singleton `globalThis` | `src/db/schema.ts`, `src/db/index.ts`, `drizzle.config.*` (`5434`) | Single Pool prevents HMR `EMFILE`; `drizzle-kit generate` diff→SQL | Prisma / inline `new Pool()` |
 | ADR-004 | Tailwind v4 CSS-first `@theme` (sole source) | `src/app/globals.css`, `src/components/ui.tsx` | Token authority without config drift; `build` proves parity | `tailwind.config.*` (v3) / arbitrary escapes |
 | ADR-005 | In-memory `Map` limiter `8/10min` via `x-forwarded-for` | `src/lib/rate-limit.ts`, `src/app/api/applications/route.ts` | Single-instance zero-infra; probed `400×8→429×2` | Redis from day-0 / no limiter |
-| ADR-006 | Vitest `37` (11+13+7+6) + Playwright prod `44` per project (pure vs DB boundary) | `vitest.config.ts`, `playwright.config.ts` (`3002`, `reuseExistingServer`), `e2e/*` (`smoke 7 + seo 6 + funnel 4 + assets 19 + parity 8`) | Dev HMR ≠ prod; `assets` guards 14 images + alias incidents + `parity` guards H4/OOM + wordmarks/avatars/learn-hub/calculator/footer/wizard | Unit-only / E2E on `dev` |
+| ADR-006 | Vitest `37` (11+13+7+6) + Playwright prod `55` per project (pure vs DB boundary) | `vitest.config.ts`, `playwright.config.ts` (`3002`, `reuseExistingServer`), `e2e/*` (`smoke 7 + seo 6 + funnel 4 + assets 19 + parity 19`) | Dev HMR ≠ prod; `assets` guards 14 images + alias incidents + `parity` guards H4/OOM + wordmarks/avatars/learn-hub/calculator/footer/wizard + pass-3 live-source pins | Unit-only / E2E on `dev` |
 | ADR-007 | `images.unoptimized:true` (no `sharp`) | `next.config.ts`, `postcss.config.mjs` | No optimizer in deploy/sandbox would deadlock | Optimizer-on by default |
 
 ---
@@ -1536,7 +1536,7 @@ What live-site catches that CI cannot: `modfii.com` parity aliases (308), host-r
 |---------|------|------------------|-------|
 | Brand | `src/lib/catalog.ts:SITE` | `ModFii, #1 Prefab, Nashville NMLS 2537136` | `layout.tsx:metadataBase` |
 | Hero | `src/app/page.tsx` | `HERO_CHECKS 3` + `PARTNER_WORDMARKS 5` + `INTRO_CARDS 4` + `PROBLEMS 3` + `FIXES 3` + `STEPS 3` | `smoke.spec.ts: heading[1] visible` |
-| Header CTA | `src/components/site-header.tsx` | `ButtonLink /get-started, variant overDarkHero?onPrimary:primary` forest pill | Review: never amber |
+| Header CTA | `src/components/site-header.tsx` | `ButtonLink /get-started variant=primary` forest pill (header always light — pass 3) | Review: never amber |
 | Pool | `src/db/index.ts` | `globalThis.__arenaNextJsPostgresqlPool` single | `rg "new Pool"` 1 hit |
 | PMI | `src/lib/calculator.ts` | `PMI_ANNUAL_RATE 0.0065`, site-built `1.15×` | `calculator.test.ts` 11 tests |
 | Scoring | `src/lib/matching.ts` | `+20/+18/+10/+8/+12`, `5.4% floor`, `cap 99`, `top 4` | `matching.test.ts` 13 tests |
@@ -1546,7 +1546,7 @@ What live-site catches that CI cannot: `modfii.com` parity aliases (308), host-r
 | Images | `public/images/*` | `5` + `brand/og-image.jpg` | `assets.spec.ts` `6×200` + broken-img |
 | Sitemap | `src/app/sitemap.ts` | `STATIC_PATHS 40` → `152` locs (23+50+40) | `seo.spec.ts` `30×200` |
 | Env | `.env.example` | 12 + `FEATURE_*` | `src/db/index.ts` throw on missing |
-| Pre-ship gate | `AGENTS.md` | `db:setup → lint (0/0) → typecheck → test 37/37 → build 43/43 → e2e 44/44` | `drizzle` journal `idx 0,1` |
+| Pre-ship gate | `AGENTS.md` | `db:setup → lint (0/0) → typecheck → test 37/37 → build 43/43 → e2e 55/55` | `drizzle` journal `idx 0,1` |
 
 **Copy-paste env generation:**
 
@@ -1591,4 +1591,4 @@ DELIVER  → Complete handoff: usage, runbooks, challenges/solutions, next steps
 - [ ] TOC matches all `^## ` / `^### ` headings; appendices A–E referenced from body
 - [ ] `wc -l home-financing_SKILL.md` → `1,800–2,800` for this mid-size project (PAD `1,140` + SKILL `~1,000–1,400` = combined `~2,100–2,500`)
 
-*Last verified 2026-09-12 (SKILL v1.1 — `37/37` vitest = 11+13+7+6 incl. H4/OOM + `44/44` per project playwright = smoke 7+seo 6+funnel 4+assets 19+parity 8 + build `43/43` + `lint 0/0` + `typecheck` + DB init `8/40/50/23/59/5` + live `health/funnel/sitemap/images/aliases` + `reveal`/`learn-explorer`/`loading`/`error`) against `package.json` (next ^16.3.4), `tsconfig.json` (strict, skills excluded), `next.config.ts` (11 redirects), `drizzle.config.*` (`5434`), `docker-compose.yml` (`home_financing_*` + `pgcrypto/pg_trgm`), `src/db/schema.ts` (8 tables), `src/lib/*` (37 tests), `public/brand/wordmarks 5` + `public/images/avatars 3`, `playwright.config.ts` (`3002`), `e2e/*` 44 per project, `.env.example`. Evidence: `docs/AUDIT_REPORT.md` (hex-proof `[` artifact).*
+*Last verified 2026-09-12 (SKILL v1.2 — remediation pass 3: live-source parity — circle brand mark + two-tone wordmark, always-light header, homepage intro eyebrow + closing trust line, green band + duplicate steps CTA removed, get-started 3-step band, calculator amber band, footer legal line + 2-item dropdown; calculator-PMI E2E flake root-caused to pre-hydration value-tracker poisoning, pinned with fresh-navigation retry ×10 stable; `37/37` vitest = 11+13+7+6 incl. H4/OOM + `55/55` per project playwright = smoke 7+seo 6+funnel 4+assets 19+parity 19 (54/55 DB-less) + build `43/43` + `lint 0/0` + `typecheck` + DB init `8/40/50/23/59/5` + live `health/funnel/sitemap/images/aliases`) against `package.json` (next ^16.3.4), `tsconfig.json` (strict, skills excluded), `next.config.ts` (11 redirects), `drizzle.config.*` (`5434`), `docker-compose.yml` (`home_financing_*` + `pgcrypto/pg_trgm`), `src/db/schema.ts` (8 tables), `src/lib/*` (37 tests), `public/brand/wordmarks 5` + `public/images/avatars 3`, `playwright.config.ts` (`3002`), `e2e/*` 55 per project, `.env.example`. Evidence: `docs/REMEDIATION_PLAN_pass3.md`.*
