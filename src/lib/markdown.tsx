@@ -53,6 +53,15 @@ export function Markdown({ content }: { content: string }) {
       i += 1;
       continue;
     }
+    if (line.startsWith("#### ")) {
+      blocks.push(
+        <h4 key={key++} className="mt-6 font-display text-lg font-semibold text-foreground">
+          {inline(line.slice(5))}
+        </h4>,
+      );
+      i += 1;
+      continue;
+    }
     if (line.startsWith("### ")) {
       blocks.push(
         <h3 key={key++} className="mt-8 font-display text-xl font-semibold text-foreground">
@@ -111,6 +120,7 @@ export function Markdown({ content }: { content: string }) {
       continue;
     }
     const para: string[] = [];
+    const start = i;
     while (i < lines.length) {
       const current = lines[i] ?? "";
       if (
@@ -122,6 +132,14 @@ export function Markdown({ content }: { content: string }) {
         break;
       }
       para.push(current);
+      i += 1;
+    }
+    if (i === start) {
+      // Loop safety (2026-09-11 OOM incident): the break conditions above all
+      // match lines the outer loop did not consume (e.g. "####" and deeper
+      // hashes once fell through here). Never let the outer loop re-examine
+      // the same line — consume it and keep the parser terminating.
+      para.push(lines[start] ?? "");
       i += 1;
     }
     blocks.push(
