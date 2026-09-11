@@ -2,7 +2,7 @@
 
 import { Button, cn } from "@/components/ui";
 import type { ApplicationInput, LenderMatch } from "@/lib/matching";
-import { ArrowLeft, ArrowRight, Check, Home, Landmark, RefreshCw, Shield } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Clock, Home, Landmark, Lock, RefreshCw, Shield } from "lucide-react";
 import { useMemo, useState } from "react";
 
 const INTENTS = [
@@ -75,24 +75,48 @@ function Choice({
   selected,
   label,
   description,
+  icon: Icon,
   onClick,
 }: {
   selected: boolean;
   label: string;
   description?: string;
+  icon?: typeof Home;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={selected}
       className={cn(
-        "w-full rounded-xl border-2 p-4 text-left transition",
-        selected ? "border-primary bg-primary/5" : "border-border hover:border-primary/40",
+        "flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left transition",
+        selected ? "border-primary bg-primary/5" : "border-border bg-background hover:border-primary/40",
       )}
     >
-      <p className="font-semibold">{label}</p>
-      {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
+      {Icon ? (
+        <span
+          className={cn(
+            "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+            selected ? "bg-primary text-primary-foreground" : "bg-secondary text-primary",
+          )}
+        >
+          <Icon className="h-5 w-5" aria-hidden />
+        </span>
+      ) : null}
+      <span className="min-w-0 flex-1">
+        <span className="block font-semibold">{label}</span>
+        {description ? <span className="mt-0.5 block text-sm text-muted-foreground">{description}</span> : null}
+      </span>
+      <span
+        aria-hidden
+        className={cn(
+          "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2",
+          selected ? "border-primary bg-primary text-primary-foreground" : "border-border",
+        )}
+      >
+        {selected ? <Check className="h-3 w-3" /> : null}
+      </span>
     </button>
   );
 }
@@ -120,7 +144,7 @@ export function PrequalForm() {
 
   if (result) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-lg md:p-10">
+      <div className="rounded-2xl border border-border bg-card p-6 text-foreground shadow-lg md:p-10">
         <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
           <Check className="h-7 w-7" />
         </div>
@@ -175,19 +199,14 @@ export function PrequalForm() {
   }
 
   return (
-    <div className="rounded-2xl border-2 border-border bg-card p-6 shadow-2xl md:p-8">
+    <div className="rounded-2xl border-2 border-border bg-card p-6 text-foreground shadow-2xl md:p-8">
       <div className="mb-8">
         <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
-          <span>
-            Step {step + 1} of 4
-          </span>
-          <span className="flex items-center gap-1">
-            <Shield className="h-3.5 w-3.5 text-primary" />
-            No credit impact
-          </span>
+          <span>Step {step + 1} of 4</span>
+          <span>{Math.round(progress)}% complete</span>
         </div>
         <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-          <div className="h-full bg-accent transition-all" style={{ width: `${progress}%` }} />
+          <div className="h-full rounded-full bg-primary transition-all duration-300" style={{ width: `${progress}%` }} />
         </div>
       </div>
 
@@ -204,6 +223,7 @@ export function PrequalForm() {
                 selected={data.propertyIntent === item.value}
                 label={item.label}
                 description={item.description}
+                icon={item.icon}
                 onClick={() => update({ propertyIntent: item.value })}
               />
             ))}
@@ -249,8 +269,8 @@ export function PrequalForm() {
             <h1 className="font-display text-2xl font-bold md:text-3xl">Tell us about the home</h1>
             <p className="mt-2 text-muted-foreground">This helps us match you with the right financing options.</p>
           </div>
-          <div className="space-y-3">
-            <p className="text-sm font-medium">What type of home?</p>
+          <div className="grid gap-3 md:grid-cols-2">
+            <p className="text-sm font-medium md:col-span-2">What type of home?</p>
             {HOMES.map((item) => (
               <Choice
                 key={item.value}
@@ -261,8 +281,8 @@ export function PrequalForm() {
               />
             ))}
           </div>
-          <div className="space-y-3">
-            <p className="text-sm font-medium">Land situation?</p>
+          <div className="grid gap-3 md:grid-cols-2">
+            <p className="text-sm font-medium md:col-span-2">Land situation?</p>
             {LAND.map((item) => (
               <Choice
                 key={item.value}
@@ -447,7 +467,17 @@ export function PrequalForm() {
         </div>
       ) : null}
 
-      <p className="mt-6 text-center text-xs text-muted-foreground">256-bit encryption · NMLS #2537136 · We never sell your data</p>
+      <p className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-center text-xs text-muted-foreground">
+        <span className="inline-flex items-center gap-1.5">
+          <Shield className="h-3.5 w-3.5 text-primary" /> No credit impact
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <Clock className="h-3.5 w-3.5 text-primary" /> 3 min to complete
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <Lock className="h-3.5 w-3.5 text-primary" /> 256-bit encryption · NMLS #2537136
+        </span>
+      </p>
     </div>
   );
 }

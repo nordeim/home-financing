@@ -1,4 +1,4 @@
-import { Breadcrumbs } from "@/components/page-shell";
+import { PageHero } from "@/components/page-shell";
 import { ButtonLink, Container } from "@/components/ui";
 import { glossaryByLetter } from "@/lib/catalog";
 import type { Metadata } from "next";
@@ -17,15 +17,12 @@ export default function GlossaryPage() {
 
   return (
     <main>
-      <section className="bg-primary pt-28 pb-16 text-primary-foreground">
-        <Container>
-          <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Glossary" }]} light />
-          <h1 className="font-display text-4xl font-bold md:text-5xl">Modular Home Financing Glossary</h1>
-          <p className="mt-4 max-w-2xl text-xl text-primary-foreground/80">
-            Clear definitions for construction loans, mortgage terms, and prefab home terminology.
-          </p>
-        </Container>
-      </section>
+      <PageHero
+        title="Modular Home Financing Glossary"
+        description="Clear definitions for construction loans, mortgage terms, and prefab home terminology."
+        crumbs={[{ name: "Home", href: "/" }, { name: "Glossary" }]}
+        imageSrc="/images/green-home.jpg"
+      />
       <nav className="sticky top-16 z-40 border-b border-border bg-background/95 py-3 backdrop-blur-sm" aria-label="Letters">
         <Container>
           <div className="flex flex-wrap justify-center gap-1">

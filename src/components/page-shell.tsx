@@ -1,6 +1,6 @@
-import { Badge, ButtonLink, Container } from "@/components/ui";
+import { ButtonLink, Container, cn } from "@/components/ui";
 import type { GuidePageContent } from "@/lib/guides";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -8,13 +8,15 @@ import type { ReactNode } from "react";
 export function Breadcrumbs({
   items,
   light = false,
+  align = "left",
 }: {
   items: Array<{ name: string; href?: string }>;
   light?: boolean;
+  align?: "left" | "center";
 }) {
   return (
     <nav aria-label="Breadcrumb" className={`mb-8 text-sm ${light ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-      <ol className="flex flex-wrap items-center gap-2">
+      <ol className={`flex flex-wrap items-center gap-2 ${align === "center" ? "justify-center" : ""}`}>
         {items.map((item, index) => (
           <li key={`${item.name}-${index}`} className="flex items-center gap-2">
             {index > 0 ? <span aria-hidden>/</span> : null}
@@ -32,30 +34,91 @@ export function Breadcrumbs({
   );
 }
 
+/**
+ * Shared interior hero — centered, photo-backed with a deep forest overlay,
+ * optional eyebrow pill, amber-highlighted second title line, stat chips and
+ * CTA pair, mirroring the modfii.com page heroes.
+ */
 export function PageHero({
   eyebrow,
   title,
+  highlight,
   description,
   crumbs,
   imageSrc,
+  stats,
+  ctas,
 }: {
   eyebrow?: string;
   title: string;
+  highlight?: string;
   description: string;
   crumbs: Array<{ name: string; href?: string }>;
   imageSrc?: string;
+  stats?: Array<{ label: string; value: string }>;
+  ctas?: Array<{ label: string; href: string; variant?: "secondary" | "onPrimary" }>;
 }) {
   return (
-    <section className="relative overflow-hidden bg-primary pt-28 pb-16 text-primary-foreground">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(38_92%_50%/0.18),transparent_60%)]" />
+    <section className="relative isolate overflow-hidden bg-forest pb-16 pt-32 text-primary-foreground md:pb-20 md:pt-36">
       {imageSrc ? (
-        <Image src={imageSrc} alt="" fill className="object-cover opacity-20" sizes="100vw" />
-      ) : null}
+        <>
+          <Image src={imageSrc} alt="" fill className="object-cover opacity-35" sizes="100vw" priority />
+          <div className="absolute inset-0 bg-gradient-to-b from-forest/80 via-forest/85 to-forest/90" />
+        </>
+      ) : (
+        <div className="absolute inset-0 bg-primary" />
+      )}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(38_92%_50%/0.16),transparent_60%)]" />
       <Container className="relative z-10">
-        <Breadcrumbs items={crumbs} light />
-        {eyebrow ? <Badge className="mb-4 bg-accent text-accent-foreground">{eyebrow}</Badge> : null}
-        <h1 className="max-w-4xl font-display text-4xl font-bold md:text-5xl">{title}</h1>
-        <p className="mt-4 max-w-2xl text-xl text-primary-foreground/80">{description}</p>
+        <Breadcrumbs items={crumbs} light align="center" />
+        <div className="mx-auto max-w-4xl text-center">
+          {eyebrow ? (
+            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+              <Star className="h-4 w-4 fill-accent text-accent" aria-hidden />
+              {eyebrow}
+            </p>
+          ) : null}
+          <h1 className="font-display text-4xl font-bold leading-[1.08] md:text-6xl">
+            {title}
+            {highlight ? (
+              <>
+                {" "}
+                <span className="text-accent">{highlight}</span>
+              </>
+            ) : null}
+          </h1>
+          <p className="mx-auto mt-6 max-w-3xl text-lg text-white/85 md:text-xl">{description}</p>
+          {ctas && ctas.length > 0 ? (
+            <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              {ctas.map((cta, index) => (
+                <ButtonLink
+                  key={cta.href}
+                  href={cta.href}
+                  variant={cta.variant ?? (index === 0 ? "secondary" : "onPrimary")}
+                  size="lg"
+                >
+                  {cta.label}
+                  {index === 0 ? <ArrowRight className="h-4 w-4" /> : null}
+                </ButtonLink>
+              ))}
+            </div>
+          ) : null}
+        </div>
+        {stats && stats.length > 0 ? (
+          <div
+            className={cn(
+              "mx-auto mt-14 grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2",
+              stats.length >= 4 ? "lg:grid-cols-4" : "sm:grid-cols-3",
+            )}
+          >
+            {stats.map((stat) => (
+              <div key={stat.label} className="rounded-xl border border-white/15 bg-white/10 px-4 py-5 text-center backdrop-blur-sm">
+                <p className="text-xs text-white/70">{stat.label}</p>
+                <p className="mt-1 font-display text-xl font-bold text-accent">{stat.value}</p>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </Container>
     </section>
   );
@@ -75,22 +138,13 @@ export function GuideView({
       <PageHero
         eyebrow={guide.eyebrow}
         title={guide.title}
+        highlight={guide.highlight}
         description={guide.description}
         crumbs={crumbs}
         imageSrc={guide.heroImage}
+        stats={guide.stats}
+        ctas={[{ label: guide.cta, href: "/get-started" }]}
       />
-      {guide.stats ? (
-        <section className="border-b border-border bg-card">
-          <Container className="grid grid-cols-1 gap-6 py-8 sm:grid-cols-3">
-            {guide.stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <p className="font-display text-3xl font-bold text-primary">{stat.value}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
-              </div>
-            ))}
-          </Container>
-        </section>
-      ) : null}
       <Container className="grid gap-12 py-16 lg:grid-cols-[minmax(0,1fr)_280px]">
         <article>
           {guide.sections.map((section) => (
@@ -115,8 +169,11 @@ export function GuideView({
               <h2 className="mb-6 font-display text-2xl font-bold">Frequently asked questions</h2>
               <div className="space-y-4">
                 {guide.faqs.map((faq) => (
-                  <details key={faq.question} className="rounded-xl border border-border bg-card px-5 py-4">
-                    <summary className="cursor-pointer font-semibold">{faq.question}</summary>
+                  <details key={faq.question} className="group rounded-xl border border-border bg-card px-5 py-4">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold [&::-webkit-details-marker]:hidden">
+                      {faq.question}
+                      <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden />
+                    </summary>
                     <p className="mt-3 text-muted-foreground">{faq.answer}</p>
                   </details>
                 ))}

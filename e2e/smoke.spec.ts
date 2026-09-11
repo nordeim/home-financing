@@ -17,8 +17,8 @@ test.describe("home smoke", () => {
 
   test("get-started funnel renders and is reachable from header", async ({ page }) => {
     await page.goto("/");
-    // Header has "Get Pre-Qualified" linking to /get-started
-    await page.getByRole("link", { name: /get pre-qualified/i }).first().click();
+    // Header CTA is "Get Started" (modfii.com parity); hero CTA also routes to /get-started
+    await page.getByRole("link", { name: /^get started$/i }).first().click();
     await expect(page).toHaveURL(/\/get-started/);
     await expect(page.getByRole("heading", { name: /get matched/i })).toBeVisible();
   });

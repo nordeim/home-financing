@@ -12,6 +12,8 @@ export interface GuideSection {
 export interface GuidePageContent {
   slug: string;
   title: string;
+  /** Optional second title line rendered in the brand amber (modfii.com hub style). */
+  highlight?: string;
   eyebrow: string;
   description: string;
   heroImage?: "/images/hero-prefab.jpg" | "/images/green-home.jpg" | "/images/adu-backyard.jpg" | "/images/tiny-home.jpg" | "/images/interior-living.jpg";
@@ -26,13 +28,14 @@ export const GUIDES: Record<string, GuidePageContent> = {
   "modular-home-financing": {
     slug: "modular-home-financing",
     title: "Modular Home Financing",
-    eyebrow: "The complete marketplace",
+    highlight: "Made Simple",
+    eyebrow: "50+ Specialized Lenders",
     description:
       "Get matched with lenders who finance prefab and modular homes as real property—not as trailers. Compare FHA, VA, USDA, conventional, and construction-to-permanent options.",
     heroImage: "/images/hero-prefab.jpg",
     stats: [
+      { label: "Approval rate", value: "94%" },
       { label: "Typical approval", value: "7 days" },
-      { label: "Down payment from", value: "0%" },
       { label: "Avg. buyer savings", value: "$12K" },
     ],
     sections: [
@@ -296,9 +299,18 @@ export const GUIDES: Record<string, GuidePageContent> = {
   },
   "loan-options": {
     slug: "modular-home-financing/loan-options",
-    title: "Modular Home Loan Options",
+    title: "Modular Home",
+    highlight: "Loan Options",
     eyebrow: "Compare programs",
-    description: "FHA, VA, USDA, conventional, and construction-to-permanent loans for modular and prefab homes—side by side.",
+    description:
+      "Compare financing options for your modular home. From government-backed FHA and VA loans to construction-to-permanent financing—find the right fit for your situation.",
+    heroImage: "/images/hero-prefab.jpg",
+    stats: [
+      { label: "Lowest down payment", value: "VA/USDA: $0" },
+      { label: "Lowest credit score", value: "FHA: 580+" },
+      { label: "Fastest approval", value: "7–14 days avg." },
+      { label: "No PMI", value: "VA Loans" },
+    ],
     sections: [
       {
         heading: "Pick the program, then the lender",

@@ -1,4 +1,4 @@
-import { Breadcrumbs } from "@/components/page-shell";
+import { PageHero } from "@/components/page-shell";
 import { Badge, ButtonLink, Container } from "@/components/ui";
 import { manufacturers } from "@/lib/catalog";
 import type { Metadata } from "next";
@@ -15,22 +15,18 @@ const TIERS = ["Affordable", "Mid-Range", "Premium"] as const;
 export default function ManufacturersPage() {
   return (
     <main>
-      <section className="bg-primary pt-28 pb-16 text-primary-foreground">
-        <Container>
-          <Breadcrumbs
-            items={[
-              { name: "Home", href: "/" },
-              { name: "Modular financing", href: "/modular-home-financing" },
-              { name: "Manufacturers" },
-            ]}
-            light
-          />
-          <h1 className="font-display text-4xl font-bold md:text-5xl">Prefab Home Manufacturers</h1>
-          <p className="mt-4 max-w-2xl text-xl text-primary-foreground/80">
-            Connect with approved lenders for America&apos;s top modular and manufactured home builders.
-          </p>
-        </Container>
-      </section>
+      <PageHero
+        eyebrow="50+ builders covered"
+        title="Prefab Home Manufacturers"
+        description="Connect with approved lenders for America's top modular and manufactured home builders."
+        crumbs={[
+          { name: "Home", href: "/" },
+          { name: "Modular financing", href: "/modular-home-financing" },
+          { name: "Manufacturers" },
+        ]}
+        imageSrc="/images/hero-prefab.jpg"
+        ctas={[{ label: "Get pre-qualified", href: "/get-started" }]}
+      />
       <Container className="py-12">
         {TIERS.map((tier) => {
           const items = manufacturers.filter((item) => item.category === tier);

@@ -1,4 +1,4 @@
-import { Breadcrumbs } from "@/components/page-shell";
+import { PageHero } from "@/components/page-shell";
 import { Badge, Container } from "@/components/ui";
 import { articles, authorSlug } from "@/lib/catalog";
 import type { Metadata } from "next";
@@ -12,16 +12,14 @@ export const metadata: Metadata = {
 
 export default function LearnPage() {
   return (
-    <main className="pt-28 pb-20">
-      <section className="bg-primary pb-16 text-primary-foreground">
-        <Container className="pt-8">
-          <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Learn" }]} light />
-          <h1 className="font-display text-4xl font-bold md:text-5xl">Learn</h1>
-          <p className="mt-4 max-w-2xl text-xl text-primary-foreground/80">
-            Guides, case studies, and specialist explainers for factory-built home financing.
-          </p>
-        </Container>
-      </section>
+    <main className="pb-20">
+      <PageHero
+        eyebrow="Specialist guides"
+        title="Learn"
+        description="Guides, case studies, and specialist explainers for factory-built home financing."
+        crumbs={[{ name: "Home", href: "/" }, { name: "Learn" }]}
+        imageSrc="/images/interior-living.jpg"
+      />
       <Container className="grid gap-6 py-12 md:grid-cols-2 lg:grid-cols-3">
         {articles.map((article) => (
           <Link
