@@ -66,7 +66,7 @@ IMPORTANT: File is read fresh for every conversation. Be brief and practical.
 ### Next.js 16 + React 19 — App Router (authoritative)
 
 - **App Router only** — routes under `src/app/**` (`page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`). No `pages/` directory.
-- **Server Components by default** — add `"use client"` only when using `useState`/`useEffect`/event handlers/browser APIs (`src/components/site-header.tsx`, `prequal-form.tsx`, `calculator-app.tsx` are correct examples).
+- **Server Components by default** — add `"use client"` only when using `useState`/`useEffect`/event handlers/browser APIs (`src/components/site-header.tsx`, `prequal-form.tsx`, `calculator-app.tsx` are correct examples) **plus the required file-convention boundary `src/app/error.tsx`** (Next.js 16 `error.md` — error boundaries must be Client Components; `retry` is stable since 16.3, `reset` is the legacy alias kept for back-compat; `global-error.tsx` would also be client if added).
 - **Never import a Server Component into a Client Component** — extract shared UI to a leaf component.
 - **Data fetching in Server Components** — direct `db` access or `ensureSeeded()` + `catalog` helpers; no client-side `fetch` for own data except API routes.
 - **`next/font`** — `DM_Sans` + `Outfit` already configured in `src/app/layout.tsx` with `variable` + `display: swap`. Use `var(--font-*)` tokens, never `<link>` for Google Fonts.
@@ -75,7 +75,7 @@ IMPORTANT: File is read fresh for every conversation. Be brief and practical.
 - **Route Handlers** — `src/app/api/*/route.ts` with `export const dynamic = "force-dynamic"`. Validate body with `matching.ts` validators (Zod not yet adopted — keep manual validators consistent until migration).
 - **Redirects** — canonical redirects live in `next.config.ts:redirects()` (legacy `/loans/*`, `/manufacturers`, `/states/*`, `/get-started-v2`, `/playbook`). Add new redirects there, not in middleware.
 - **No `middleware.ts` / `proxy.ts`** in this codebase — proxy concerns are handled at the reverse proxy.
-- **Errors/Loading** — every segment that fetches should have `loading.tsx`/`error.tsx` (currently missing in many segments — add incrementally).
+- **Errors/Loading** — every segment that fetches should have `loading.tsx`/`error.tsx` (currently missing in many segments — add incrementally). `src/app/error.tsx` is the root error boundary and **must** be `"use client"` per the `error.md` convention — it receives `{ error: Error & { digest?: string }, retry?: () => void, reset?: () => void }` (`retry` stable since Next 16.3; `reset` without re-fetch is the legacy alias, kept via `retry ?? reset`) and logs via `useEffect(() => console.error(error), [error])`.
 
 ### React 19 Patterns
 
@@ -578,3 +578,5 @@ This project is intentionally static-site-hostable with an optional Postgres bac
 ---
 
 *Last generated 2026-09-11 via `claude-md:create`; updated 2026-09-11 (remediation pass 2); updated 2026-09-12 (remediation pass 3 — live-source parity: circle brand mark + two-tone wordmark, always-light header (transparent-over-dark removed after a computed-style probe), homepage intro eyebrow + closing trust line, green band + duplicate steps CTA removed, get-started "Get Financing in 3 Easy Steps" band, calculator amber sections, footer copyright/legal-line + 2-item More dropdown; calculator-PMI E2E flake root-caused to pre-hydration value-tracker poisoning and pinned with a fresh-navigation retry; counts now 37 unit + 55 E2E per project = 42 declarations + 14 asset variants; earlier passes: markdown H4/OOM fix + regression suites, untracked `.env` (real secrets in `d572d73` — rotate `BETTER_AUTH_SECRET`/`CRON_SECRET`), eslint ignores `skills/**`+`infrastructure/**`, six missing images, compare alias redirects. Source of truth: package.json, tsconfig, next.config.ts, eslint.config.mjs, drizzle.config.ts/json, docker-compose.yml:5434, src/db, src/lib, src/scripts, e2e, vitest.config.ts, live modfii.com probes (`docs/REMEDIATION_PLAN_pass3.md`). Preserve team-specific conventions when updating.*
+
+*Updated 2026-09-13: error boundary `src/app/error.tsx` migrated to Next 16.3 stable `retry` prop with `reset` alias; `useEffect` logging added; docs allow-list updated in AGENTS.md, CLAUDE.md, README.md; full gate `lint → typecheck → test → build → e2e` green (55/55).*

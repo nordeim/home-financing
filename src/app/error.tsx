@@ -1,14 +1,22 @@
 "use client";
 
 import { Button, ButtonLink, Container } from "@/components/ui";
+import { useEffect } from "react";
 
 export default function Error({
   error,
+  retry,
   reset,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry?: () => void;
+  reset?: () => void;
 }) {
+  const doRetry = retry ?? reset;
+
+  useEffect(() => {
+    console.error(error);
+  }, [error]);
   return (
     <main className="pb-20 pt-32">
       <Container className="max-w-xl text-center">
@@ -25,7 +33,7 @@ export default function Error({
           <p className="mt-3 font-mono text-xs text-muted-foreground">Ref: {error.digest}</p>
         ) : null}
         <div className="mt-8 flex justify-center gap-3">
-          <Button onClick={reset}>Try again</Button>
+          <Button onClick={doRetry} disabled={!doRetry}>Try again</Button>
           <ButtonLink href="/" variant="outline">
             Home
           </ButtonLink>
