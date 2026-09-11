@@ -142,6 +142,8 @@ export function PrequalForm() {
 
   const progress = useMemo(() => ((step + 1) / 4) * 100, [step]);
 
+  const STEP_NAMES = ["Tell us about your project", "About the home", "Quick details", "Contact details"];
+
   if (result) {
     return (
       <div className="rounded-2xl border border-border bg-card p-6 text-foreground shadow-lg md:p-10">
@@ -200,10 +202,31 @@ export function PrequalForm() {
 
   return (
     <div className="rounded-2xl border-2 border-border bg-card p-6 text-foreground shadow-2xl md:p-8">
+      {/* Trust chips — top of card (source parity) */}
+      <p className="mb-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+        <span className="inline-flex items-center gap-1.5">
+          <Shield className="h-3.5 w-3.5 text-primary" /> No credit impact
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <Clock className="h-3.5 w-3.5 text-primary" /> 3 min to complete
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <Lock className="h-3.5 w-3.5 text-primary" /> 256-bit encryption
+        </span>
+      </p>
+
       <div className="mb-8">
-        <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
-          <span>Step {step + 1} of 4</span>
-          <span>{Math.round(progress)}% complete</span>
+        <div className="mb-2 flex items-center gap-2.5">
+          <span
+            aria-hidden
+            className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
+          >
+            {step + 1}
+          </span>
+          <p className="text-sm font-semibold">{STEP_NAMES[step]}</p>
+          <span className="sr-only">
+            Step {step + 1} of 4 · {Math.round(progress)}% complete
+          </span>
         </div>
         <div className="h-1.5 overflow-hidden rounded-full bg-muted">
           <div className="h-full rounded-full bg-primary transition-all duration-300" style={{ width: `${progress}%` }} />
@@ -212,8 +235,8 @@ export function PrequalForm() {
 
       {step === 0 ? (
         <div className="space-y-8">
-          <div className="text-center">
-            <h1 className="font-display text-2xl font-bold md:text-3xl">What brings you to ModFii?</h1>
+          <div>
+            <h1 className="font-display text-2xl font-bold md:text-3xl">What are you looking to do?</h1>
             <p className="mt-2 text-muted-foreground">Takes about 2 minutes. Estimates are fine.</p>
           </div>
           <div className="space-y-3">
@@ -229,16 +252,17 @@ export function PrequalForm() {
             ))}
           </div>
           <label className="block">
-            <span className="mb-2 block text-sm font-medium">ZIP code</span>
+            <span className="mb-2 block text-sm font-medium">Property ZIP code</span>
             <input
               inputMode="numeric"
               autoComplete="postal-code"
               value={data.zipCode}
               onChange={(event) => update({ zipCode: event.target.value.replace(/\D/g, "").slice(0, 5) })}
               className="h-12 w-full rounded-lg border border-input bg-background px-4"
-              placeholder="37203"
+              placeholder="Enter 5-digit ZIP"
               maxLength={5}
             />
+            <span className="mt-1.5 block text-xs text-muted-foreground">Where the home will be located</span>
             {errors.zipCode ? <p className="mt-1 text-sm text-destructive">{errors.zipCode}</p> : null}
           </label>
           <Button
@@ -257,6 +281,17 @@ export function PrequalForm() {
             Continue
             <ArrowRight className="h-4 w-4" />
           </Button>
+          <p className="text-center text-xs text-muted-foreground">
+            By continuing, you agree to our{" "}
+            <a href="/privacy-policy" className="underline underline-offset-2 hover:text-foreground">
+              Privacy Policy
+            </a>{" "}
+            and{" "}
+            <a href="/terms" className="underline underline-offset-2 hover:text-foreground">
+              Terms of Service
+            </a>
+            .
+          </p>
         </div>
       ) : null}
 
@@ -466,18 +501,6 @@ export function PrequalForm() {
           </Button>
         </div>
       ) : null}
-
-      <p className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-center text-xs text-muted-foreground">
-        <span className="inline-flex items-center gap-1.5">
-          <Shield className="h-3.5 w-3.5 text-primary" /> No credit impact
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <Clock className="h-3.5 w-3.5 text-primary" /> 3 min to complete
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <Lock className="h-3.5 w-3.5 text-primary" /> 256-bit encryption · NMLS #2537136
-        </span>
-      </p>
     </div>
   );
 }

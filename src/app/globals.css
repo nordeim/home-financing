@@ -95,9 +95,36 @@
   }
 }
 
+/* Animated <details> accordions (modfii.com parity): the summary content
+   expands/collapses smoothly where the browser supports ::details-content.
+   Browsers without support keep the instant native behavior. */
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+
+  details::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition:
+      block-size 0.3s var(--ease-brand),
+      content-visibility 0.3s allow-discrete;
+  }
+
+  details[open]::details-content {
+    block-size: auto;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  /* Scroll-reveal content must never stay hidden when motion is reduced. */
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   *,

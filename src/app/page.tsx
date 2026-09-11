@@ -1,4 +1,5 @@
 import { Badge, ButtonLink, Container } from "@/components/ui";
+import { Reveal } from "@/components/reveal";
 import { SITE } from "@/lib/catalog";
 import {
   ArrowRight,
@@ -29,7 +30,13 @@ export const metadata: Metadata = {
 
 const HERO_CHECKS = ["No credit impact", "0.5% closing fee", "Green mortgage options"];
 
-const PARTNER_WORDMARKS = ["DVELE", "plant", "excel", "SKYLINE", "Dutch Housing"];
+const PARTNER_WORDMARKS = [
+  { src: "/brand/wordmarks/dvele-qHduDYI9.png", alt: "Dvele" },
+  { src: "/brand/wordmarks/plant-prefab-BZiOWTM8.png", alt: "Plant Prefab" },
+  { src: "/brand/wordmarks/excel-homes-7uiBs08K.png", alt: "Excel Homes" },
+  { src: "/brand/wordmarks/skyline.png", alt: "Skyline" },
+  { src: "/brand/wordmarks/dutch-housing-DfGaFGP9.png", alt: "Dutch Housing" },
+];
 
 const INTRO_CARDS = [
   {
@@ -120,7 +127,7 @@ const STORIES = [
     title: "First-time Prefab Buyer",
     location: "Portland, OR",
     savings: "$14,200",
-    initials: "SC",
+    avatar: "/images/avatars/sarah-chen.jpg",
   },
   {
     quote:
@@ -129,7 +136,7 @@ const STORIES = [
     title: "Eco-conscious Homeowners",
     location: "Austin, TX",
     savings: "$21,600",
-    initials: "MR",
+    avatar: "/images/avatars/marcus-elena-rodriguez.jpg",
   },
   {
     quote:
@@ -138,7 +145,7 @@ const STORIES = [
     title: "VP Sales, Method Homes",
     location: "Seattle, WA",
     savings: "40% more closes",
-    initials: "JT",
+    avatar: "/images/avatars/james-thornton.jpg",
   },
 ];
 
@@ -278,11 +285,8 @@ export default function HomePage() {
           <p className="text-center text-sm text-muted-foreground">Trusted by buyers of leading manufacturers</p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
             {PARTNER_WORDMARKS.map((mark) => (
-              <span
-                key={mark}
-                className="font-display text-xl font-bold uppercase tracking-[0.18em] text-forest/60"
-              >
-                {mark}
+              <span key={mark.alt} className="flex items-center justify-center opacity-80 transition-opacity hover:opacity-100">
+                <Image src={mark.src} alt={mark.alt} width={168} height={32} className="h-8 w-auto object-contain" />
               </span>
             ))}
           </div>
@@ -292,38 +296,40 @@ export default function HomePage() {
       {/* Intro — Modular & Prefab Home Loans (lazy-revealed on the source) */}
       <section className="py-20 md:py-24">
         <Container>
-          <div className="mx-auto mb-14 max-w-3xl text-center">
+          <Reveal className="mx-auto mb-14 max-w-3xl text-center">
             <h2 className="font-display text-3xl font-bold md:text-5xl">Modular &amp; Prefab Home Loans</h2>
             <p className="mt-6 text-lg text-muted-foreground">
               ModFii is the leading marketplace connecting prefab, modular, and tiny home buyers with lenders who
               specialize in factory-built construction financing. We help you get approved faster, with better rates,
               and without the confusion that comes from working with traditional mortgage lenders.
             </p>
-          </div>
+          </Reveal>
           <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
-            {INTRO_CARDS.map((card) => (
-              <div key={card.title} className="rounded-2xl border border-border bg-card p-8">
-                <div className="flex items-center gap-4">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary">
-                    <card.icon className="h-5 w-5" aria-hidden />
-                  </span>
-                  <h3 className="font-display text-xl font-bold">{card.title}</h3>
-                </div>
-                <p className="mt-4 leading-relaxed text-muted-foreground">{card.body}</p>
-                {card.chips ? (
-                  <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    {card.chips.map((chip) => (
-                      <span
-                        key={chip}
-                        className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-sm font-medium text-foreground"
-                      >
-                        <CheckCircle2 className="h-4 w-4 text-primary" aria-hidden />
-                        {chip}
-                      </span>
-                    ))}
+            {INTRO_CARDS.map((card, index) => (
+              <Reveal key={card.title} variant="card" delay={index * 75}>
+                <div className="h-full rounded-2xl border border-border bg-card p-8">
+                  <div className="flex items-center gap-4">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary">
+                      <card.icon className="h-5 w-5" aria-hidden />
+                    </span>
+                    <h3 className="font-display text-xl font-bold">{card.title}</h3>
                   </div>
-                ) : null}
-              </div>
+                  <p className="mt-4 leading-relaxed text-muted-foreground">{card.body}</p>
+                  {card.chips ? (
+                    <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      {card.chips.map((chip) => (
+                        <span
+                          key={chip}
+                          className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-sm font-medium text-foreground"
+                        >
+                          <CheckCircle2 className="h-4 w-4 text-primary" aria-hidden />
+                          {chip}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Reveal>
             ))}
           </div>
           <div className="mt-12 text-center">
@@ -477,13 +483,14 @@ export default function HomePage() {
               <figure key={story.name} className="flex flex-col rounded-2xl border border-border bg-card p-8">
                 <Stars />
                 <blockquote className="mt-5 flex-1 text-muted-foreground">&ldquo;{story.quote}&rdquo;</blockquote>
-                <figcaption className="mt-6 flex items-center gap-3">
-                  <span
-                    aria-hidden
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary"
-                  >
-                    {story.initials}
-                  </span>
+                <figcaption className="mt-6 flex items-center gap-4">
+                  <Image
+                    src={story.avatar}
+                    alt=""
+                    width={48}
+                    height={48}
+                    className="h-12 w-12 shrink-0 rounded-full object-cover"
+                  />
                   <div>
                     <p className="font-semibold">{story.name}</p>
                     <p className="text-sm text-muted-foreground">

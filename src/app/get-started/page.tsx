@@ -1,7 +1,8 @@
 import { PrequalForm } from "@/components/prequal-form";
 import { Container } from "@/components/ui";
-import { Clock, Leaf, ShieldCheck, Star, Users } from "lucide-react";
+import { BadgeCheck, Clock, Leaf, ShieldCheck, Star, Users } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Get Pre-Qualified",
@@ -29,8 +30,18 @@ const BENEFITS = [
 
 export default function GetStartedPage() {
   return (
-    <main className="bg-forest pb-20 pt-28 text-primary-foreground">
-      <Container className="grid items-start gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+    <main className="relative isolate overflow-hidden bg-forest pb-20 pt-28 text-primary-foreground">
+      {/* Photo-backed hero (source parity: interior shot under a forest overlay) */}
+      <Image
+        src="/images/interior-living.jpg"
+        alt=""
+        fill
+        priority
+        className="object-cover opacity-25"
+        sizes="100vw"
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-forest/90 via-forest/70 to-forest/40" aria-hidden />
+      <Container className="relative grid items-start gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <div>
           <p className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
             <Leaf className="h-4 w-4 text-accent" aria-hidden />
@@ -70,8 +81,27 @@ export default function GetStartedPage() {
               &ldquo;After two banks rejected us, ModFii found a lender who approved our Plant Prefab home in days. The
               rate was better than we expected.&rdquo;
             </blockquote>
-            <figcaption className="mt-3 text-sm text-white/70">Jennifer M. · Austin, TX</figcaption>
+            <figcaption className="mt-4 flex items-center gap-3 border-t border-white/15 pt-4">
+              <span
+                aria-hidden
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-accent-foreground"
+              >
+                JM
+              </span>
+              <span>
+                <span className="block text-sm font-semibold text-white">Jennifer M.</span>
+                <span className="block text-xs text-white/70">Colorado · Verified Buyer</span>
+              </span>
+            </figcaption>
           </figure>
+          <ul className="mt-8 flex flex-wrap gap-x-7 gap-y-3 text-sm text-white/85">
+            {["600+ families helped", "50+ lender network", "All 50 states"].map((item) => (
+              <li key={item} className="flex items-center gap-2">
+                <BadgeCheck className="h-4 w-4 text-accent" aria-hidden />
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
         <PrequalForm />
       </Container>

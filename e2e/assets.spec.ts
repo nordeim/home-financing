@@ -21,6 +21,14 @@ test.describe("referenced image assets resolve", () => {
     "/images/adu-backyard.jpg",
     "/images/tiny-home.jpg",
     "/brand/og-image.jpg",
+    "/brand/wordmarks/dvele-qHduDYI9.png",
+    "/brand/wordmarks/plant-prefab-BZiOWTM8.png",
+    "/brand/wordmarks/excel-homes-7uiBs08K.png",
+    "/brand/wordmarks/skyline.png",
+    "/brand/wordmarks/dutch-housing-DfGaFGP9.png",
+    "/images/avatars/sarah-chen.jpg",
+    "/images/avatars/marcus-elena-rodriguez.jpg",
+    "/images/avatars/james-thornton.jpg",
   ];
 
   for (const src of referencedImages) {
