@@ -1,10 +1,10 @@
-# home-financing (ModFii) — Engineering Skill v1.2.0
+# home-financing (ModFii) — Engineering Skill v1.3.0
 
 **Classification:** Internal Engineering Reference — Reusable Skill Document
 **Status:** DEFINITIVE, PRODUCTION-LOCKED
-**Companion Documents:** `Project_Architecture_Document.md` v1.0 (blueprint) · `CLAUDE.md` (agent spec, ~600 lines) · `AGENTS.md` (cheat-sheet) · `README.md` (operator guide)
-**Last Updated:** 2026-09-12 (v1.2 — remediation pass 3: live-source parity + PMI flake root-cause + counts 37 unit / 55 E2E per project)
-**Project State:** 37 Vitest (11+13+7+6, incl. H4/OOM regression) + 55 Playwright per project (55/55 with DB, 54/55 DB-less — 42 declarations + 14 asset variants) · 43/43 Next build · PG 17 `8/40/50/23/59/5` seeded · `lint 0/0` · `typecheck` pass
+**Companion Documents:** `Project_Architecture_Document.md` v1.0 (blueprint) · `CLAUDE.md` (agent spec, ~600 lines) · `AGENTS.md` (cheat-sheet) · `README.md` (operator guide) · `docs/REMEDIATION_PLAN_pass4.md` (pass-4 evidence)
+**Last Updated:** 2026-09-13 (v1.3 — remediation pass 4: source-exact hero + guide-hero system + counts 37 unit / 61 E2E per project)
+**Project State:** 37 Vitest (11+13+7+6, incl. H4/OOM regression) + 61 Playwright per project (61/61 with DB, 60/61 DB-less — 47 declarations + data-driven loops) · 43/43 Next build · PG 17 `8/40/50/23/59/5` seeded · `lint 0/0` · `typecheck` pass
 **Audience:** AI Coding Agents, Senior Engineers, Tech Leads, DevOps, Onboarding Engineers
 **Rule:** Every rule in this document traces to a specific file, test, or live probe. Nothing is here "because it's popular."
 
@@ -96,7 +96,7 @@ Pinned from `package.json` (`package-lock.json` is the lockfile, not pnpm) + `do
 | Scripting | `tsx` | `^4.23.13` | Runs `src/scripts/migrate|seed|reset` as ESM. |
 | Lint | ESLint + `eslint-config-next` | `^9.39.5` + `^16.3.4` | Flat config `eslint.config.mjs` + `defineConfig` + `globalIgnores(.next,out,build,next-env,skills,infrastructure)`. |
 | Unit | Vitest | `^3.2.7` (`vitest/config`, `node` env, `include: src/**/*.test.ts`) | Co-located `src/lib/*.test.ts` pure only (calculator 11 + matching 13 + rate-limit 7 + markdown 6 = 37). `37/37` green. |
-| E2E | Playwright + `@axe-core/playwright` | `^1.63.0` + `^4.13.0` | Prod `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `chromium+webkit`, `x-forwarded-for` isolation. `55 per project` — 42 declarations + 14 asset variants (110 with webkit, `55/55` with DB, `54/55` DB-less). `assets 19 runtime` + `parity 19` + `smoke 7` + `seo 6` + `funnel 4`. |
+| E2E | Playwright + `@axe-core/playwright` | `^1.63.0` + `^4.13.0` | Prod `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `chromium+webkit`, `x-forwarded-for` isolation. `61 per project` — 47 declarations + data-driven loops (122 with webkit, `61/61` with DB, `60/61` DB-less). `assets 19 runtime` + `parity 26 runtime` + `smoke 7` + `seo 5` + `funnel 4`. |
 | Package Manager | npm | `package-lock.json` | Single app, no monorepo/turborepo. Gate: `db:setup → lint → typecheck → test → build → e2e`. |
 
 ---
@@ -346,7 +346,7 @@ src/scripts/ (3 lifecycle, all local-guarded)
 └── reset.ts (DROP SCHEMA public,drizzle CASCADE + extensions)
 
 drizzle/ (0000_amusing_thena.sql ~200 lines, 0001_sharp_stick.sql 1 line, meta/_journal.json idx 0,1)
-e2e/ (55 per project — 42 declarations + 14 asset variants, `parity.spec.ts` pins H4/OOM + parity + pass-3 live-source pins)
+e2e/ (61 per project — 47 declarations + data-driven loops, `parity.spec.ts` pins H4/OOM + parity + pass-3 live-source pins + pass-4 source-exact hero/guide-hero pins)
 ├── smoke.spec.ts (7)
 ├── seo.spec.ts (6)
 ├── funnel.spec.ts (4)
@@ -731,7 +731,7 @@ npm run build
 # → Routes: ○ 36 static + ƒ 7 dynamic
 
 # 6 — E2E (prod next start on 3002, reuseExistingServer, chromium; valid-payload needs DB)
-npm run e2e             # chromium 55/55 per project (42 declarations + 14 asset variants; 54/55 DB-less)
+npm run e2e             # chromium 61/61 per project (47 declarations + data-driven loops; 60/61 DB-less)
 npm run e2e:all         # chromium + webkit
 
 # 7 — Readiness + content surfaces
@@ -1546,7 +1546,7 @@ What live-site catches that CI cannot: `modfii.com` parity aliases (308), host-r
 | Images | `public/images/*` | `5` + `brand/og-image.jpg` | `assets.spec.ts` `6×200` + broken-img |
 | Sitemap | `src/app/sitemap.ts` | `STATIC_PATHS 40` → `152` locs (23+50+40) | `seo.spec.ts` `30×200` |
 | Env | `.env.example` | 12 + `FEATURE_*` | `src/db/index.ts` throw on missing |
-| Pre-ship gate | `AGENTS.md` | `db:setup → lint (0/0) → typecheck → test 37/37 → build 43/43 → e2e 55/55` | `drizzle` journal `idx 0,1` |
+| Pre-ship gate | `AGENTS.md` | `db:setup → lint (0/0) → typecheck → test 37/37 → build 43/43 → e2e 61/61` | `drizzle` journal `idx 0,1` |
 
 **Copy-paste env generation:**
 
@@ -1591,4 +1591,4 @@ DELIVER  → Complete handoff: usage, runbooks, challenges/solutions, next steps
 - [ ] TOC matches all `^## ` / `^### ` headings; appendices A–E referenced from body
 - [ ] `wc -l home-financing_SKILL.md` → `1,800–2,800` for this mid-size project (PAD `1,140` + SKILL `~1,000–1,400` = combined `~2,100–2,500`)
 
-*Last verified 2026-09-12 (SKILL v1.2 — remediation pass 3: live-source parity — circle brand mark + two-tone wordmark, always-light header, homepage intro eyebrow + closing trust line, green band + duplicate steps CTA removed, get-started 3-step band, calculator amber band, footer legal line + 2-item dropdown; calculator-PMI E2E flake root-caused to pre-hydration value-tracker poisoning, pinned with fresh-navigation retry ×10 stable; `37/37` vitest = 11+13+7+6 incl. H4/OOM + `55/55` per project playwright = smoke 7+seo 6+funnel 4+assets 19+parity 19 (54/55 DB-less) + build `43/43` + `lint 0/0` + `typecheck` + DB init `8/40/50/23/59/5` + live `health/funnel/sitemap/images/aliases`) against `package.json` (next ^16.3.4), `tsconfig.json` (strict, skills excluded), `next.config.ts` (11 redirects), `drizzle.config.*` (`5434`), `docker-compose.yml` (`home_financing_*` + `pgcrypto/pg_trgm`), `src/db/schema.ts` (8 tables), `src/lib/*` (37 tests), `public/brand/wordmarks 5` + `public/images/avatars 3`, `playwright.config.ts` (`3002`), `e2e/*` 55 per project, `.env.example`. Evidence: `docs/REMEDIATION_PLAN_pass3.md`.*
+*Last verified 2026-09-13 (SKILL v1.3 — remediation pass 4: source-exact home hero (daylight photo + dual-overlay recipe + content-driven height + text-4xl→6xl headline + no hero-grid), intro eyebrow REMOVED (live source renders none — pass-3 pin flipped to absence), hub hero Last-Updated line + "Here's the truth" glass callout + dual CTA + 4th chip + crumbsOutside breadcrumbs, FHA/VA/USDA/construction loan pages source copy + amber-first CTA + contextual eyebrow icons + author/reviewer strips, learn "read read" fix, calculator Free-Calculator pill + middle crumb + `--color-chart-tax` blue tax segment, header blur 12→16px, hero photo + skyline wordmark swapped to source assets; earlier pass 3: circle brand mark + two-tone wordmark, always-light header, closing trust line, green band removed, get-started 3-step band, calculator amber band, footer legal line + 2-item dropdown; calculator-PMI E2E flake root-caused to pre-hydration value-tracker poisoning, pinned with fresh-navigation retry ×10 stable; `37/37` vitest = 11+13+7+6 incl. H4/OOM + `61/61` per project playwright = smoke 7+seo 5+funnel 4+assets 19+parity 26 (60/61 DB-less) + build `43/43` + `lint 0/0` + `typecheck` + DB init `8/40/50/23/59/5` + live `health/funnel/sitemap/images/aliases`) against `package.json` (next ^16.3.4), `tsconfig.json` (strict, skills excluded), `next.config.ts` (11 redirects), `drizzle.config.*` (`5434`), `docker-compose.yml` (`home_financing_*` + `pgcrypto/pg_trgm`), `src/db/schema.ts` (8 tables), `src/lib/*` (37 tests), `public/brand/wordmarks 5` + `public/images/avatars 3`, `playwright.config.ts` (`3002`), `e2e/*` 55 per project, `.env.example`. Evidence: `docs/REMEDIATION_PLAN_pass3.md`.*

@@ -3,7 +3,7 @@
 **Classification:** Internal Engineering Reference
 **Status:** DEFINITIVE, PRODUCTION-LOCKED BLUEPRINT
 **Companion Documents:** `CLAUDE.md` (agent spec) · `AGENTS.md` (compact cheat-sheet) · `README.md` (operator guide)
-**Last Updated:** 2026-09-12 (v1.2 — remediation pass 3: live-source parity + PMI-flake root cause + counts 37 unit / 55 E2E per project)
+**Last Updated:** 2026-09-13 (v1.3 — remediation pass 4: source-exact hero + guide-hero system + counts 37 unit / 61 E2E per project; `turbo.json` doc drift resolved)
 **Audience:** Senior Engineers, Tech Leads, DevOps, Onboarding Engineers, and AI Coding Agents
 **Rule:** Every architectural decision in this document traces to a specific rationale. Nothing is here "because it's popular."
 
@@ -75,7 +75,7 @@ Every version is pinned from `package.json` / `docker-compose.yml` / `drizzle.co
 | Build Scripting | `tsx` | `^4.23.13` | Runs `src/scripts/migrate.ts/seed.ts/reset.ts` as ESM without compile step. |
 | Linting | ESLint + `eslint-config-next` | `^9.39.5` + `^16.3.4` (`core-web-vitals`) | Flat config (`eslint.config.mjs` + `defineConfig`), `globalIgnores([.next,out,build,next-env,skills,infrastructure])` — operator-managed folders excluded. |
 | Unit Testing | Vitest | `^3.2.7` (`vitest/config`, `environment: node`) | Co-located `src/lib/*.test.ts` on pure domains only (calculator 11 + matching 13 + rate-limit 7 + markdown 6 = 37); DB paths stay under Playwright. `include: src/**/*.test.ts`. |
-| E2E Testing | Playwright + `@axe-core/playwright` | `^1.63.0` + `^4.13.0` | Prod `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `timeout: 30000/5000`, projects `chromium + webkit`, `x-forwarded-for` isolation for rate-limit tests. 55 per project — 42 declarations + 14 asset-title variants (110 with webkit, 55/55 with DB, 54/55 DB-less). |
+| E2E Testing | Playwright + `@axe-core/playwright` | `^1.63.0` + `^4.13.0` | Prod `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `timeout: 30000/5000`, projects `chromium + webkit`, `x-forwarded-for` isolation for rate-limit tests. 61 per project — 47 declarations + data-driven loops (122 with webkit, 61/61 with DB, 60/61 DB-less). |
 | Package Manager | npm | `package-lock.json` (not pnpm) | Single-app, no monorepo/turborepo. `npm install` path; `db:setup → lint → typecheck → test → build → e2e` is the pre-PR gate. |
 
 ### 1.3 Architecture Decision Records (ADRs)
@@ -123,15 +123,15 @@ Every version is pinned from `package.json` / `docker-compose.yml` / `drizzle.co
 #### ADR-006: Vitest Unit (37) + Playwright Prod-Build E2E (55) — Pure vs. DB Boundary
 
 - **Context:** Logic (PMI, amortization, scoring, validation, limiter) is deterministic and pure; persistence and sitemap + alias routing are DB/deployment-shaped and need prod-build parity (dev HMR diverged from prod in prior `scandihaven` audit).
-- **Decision:** Vitest `3.2.7` (node env, `@` alias, `include: src/**/*.test.ts`) for `src/lib/{calculator,matching,rate-limit,markdown}.test.ts` — **37 tests** (calculator 11 + matching 13 + rate-limit 7 + markdown 6) on pure domains only — markdown pins the 2026-09-11 H4/OOM regression (both killing articles). Playwright `1.63.0` + `@axe-core/playwright 4.13.0` for `e2e/{smoke,seo,funnel,assets,parity}.spec.ts` — **55 per project** (42 declarations + 14 asset-title variants, 110 with webkit) running `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `expect:5000`. `assets.spec.ts` pins the two `2026-09-11` incidents: 14 image assets `200` (6 heroes/OG + 5 wordmarks + 3 avatars) + 3 broken-img checks + 2 `/compare/*` parity aliases resolve. `parity.spec.ts` pins H4 OOM + wordmarks/avatars/learn-hub/calculator/footer/wizard + the pass-3 live-source pins. Funnel valid-payload E2E needs Postgres (migrated+seeded); the other 54 run DB-less.
-- **Rationale:** `lint (0/0)` + `typecheck` + `test (37/37)` is the fast local gate; `build (43/43)` validates redirects + RSC boundaries + `skills` exclusion; `e2e 55/55` on the shipped artifact catches what `dev` HMR hides (assets 19 runtime + parity 19 incl. the pass-3 live-source pins).
+- **Decision:** Vitest `3.2.7` (node env, `@` alias, `include: src/**/*.test.ts`) for `src/lib/{calculator,matching,rate-limit,markdown}.test.ts` — **37 tests** (calculator 11 + matching 13 + rate-limit 7 + markdown 6) on pure domains only — markdown pins the 2026-09-11 H4/OOM regression (both killing articles). Playwright `1.63.0` + `@axe-core/playwright 4.13.0` for `e2e/{smoke,seo,funnel,assets,parity}.spec.ts` — **61 per project** (47 declarations + data-driven loops: +14 asset URLs, +2 H4 articles; 122 with webkit) running `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `expect:5000`. `assets.spec.ts` pins the two `2026-09-11` incidents: 14 image assets `200` (6 heroes/OG + 5 wordmarks + 3 avatars) + 3 broken-img checks + 2 `/compare/*` parity aliases resolve. `parity.spec.ts` pins H4 OOM + wordmarks/avatars/learn-hub/calculator/footer/wizard + the pass-3 live-source pins + the pass-4 source-exact pins (hero overlay recipe/bottom fade/no hero-grid, hub Last-Updated + truth callout + dual CTA + 4 chips, FHA/VA highlight + dual CTA + author strip, learn no-"read read", calculator pill + middle crumb). Funnel valid-payload E2E needs Postgres (migrated+seeded); the other 60 run DB-less.
+- **Rationale:** `lint (0/0)` + `typecheck` + `test (37/37)` is the fast local gate; `build (43/43)` validates redirects + RSC boundaries + `skills` exclusion; `e2e 61/61` on the shipped artifact catches what `dev` HMR hides (assets 19 runtime + parity 26 runtime incl. the pass-3 + pass-4 live-source pins).
 - **Consequences:** Positive — `build` + `e2e` catch alias 404s and broken `<img>` before deploy. Negative — `reuseExistingServer:true` requires `x-forwarded-for` isolation for rate-limit tests; E2E needs `E2E_PORT=3002` because `3000` is occupied by the sibling `scandihaven` repo in this dev host.
 - **Alternatives Rejected:** Unit-only (would miss alias/image regressions), E2E on `dev` (HMR drift), `pg-mem`/testcontainers for API integration (not yet — documented as next).
 
 #### ADR-007: Production Build + Image Pipeline — `images.unoptimized:true`
 
 - **Context:** No `sharp` optimizer in the deploy target; optimizing would deadlock in constrained sandboxes (`DISABLE_IMAGE_OPTIMIZER=1` guard).
-- **Decision:** `next.config.ts:images.unoptimized:true` intentional — `next/image` still provides `priority`, sizing, and a11y, but serves images unoptimized. Retaining `sharp` would require infra change. `DISABLE_IMAGE_OPTIMIZER=1` stays listed in `turbo.json:globalEnv` if used (currently no `turbo.json` — not a regression).
+- **Decision:** `next.config.ts:images.unoptimized:true` intentional — `next/image` still provides `priority`, sizing, and a11y, but serves images unoptimized. Retaining `sharp` would require infra change. `DISABLE_IMAGE_OPTIMIZER=1` has no `turbo.json` to live in (this repo is not a Turborepo — resolved in pass 4; wire into CI env if Turborepo is ever added).
 - **Rationale:** Build `✓ Generating static pages using 3 workers (43/43)` proves the pipeline works without native `sharp`.
 - **Consequences:** Re-enabling requires `turbo.json` awareness + deploy `sharp` installation.
 - **Alternatives Rejected:** Optimizer-on by default (would deadlock in this sandbox/deploy combo).
@@ -824,7 +824,7 @@ No queue, worker, or async pipeline is running in this iteration. `CRON_SECRET` 
 | E2E — parity | Playwright | 1 | 19 | `e2e/parity.spec.ts` | **Required** for H4 OOM / wordmarks+avatars/learn-hub/calculator/footer/wizard (other 54 DB-less) | (same) |
 | **Total** | Vitest + Playwright | 8 | **92 (37+55)** | `src/lib/*.test.ts` + `e2e/*.spec.ts` | See notes | `npm run db:setup → lint → typecheck → test → build → e2e` |
 
-With Postgres: **55/55** E2E (chromium, 42 declarations + 14 asset-title variants). Without DB: **54/55** (funnel valid-payload is the only DB-dependent test — expects `200` with `application_matches` persistence; other 54 verify static/SEO/assets/parity). `e2e:all` runs `chromium + webkit` (110 total).
+With Postgres: **61/61** E2E (chromium, 47 declarations + data-driven loops). Without DB: **60/61** (funnel valid-payload is the only DB-dependent test — expects `200` with `application_matches` persistence; other 60 verify static/SEO/assets/parity). `e2e:all` runs `chromium + webkit` (122 total).
 
 ### 8.2 Test Patterns
 
@@ -857,7 +857,7 @@ npm run lint          # ESLint flat (0 errors / 0 warnings) — skills/infrastru
 npm run typecheck     # tsc --noEmit (skills excluded)
 npm run test          # vitest 37/37 (11+13+7+6, incl. markdown H4/OOM regression)
 npm run build         # next build — validates redirects + RSC boundaries + skills excluded
-npm run e2e           # playwright chromium 55/55 per project (42 declarations + 14 asset variants; valid-payload needs DB)
+npm run e2e           # playwright chromium 61/61 per project (47 declarations + data-driven loops; valid-payload needs DB)
 curl -s http://localhost:3002/api/health | jq  # { ok:true, status:ok, db:true }
 curl -s http://localhost:3002/sitemap.xml | grep -c "<loc>"  # 152
 ```
@@ -917,7 +917,7 @@ Canonical from `.env.example` + `docker-compose.yml` + `src/db/index.ts` + `src/
 | `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | No | OAuth | — |
 | `AUTH_APPLE_ID` / `AUTH_APPLE_SECRET` | No | OAuth | — |
 | `FEATURE_*` | No | Flags `on/off` (also `true/false`, `1/0`); unknown `FEATURE_*` fails fast | `FEATURE_TRADE=off` |
-| `DISABLE_IMAGE_OPTIMIZER` | No | `1` in sandboxes where `sharp` deadlocks; if used must stay in `turbo.json:globalEnv` | `1` |
+| `DISABLE_IMAGE_OPTIMIZER` | No | `1` in sandboxes where `sharp` deadlocks; no `turbo.json` in this repo — wire into CI env if Turborepo is added | `1` |
 
 > `.env` never committed (see §6.1 S-09). `d572d73` history still contains real `BETTER_AUTH_SECRET`/`CRON_SECRET` — rotate on deploy.
 
@@ -945,7 +945,7 @@ Canonical from `.env.example` + `docker-compose.yml` + `src/db/index.ts` + `src/
 | DB provision | `docker compose up -d` + `npm run db:setup` (CI) | `migrate` + `seed` idempotent; `docker compose logs -f postgres` shows `pgcrypto: t` |
 | Quality | `npm run lint` (flat + `core-web-vitals`) + `npm run typecheck` + `npm run test` | `lint 0/0`, `typecheck` pass (`skills` excluded), `test 37/37 (11+13+7+6)` |
 | Build | `npm run build` | `43/43` pages, redirects validated, RSC boundaries proven |
-| E2E | `npm run e2e` (prod `next start` on `3002`) + `npm run e2e:all` (chromium+webkit) | `55/55` (with DB, per project) / `54/55` (without DB, funnel valid-payload blocked) |
+| E2E | `npm run e2e` (prod `next start` on `3002`) + `npm run e2e:all` (chromium+webkit) | `61/61` (with DB, per project) / `60/61` (without DB, funnel valid-payload blocked) |
 | Readiness | `curl http://localhost:3002/api/health` | `{ ok:true, status:ok, db:true }` |
 | Deploy | Vercel / Node SSR (no `standalone` yet — add `output:"standalone"` in `next.config.ts` if containerizing) | `NEXT_PUBLIC_SITE_URL` + `BETTER_AUTH_URL` must be `https://modfii.jesspete.shop` or sitemap/OG/auth break |
 
@@ -1064,13 +1064,13 @@ DATABASE_URL=postgresql://user:pass@localhost:5432/home_financing_dev npm run de
 | **HIGH** | `.env` with real `BETTER_AUTH_SECRET`/`CRON_SECRET` committed in `d572d73` remains in git history | Secrets retrievable via `git show d572d73:.env`; `BETTER_AUTH_SECRET=8KxGM…` / `CRON_SECRET=ec16d8…` must be considered compromised | **Mitigated in workspace** — current `.env` has fresh `ec16d809a08c91d24dbfdab7e7be4a99` for `CRON_SECRET` and prod `https://modfii.jesspete.shop`; **Open** — run `filter-repo`/BFG and rotate on deploy if history-exposed values were ever valid prod secrets |
 | **MEDIUM** | In-memory `Map` rate limiter resets on restart, under-limits on multi-instance | Burst burst-locked assumption breaks past single deploy | **Accepted** — documented; migrate to Redis/Upstash before scaling |
 | **MEDIUM** | `README.md` troubleshooting row says "`.env.example` still contains legacy `scandihaven_*` placeholders" — now actually `home_financing_*` | Doc stale sentence could mislead onboarding | **Open** — update that row to canonical `home_financing_*` |
-| **MEDIUM** | `CLAUDE.md` references `turbo.json:globalEnv` for `DISABLE_IMAGE_OPTIMIZER` but no `turbo.json` exists | Minor contract drift | **Open** — add `turbo.json` when Turborepo is introduced, or drop the `globalEnv` claim |
+| **MEDIUM** | `CLAUDE.md` references `turbo.json:globalEnv` for `DISABLE_IMAGE_OPTIMIZER` but no `turbo.json` exists | Minor contract drift | **Resolved 2026-09-13 (pass 4)** — claims reworded across CLAUDE.md/README.md/PAD/.env.example/SKILL to state no `turbo.json` exists; revisit only if Turborepo is introduced |
 | **LOW** | `skills/` is operator-managed, `tsconfig` + `eslint` already exclude it, but `**/.pytest_cache/__pycache__/.mypy_cache` under `skills/` re-added in PR can inflate repo | History shows `8aacd13` committed 17 cache files | **Mitigated** — `*.pyc`, `**/.venv`, `__pycache__`, `.mypy_cache` now ignored; PR review must reject cache files |
 | **LOW** | Many route segments that call `ensureSeeded()`/`db` lack `loading.tsx`/`error.tsx` | Missing boundary degrades graceful degradation | **Open** — add incrementally per `CLAUDE.md` file → serve the material or edit a separate technical section |
 | **LOW** | `CRON_SECRET` and `STRIPE_*` / `RESEND_API_KEY` not yet consumed in code (log transport only) | Env is over-specified relative to implemented features | **Open** — wire when jobs/checkout/email ships; until then they are reserved keys |
 | **LOW** | `pm run dev` on `:3000` collides with sibling `scandihaven` on same dev host | Requires `E2E_PORT=3002` / `next dev --port 3002` | **Accepted** — `playwright.config.ts` defaults to `3002`; document in `AGENTS.md` |
 
-No `CRITICAL` open issues. `lint 0/0`, `typecheck` pass, `37/37` unit (11+13+7+6), `55/55` E2E per project (54/55 DB-less), `build 43/43`, live probes green as of `2026-09-12`.
+No `CRITICAL` open issues. `lint 0/0`, `typecheck` pass, `37/37` unit (11+13+7+6), `61/61` E2E per project (60/61 DB-less), `build 43/43`, live probes green as of `2026-09-13` (pass 4: source-exact home hero, hub truth callout + Last-Updated, loan-page source heroes + author strips, learn read-duplication fix, calculator pill + blue tax segment, intro-eyebrow removal — see `docs/REMEDIATION_PLAN_pass4.md`).
 
 ---
 
@@ -1142,4 +1142,4 @@ No `CRITICAL` open issues. `lint 0/0`, `typecheck` pass, `37/37` unit (11+13+7+6
 
 ---
 
-*Last verified 2026-09-12 (PAD v1.2 — remediation pass 3: live-source parity against rendered modfii.com — circle brand mark + two-tone wordmark, always-light header (transparent-over-dark removed after computed-style probes at 1440px + 390px), homepage "Your Prefab Financing Partner" eyebrow + closing trust line, green band + duplicate steps CTA removed, get-started "Get Financing in 3 Easy Steps" band, calculator `bg-accent/15` sections, footer copyright/legal-line + 2-item More dropdown; calculator-PMI E2E flake root-caused to pre-hydration value-tracker poisoning and pinned with a fresh-navigation retry, ×10 stable; counts `37/37` vitest = 11+13+7+6 + `55/55` per project playwright = smoke 7+seo 6+funnel 4+assets 19+parity 19 (54/55 DB-less) + `next build` 43/43 + `lint 0/0` + live probes (`/api/health` ok:true, funnel 4 matches, sitemap 152, robots host correct) against `package.json` (next ^16.3.4, react ^19.3.0, tailwind ^4.3.3, vitest ^3.2, playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills+infrastructure ignored), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (37 tests), `public/brand/wordmarks 5` + `public/images/avatars 3` + `public/images 5` + `brand/og-image.jpg`, `playwright.config.ts` (3002), `e2e/*` 55 per project, `vitest` 37/37. Source of truth: `package.json`, `tsconfig.json`, `next.config.ts`, `eslint.config.mjs`, `drizzle.config.ts/.json`, `docker-compose.yml:5434`, `src/db`, `src/lib`, `src/scripts`, `e2e`, `vitest.config.ts`, `.env.example`, live modfii.com + modfii.jesspete.shop probes. Evidence: `docs/REMEDIATION_PLAN_pass3.md`.*
+*Last verified 2026-09-13 (PAD v1.3 — remediation pass 4: source-exact home hero (daylight photo + `from-primary/95 via-primary/90 to-primary/80` + bottom fade + content-driven height + text-4xl→6xl headline, no hero-grid), intro eyebrow REMOVED (live source renders none — pass-3 pin flipped), hub hero Last-Updated line + "Here's the truth" glass callout + dual CTA + 4th chip + crumbsOutside breadcrumbs, FHA/VA/USDA/construction loan pages source copy + amber-first CTA + contextual eyebrow icons + author/reviewer strips + FHA chip removal, learn "read read" fix, calculator Free-Calculator pill + middle crumb + `--color-chart-tax` blue tax segment, header blur 12→16px, hero photo + skyline wordmark swapped to source assets; pass 3 (2026-09-12): circle brand mark + two-tone wordmark, always-light header, closing trust line, green band removed, get-started 3-step band, calculator amber band, footer legal line + 2-item More dropdown, PMI-flake root cause; counts `37/37` vitest = 11+13+7+6 + `61/61` per project playwright = smoke 7+seo 5+funnel 4+assets 19+parity 26 (60/61 DB-less) + `next build` 43/43 + `lint 0/0` + live probes (`/api/health` ok:true, funnel 4 matches, sitemap 152, robots host correct) against `package.json` (next ^16.3.4, react ^19.3.0, tailwind ^4.3.3, vitest ^3.2, playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills+infrastructure ignored), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (37 tests), `public/brand/wordmarks 5` + `public/images/avatars 3` + `public/images 5` + `brand/og-image.jpg`, `playwright.config.ts` (3002), `e2e/*` 55 per project, `vitest` 37/37. Source of truth: `package.json`, `tsconfig.json`, `next.config.ts`, `eslint.config.mjs`, `drizzle.config.ts/.json`, `docker-compose.yml:5434`, `src/db`, `src/lib`, `src/scripts`, `e2e`, `vitest.config.ts`, `.env.example`, live modfii.com + modfii.jesspete.shop probes. Evidence: `docs/REMEDIATION_PLAN_pass4.md` (pass 3: `docs/REMEDIATION_PLAN_pass3.md`).*
