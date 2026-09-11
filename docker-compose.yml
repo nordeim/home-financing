@@ -1,5 +1,5 @@
 # ══════════════════════════════════════════════════════════════════
-# Scandi Haven — Local Development Services
+# Home Financing — Local Development Services
 # ══════════════════════════════════════════════════════════════════
 # Usage:
 #   Start:   docker compose up -d
@@ -12,33 +12,33 @@ services:
   # ─── PostgreSQL 17 ───────────────────────────────────────────────
   postgres:
     image: postgres:17-alpine
-    container_name: scandihaven_postgres
+    container_name: home_financing_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: scandihaven_dev
-      POSTGRES_USER: scandihaven_user
-      POSTGRES_PASSWORD: scandihaven_secret
+      POSTGRES_DB: home_financing_dev
+      POSTGRES_USER: home_financing_user
+      POSTGRES_PASSWORD: home_financing_secret
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - home_financing_data:/var/lib/postgresql/data
       - ./infrastructure/postgres/init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U scandihaven_user -d scandihaven_dev"]
+      test: ["CMD-SHELL", "pg_isready -U home_financing_user -d home_financing_dev"]
       interval: 5s
       timeout: 5s
       retries: 10
       start_period: 10s
     networks:
-      - scandihaven_net
+      - home_financing_net
 
 # ─── Named Volumes ─────────────────────────────────────────────────
 volumes:
-  postgres_data:
+  home_financing_data:
     driver: local
 
 # ─── Networks ──────────────────────────────────────────────────────
 networks:
-  scandihaven_net:
+  home_financing_net:
     driver: bridge

@@ -5,7 +5,7 @@ IMPORTANT: File is read fresh for every conversation. Be brief and practical.
 # ModFii — Home Financing (Prefab Mortgage Marketplace)
 
 > **Brand:** ModFii — "The #1 Prefab Home Mortgage Platform" — prefab/modular/ADU/tiny-home financing marketplace matching borrowers to prefab-specialist lenders.
-> **Stack:** Next.js 16.2.6 (App Router) + React 19.2 + TypeScript 5.9 strict + Tailwind CSS v4.1 CSS-first `@theme` + Drizzle ORM 0.45 + PostgreSQL 17 + `pg` + `next/font` (DM Sans + Outfit) + lucide-react. Package manager: npm (package-lock.json). No test framework installed.
+> **Stack:** Next.js 16.2.6 (App Router) + React 19.2 + TypeScript 5.9 strict + Tailwind CSS v4.1 CSS-first `@theme` + Drizzle ORM 0.45.2 + PostgreSQL 17 + `pg` + `next/font` (DM Sans + Outfit) + lucide-react + Drizzle Kit 0.31 / `tsx` 4.23 + Playwright 1.63 + `@axe-core/playwright` 4.13 (E2E, 16 tests). Package manager: npm (package-lock.json).
 > **Repo:** `home-financing` (package.json name `nextjs-postgresql-template` — legacy; brand is **ModFii**). Single app, no monorepo/turborepo.
 
 ---
@@ -112,7 +112,7 @@ IMPORTANT: File is read fresh for every conversation. Be brief and practical.
 - **Tables:** `lenders`, `applications`, `application_matches`, `manufacturers`, `states`, `articles`, `glossaryTerms`, `loanProducts`. Mirrors `src/data/*.json` + `src/lib/lenders.ts` seeds.
 - **Client:** `src/db/index.ts` — `Pool` from `pg`, `drizzle(pool)`, `globalForDb.__arenaNextJsPostgresqlPool` singleton. Do not instantiate `Pool` elsewhere.
 - **Seeding:** `src/lib/ensure-seeded.ts` — global promise `__modfiiSeedPromise`, checks `count(lenders) > 0` then `insert(...).onConflictDoNothing`. Called in `app/api/health` and `app/api/applications`; reuse, don't duplicate seeding.
-- **Migrations/Introspection:** Drizzle Kit via `drizzle-kit` (devDep). Config in `drizzle.config.json` — dialect `postgresql`, schema `./src/db/schema.ts`, default URL `postgresql://postgres:postgres@127.0.0.1:5432/app_db` (overridden by env). `pgcrypto` + `pg_trgm` enabled in `infrastructure/postgres/init/*.sql`.
+- **Migrations/Introspection:** Drizzle Kit 0.31 via `drizzle-kit` + `tsx` 4.23 (devDeps). Config in `drizzle.config.ts` (primary, `satisfies Config`) and `drizzle.config.json` (JSON fallback) — `dialect postgresql`, `schema ./src/db/schema.ts`, `out ./drizzle`, `strict/verbose`; `dbCredentials.url` defaults to `postgresql://home_financing_user:home_financing_secret@localhost:5434/home_financing_dev` (runtime `DATABASE_URL` wins). Migrations in `drizzle/` (`0000_amusing_thena.sql` 8 tables + `0001_sharp_stick.sql` alters `manufacturers.founded 8→32`). `pgcrypto` + `pg_trgm` in `infrastructure/postgres/init/*.sql`.
 - **Query style:** `select().from().where(eq(...)).limit(1)`; `insert().values().returning()`. Never raw SQL unless `sql` tag is unavoidable — prefer Drizzle builders.
 
 ### Component Library Discipline
@@ -162,36 +162,53 @@ npm run dev    # http://localhost:3000
 | Command | Purpose | Verified |
 |---------|---------|----------|
 | `npm run dev` | Start Next.js dev server (http://localhost:3000) | `package.json:scripts.dev` |
-| `npm run build` | Production build | `package.json:scripts.build` |
+| `npm run build` | Production build (validates `next.config.ts:redirects`, requires `skills` excluded in `tsconfig`) | `package.json:scripts.build` |
 | `npm start` | Start production server (after build) | `package.json:scripts.start` |
 | `npm run lint` | ESLint (flat config, `eslint.config.mjs` + `eslint-config-next/core-web-vitals`) | `package.json:scripts.lint` |
-| `npm run typecheck` | `tsc --noEmit` type checking | `package.json:scripts.typecheck` |
-| `npx drizzle-kit generate` | Generate Drizzle migration from `src/db/schema.ts` | `drizzle-kit` devDep + `drizzle.config.json` |
-| `npx drizzle-kit push` | Push schema directly (dev only) | `drizzle-kit` |
-| `npx drizzle-kit studio` | Drizzle Studio / DB GUI (if installed) | `drizzle-kit` |
+| `npm run lint:fix` | ESLint auto-fix | `package.json:scripts.lint:fix` |
+| `npm run typecheck` | `tsc --noEmit` type checking (`skills` excluded) | `package.json:scripts.typecheck` |
+| `npm run db:generate` | Generate Drizzle migration (`drizzle-kit generate`, uses `drizzle.config.ts`) | `package.json:scripts.db:generate` |
+| `npm run db:migrate` | Apply migrations (`tsx src/scripts/migrate.ts`, local-host guarded, `drizzle/` → PG) | `package.json:scripts.db:migrate` |
+| `npm run db:seed` | Idempotent seed (`tsx src/scripts/seed.ts` → `ensureSeeded()`, 8 lenders/40 manuf/50 states/23 articles/59 glossary/5 products) | `package.json:scripts.db:seed` |
+| `npm run db:setup` | `db:migrate && db:seed` — one-shot init for app launch | `package.json:scripts.db:setup` |
+| `npm run db:reset` | Destructive local reset (`tsx src/scripts/reset.ts` — drops `public` + `drizzle` schemas, restores `pgcrypto/pg_trgm`) | `package.json:scripts.db:reset` |
+| `npm run e2e` | Playwright E2E (chromium, `playwright.config.ts`, prod `next start` on 3002) | `package.json:scripts.e2e` |
+| `npm run e2e:all` | Playwright both projects (chromium + webkit) | `package.json:scripts.e2e:all` |
 | `docker compose up -d` | Start Postgres 17 | `docker-compose.yml:postgres:17-alpine` |
 | `docker compose down` | Stop Postgres | `docker-compose.yml` |
 | `docker compose down -v` | Reset Postgres + delete volume `home_financing_data` | `docker-compose.yml` |
 | `docker compose logs -f postgres` | Tail DB logs / healthcheck | `docker-compose.yml` |
 
-> No `test`, `format`, `db:seed`, `db:studio` scripts are defined — see Testing Strategy.
+> `format` / `db:studio` not defined. `db:seed`/`db:generate`/`db:migrate` now via `npm run db:*` (see Build Commands). `test` not yet — use `npm run e2e` for E2E.
 
 ### Database & Seeding
 
 ```bash
-# Drizzle config points at schema ./src/db/schema.ts
-cat drizzle.config.json
+# Drizzle configs — TS primary, JSON fallback
+cat drizzle.config.ts   # satisfies Config, schema ./src/db/schema.ts, out ./drizzle
+cat drizzle.config.json # same content (JSON) — keep in sync
+ls drizzle/             # 0000_amusing_thena.sql (8 tables) + 0001_sharp_stick.sql
+
+# One-shot init (migrate + seed) — idempotent, local-host guarded
+npm run db:setup
+# → [db] migrations applied  +  [db] seed complete (40 manuf/50 states/23 articles/59 glossary)
+
+# Granular:
+npm run db:generate       # diff schema → drizzle/*.sql
+npm run db:migrate        # apply drizzle/* to PG (assertLocalDatabase)
+npm run db:seed           # ensureSeeded() — also auto-runs in /api/health
+npm run db:reset          # DROP SCHEMA public,drizzle CASCADE + restore extensions (destructive local only)
 
 # Health check seeds automatically
 curl http://localhost:3000/api/health
-# → { ok: true, db: true } (also triggers ensureSeeded)
+# → { ok: true, status: "ok", db: true } (also triggers ensureSeeded)
 
 # Manual: ensureSeeded() is idempotent — safe to call anywhere server-side
 # Never seed from client components.
 ```
 
-- `docker-compose.yml` DB: `home_financing_dev` / `home_financing_user` / `home_financing_secret` on host port **5434**. Healthcheck `pg_isready -U home_financing_user -d home_financing_dev`.
-- `drizzle.config.json` default URL is `postgresql://postgres:postgres@127.0.0.1:5432/app_db` — overridden by `DATABASE_URL` env at runtime; keep `drizzle.config.json` for CLI, `process.env.DATABASE_URL` for app.
+- `docker-compose.yml` DB: `home_financing_dev` / `home_financing_user` / `home_financing_secret` on host port **5434** (migrated from `scandihaven_*` on 5432 in this branch). Healthcheck `pg_isready -U home_financing_user -d home_financing_dev`. Script guards `src/scripts/local-db.ts` refuse non-local `DATABASE_URL` for `migrate/seed/reset`.
+- `drizzle.config.ts`/`drizzle.config.json` `dbCredentials.url` defaults to `postgresql://home_financing_user:home_financing_secret@localhost:5434/home_financing_dev` — overridden by `DATABASE_URL` env at runtime; keep both configs in sync.
 
 ### Project Structure
 
@@ -229,17 +246,31 @@ src/
     states.json           # State guides corpus
     glossary.json         # Glossary corpus
   db/
-    schema.ts             # Drizzle pgTable definitions (8 tables)
+    schema.ts             # Drizzle pgTable definitions (8 tables, manufacturers.founded varchar 32)
     index.ts              # Pool singleton + drizzle(pool)
   lib/
     catalog.ts            # Typed catalog interfaces + re-exports of data/*.json
     guides.ts             # Guide helpers
-    lenders.ts            # LENDER_SEEDS + LOAN_PRODUCT_SEEDS
+    lenders.ts            # LENDER_SEEDS (8) + LOAN_PRODUCT_SEEDS (5)
     calculator.ts         # Payment math (amortize, PMI, comparisons)
     matching.ts           # matchLenders scoring + validateApplication
     ensure-seeded.ts      # Idempotent file→DB projection (global promise)
     markdown.tsx          # Markdown renderer for articles
     rate-limit.ts         # In-memory bucket limiter + clientKey()
+  scripts/
+    local-db.ts           # isLocalDatabaseUrl / assertLocalDatabase guard
+    migrate.ts            # drizzle-orm migrator (CJS-safe main())
+    seed.ts               # ensureSeeded wrapper (CJS-safe main())
+    reset.ts              # DROP SCHEMA public+drizzle CASCADE + extensions
+drizzle/
+  0000_amusing_thena.sql  # 8 tables baseline
+  0001_sharp_stick.sql    # alter manufacturers.founded 8→32
+  meta/_journal.json
+ e2e/
+  smoke.spec.ts / seo.spec.ts / funnel.spec.ts  # Playwright 16 tests (chromium)
+ playwright.config.ts      # E2E config (prod next start on 3002, reuseExistingServer)
+ drizzle.config.ts         # TS config (primary)
+ drizzle.config.json       # JSON fallback (keep in sync)
 infrastructure/
   postgres/init/*.sql     # pgcrypto + pg_trgm extensions
 public/
@@ -250,27 +281,28 @@ public/
 
 ## Testing Strategy
 
-### Current State (audit 2026-09-11)
+### Current State (audit 2026-09-11, updated 2026-09-11)
 
-- **No test runner installed** — no `vitest`, `jest`, `playwright`, `pytest`, or `phpunit` in `package.json`.
-- **No `*.test.*` / `*.spec.*` files** in the repo.
-- **No test scripts** in `package.json` (`test`, `test:watch`, `test:coverage` absent).
-- Verification today is manual + `npm run lint` + `npm run typecheck` + `npm run build` + `curl /api/health`.
+- **Playwright E2E installed** — `@playwright/test 1.63.0` + `@axe-core/playwright 4.13.0`, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), `e2e/` with 16 tests (chromium): `smoke.spec.ts` (home/nav/footer, get-started, calculator, health, 404, axe critical), `seo.spec.ts` (sitemap absolute locs + 30×200 via host-rewrite, robots, title, OG), `funnel.spec.ts` (POST `/api/applications` 400/200 + `x-forwarded-for` isolated, burst 429, UI no-500). **16/16 passing.**
+- **No unit runner yet** — no `vitest`/`jest`, no `*.test.*` files (`e2e/*.spec.ts` are the only specs). `npm run e2e` (`--project=chromium`) and `npm run e2e:all` (chromium+webkit) are the test scripts.
+- **Manual verification still:** `npm run lint` + `npm run typecheck` + `npm run build` + `curl /api/health`.
 
-### Target Pyramid (when adding tests)
+### Target Pyramid (next)
 
-- **Unit** — `src/lib/calculator.ts`, `src/lib/matching.ts`, `src/lib/rate-limit.ts` in isolation (pure functions, deterministic). Use `vitest` + factory helpers `getMockApplicationInput(overrides)`.
-- **Integration** — `POST /api/applications` with a test Postgres (or `pg-mem`/testcontainers), `ensureSeeded()` idempotency, rate-limit 429.
-- **E2E** — critical journeys: `/` → `/get-started` → submit → matches; `/calculator` compute; `/modular-home-financing/*` content renders; `sitemap`/`robots` respond. Use Playwright.
+- **Unit (to add)** — `src/lib/calculator.ts`, `src/lib/matching.ts`, `src/lib/rate-limit.ts` in isolation (pure functions, deterministic). Use `vitest` + factory helpers `getMockApplicationInput(overrides)`.
+- **Integration (to add)** — `POST /api/applications` with a test Postgres (or `pg-mem`/testcontainers), `ensureSeeded()` idempotency, rate-limit 429.
+- **E2E (done, expand)** — add journeys: `/calculator` compute assertions, `/modular-home-financing/*` content, more funnel permutations. Use Playwright (already present).
 
-### Test Commands (to add)
+### Test Commands
 
 ```bash
-# Recommended additions to package.json:scripts
-npm test              # vitest run
-npm run test:watch    # vitest watch
-npm run test:coverage # vitest --coverage
-npx playwright test   # E2E (when playwright added)
+npm run lint          # eslint . (1 pre-existing setState-in-effect error)
+npm run typecheck     # tsc --noEmit (skills excluded)
+npm run build         # next build (requires skills excluded)
+npm run e2e           # playwright --project=chromium (needs db:setup + build, 16 tests)
+npm run e2e:all       # playwright chromium+webkit
+# To add:
+npm test              # vitest run (not yet installed)
 ```
 
 ### Standards (when tests exist)
@@ -288,7 +320,9 @@ npx playwright test   # E2E (when playwright added)
 
 ```bash
 npm run lint        # eslint .  (flat config, core-web-vitals, ignores .next/out/build/next-env.d.ts)
-npm run typecheck   # tsc --noEmit
+npm run lint:fix    # eslint . --fix
+npm run typecheck   # tsc --noEmit (skills excluded via tsconfig)
+npm run e2e         # playwright (chromium, 16 tests)
 ```
 
 - Config: `eslint.config.mjs` — `defineConfig([...nextCoreWebVitals, globalIgnores([".next/**","out/**","build/**","next-env.d.ts"])])`. Keep flat config; do not revert to `.eslintrc`.
@@ -297,7 +331,7 @@ npm run typecheck   # tsc --noEmit
 
 ### TypeScript
 
-- `strict: true` enforced. Fix type errors, never `// @ts-ignore` or `as any` (last resort only with comment explaining why).
+- `strict: true` enforced; `skills` excluded in `tsconfig.json` (otherwise `z-ai-web-dev-sdk` missing). Fix type errors, never `// @ts-ignore` or `as any` (last resort only with comment explaining why).
 - Public function params are typed; returns inferred unless inference would leak `any`.
 
 ### Naming
@@ -500,7 +534,7 @@ This project is intentionally static-site-hostable with an optional Postgres bac
 
 ## Continuous Improvement
 
-- **When you add tests:** install `vitest` + `playwright`, add `test`/`test:watch`/`test:coverage` scripts, and add a `sitemap`/health smoke test before anything fancy.
+- **When you add unit tests:** install `vitest`, add `test`/`test:watch`/`test:coverage` scripts (Playwright E2E already present — 16 tests). Add `sitemap`/health smoke first (done).
 - **When content grows:** consider moving `src/data/*.json` to Content Collections or a headless CMS — but keep the file-backed seed pattern until the migration is ADR'd and redirect-tested.
 - **When DB load grows:** add `pgBouncer` or Drizzle `migrate` workflow (`drizzle-kit generate` + `drizzle-kit migrate`) instead of ad-hoc `push`.
 - **After each task:** run `npm run lint && npm run typecheck`, reflect on what broke, and update this file if the workflow changed.
@@ -527,9 +561,9 @@ This project is intentionally static-site-hostable with an optional Postgres bac
 | 14 | Continuous Improvement | No | ✓ |
 | 15 | Frontmatter | No | ✓ (`IMPORTANT` banner) |
 
-*Framework checks:* Next.js App Router ✓, `next/font` ✓, Tailwind v4 `@theme` ✓, Drizzle + `pg` Pool singleton ✓, `next.config.ts:redirects` ✓, `images.unoptimized` documented ✓, `force-dynamic` API routes ✓.
-*Commands verified against `package.json:scripts`* (`dev`, `build`, `start`, `lint`, `typecheck`) + `drizzle.config.json` + `docker-compose.yml`. Missing `test`/`format` intentionally flagged.
+*Framework checks:* Next.js App Router ✓, `next/font` ✓, Tailwind v4 `@theme` ✓, Drizzle + `pg` Pool singleton ✓, `next.config.ts:redirects` ✓, `images.unoptimized` documented ✓, `force-dynamic` API routes ✓, Playwright E2E (prod build, 3002) ✓, Drizzle migrate/seed guarded ✓.
+*Commands verified against `package.json:scripts`* (`dev`, `build`, `start`, `lint`, `lint:fix`, `typecheck`, `e2e`, `e2e:all`, `db:generate/migrate/seed/setup/reset`) + `drizzle.config.ts`/`.json` + `docker-compose.yml:5434`. Missing `test`/`format` intentionally flagged (vitest not yet).
 
 ---
 
-*Last generated 2026-09-11 via `claude-md:create` (Steps 1→2→4→5) + `framework-templates:get` (Next.js). Source of truth for generation: codebase read (package.json, tsconfig, next.config.ts, eslint.config.mjs, drizzle.config.json, .env.example/.env, docker-compose.yml, src/db, src/lib, src/app, src/components, infrastructure/postgres/init). Preserve team-specific conventions when updating — compare this file to current codebase before overwriting.*
+*Last generated 2026-09-11 via `claude-md:create` (Steps 1→2→4→5) + `framework-templates:get` (Next.js); updated 2026-09-11 with DB lifecycle (tsx + drizzle.config.ts/json + src/scripts/* + drizzle/ 0000-0001, schema founded 32) and Playwright E2E (1.63 + @axe-core, playwright.config.ts, e2e/* 16 tests, tsconfig excludes skills). Source of truth: package.json, tsconfig, next.config.ts, eslint.config.mjs, drizzle.config.ts/json, docker-compose.yml:5434, src/db, src/lib, src/scripts, e2e. Preserve team-specific conventions when updating.*

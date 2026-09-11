@@ -1,0 +1,1 @@
+ALTER TABLE "manufacturers" ALTER COLUMN "founded" SET DATA TYPE varchar(32);

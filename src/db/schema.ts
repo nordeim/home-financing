@@ -80,7 +80,7 @@ export const manufacturers = pgTable("manufacturers", {
   name: varchar("name", { length: 160 }).notNull(),
   description: text("description").notNull(),
   headquarters: varchar("headquarters", { length: 160 }).notNull(),
-  founded: varchar("founded", { length: 8 }).notNull(),
+  founded: varchar("founded", { length: 32 }).notNull(),
   priceRange: varchar("price_range", { length: 64 }).notNull(),
   category: varchar("category", { length: 32 }).notNull(),
   homeTypes: text("home_types").array().notNull().default([]),
