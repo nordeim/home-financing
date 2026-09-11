@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 48" fill="none" role="img" aria-label="ModFii">
+  <rect width="48" height="48" rx="12" fill="#275C48"/>
+  <path d="M10 32V16l7 9 7-9v16" stroke="#F8F4EE" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M27 32V16h5c4.2 0 7.4 2.8 7.4 8s-3.2 8-7.4 8H27Z" stroke="#E8A317" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="62" y="33" fill="#1A3329" font-family="Outfit, DM Sans, system-ui, sans-serif" font-size="28" font-weight="700">ModFii</text>
+</svg>

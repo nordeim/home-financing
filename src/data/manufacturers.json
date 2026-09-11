@@ -1,0 +1,913 @@
+[
+  {
+    "slug": "clayton-homes",
+    "name": "Clayton Homes",
+    "description": "Clayton Homes is America's largest builder of manufactured and modular homes, offering a wide range of affordable housing solutions with nationwide availability.",
+    "metaDescription": "Find approved lenders for Clayton Homes modular and manufactured homes. Get pre-qualified for Clayton home financing with specialized prefab lenders.",
+    "headquarters": "Maryville, Tennessee",
+    "founded": "1956",
+    "priceRange": "$80,000 - $350,000",
+    "homeTypes": [
+      "Single-Wide",
+      "Double-Wide",
+      "Modular",
+      "CrossMod"
+    ],
+    "features": [
+      "Nationwide dealer network",
+      "In-house financing options",
+      "Energy-efficient construction",
+      "Customizable floor plans",
+      "CrossMod homes eligible for conventional financing"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "champion-homes",
+    "name": "Champion Homes",
+    "description": "Champion Homes is one of the largest modular and manufactured home builders in North America, known for quality construction and innovative designs.",
+    "metaDescription": "Get pre-qualified for Champion Homes financing with approved prefab lenders. Expert guidance on Champion modular home loans and mortgage options.",
+    "headquarters": "Troy, Michigan",
+    "founded": "1953",
+    "priceRange": "$90,000 - $400,000",
+    "homeTypes": [
+      "Manufactured",
+      "Modular",
+      "Park Models"
+    ],
+    "features": [
+      "70+ years of building experience",
+      "Regional customization options",
+      "Advanced building technology",
+      "Multiple brand portfolio",
+      "Strong resale value"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "cavco-industries",
+    "name": "Cavco Industries",
+    "description": "Cavco Industries is a leading builder of manufactured and modular homes, offering diverse brands including Fleetwood, Palm Harbor, and Cavco Homes.",
+    "metaDescription": "Find approved lenders for Cavco Industries homes including Fleetwood and Palm Harbor. Get specialized financing for Cavco modular and manufactured homes.",
+    "headquarters": "Phoenix, Arizona",
+    "founded": "1965",
+    "priceRange": "$75,000 - $450,000",
+    "homeTypes": [
+      "Manufactured",
+      "Modular",
+      "Park Models",
+      "Commercial Structures"
+    ],
+    "features": [
+      "Multiple premium brands under one company",
+      "Southwest and Western focus",
+      "Innovative design options",
+      "Commercial and residential options",
+      "Strong warranty programs"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "skyline-champion",
+    "name": "Skyline Champion",
+    "description": "Skyline Champion Corporation is one of North America's largest factory-built housing companies, created from the merger of Skyline and Champion.",
+    "metaDescription": "Get pre-qualified for Skyline Champion home financing. Connect with approved lenders specializing in Skyline Champion modular and manufactured homes.",
+    "headquarters": "Troy, Michigan",
+    "founded": "2018 (Merger)",
+    "priceRange": "$85,000 - $425,000",
+    "homeTypes": [
+      "Manufactured",
+      "Modular",
+      "Park Models",
+      "ADUs"
+    ],
+    "features": [
+      "Largest independent factory-built housing company",
+      "39 manufacturing facilities",
+      "Diverse product portfolio",
+      "National distribution network",
+      "Innovation in sustainable building"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "palm-harbor-homes",
+    "name": "Palm Harbor Homes",
+    "description": "Palm Harbor Homes, a Cavco Industries brand, is known for high-quality manufactured and modular homes with exceptional customization options.",
+    "metaDescription": "Find approved lenders for Palm Harbor Homes. Get pre-qualified for Palm Harbor modular home financing with specialized prefab mortgage experts.",
+    "headquarters": "Addison, Texas",
+    "founded": "1977",
+    "priceRange": "$100,000 - $500,000",
+    "homeTypes": [
+      "Manufactured",
+      "Modular",
+      "Two-Story Modular"
+    ],
+    "features": [
+      "Premium quality construction",
+      "Extensive customization options",
+      "Energy-efficient designs",
+      "Multi-story options available",
+      "Model home centers nationwide"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "method-homes",
+    "name": "Method Homes",
+    "description": "Method Homes specializes in premium prefab modern homes with a focus on sustainable design, architect-designed plans, and high-end finishes.",
+    "metaDescription": "Get financing for Method Homes prefab modern homes. Connect with lenders experienced in high-end modular home mortgages and construction loans.",
+    "headquarters": "Seattle, Washington",
+    "founded": "2007",
+    "priceRange": "$350,000 - $1,500,000+",
+    "homeTypes": [
+      "Modern Prefab",
+      "Architect Series",
+      "Custom Modular"
+    ],
+    "features": [
+      "Architect-designed modern homes",
+      "LEED and Passive House options",
+      "High-end finishes standard",
+      "Fully customizable designs",
+      "West Coast focus with national delivery"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "dvele",
+    "name": "Dvele",
+    "description": "Dvele creates self-powered prefab homes with integrated solar, battery storage, and smart home technology for energy independence.",
+    "metaDescription": "Find approved lenders for Dvele self-powered prefab homes. Get specialized financing for Dvele's innovative solar-powered modular homes.",
+    "headquarters": "San Diego, California",
+    "founded": "2017",
+    "priceRange": "$400,000 - $1,200,000+",
+    "homeTypes": [
+      "Self-Powered Prefab",
+      "Net-Zero Homes",
+      "ADUs"
+    ],
+    "features": [
+      "Integrated solar and battery systems",
+      "Net-zero energy capable",
+      "Smart home technology built-in",
+      "Modern architectural designs",
+      "Health-focused materials"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "blu-homes",
+    "name": "Blu Homes",
+    "description": "Blu Homes pioneered folding prefab technology, creating modern, sustainable homes that can be transported and assembled quickly.",
+    "metaDescription": "Get pre-qualified for Blu Homes financing. Connect with lenders experienced in modern prefab home mortgages and construction loans.",
+    "headquarters": "Vallejo, California",
+    "founded": "2008",
+    "priceRange": "$300,000 - $900,000+",
+    "homeTypes": [
+      "Modern Prefab",
+      "Folding Prefab",
+      "Custom Modular"
+    ],
+    "features": [
+      "Patented folding technology",
+      "Open floor plans with large windows",
+      "Sustainable materials",
+      "Quick assembly times",
+      "California modern aesthetic"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "plant-prefab",
+    "name": "Plant Prefab",
+    "description": "Plant Prefab creates custom sustainable prefab homes with a focus on healthy materials, modern design, and environmental responsibility.",
+    "metaDescription": "Find approved lenders for Plant Prefab homes. Get specialized financing for sustainable, custom prefab modular homes.",
+    "headquarters": "Rialto, California",
+    "founded": "2016",
+    "priceRange": "$350,000 - $1,000,000+",
+    "homeTypes": [
+      "Custom Prefab",
+      "LivingHomes",
+      "ADUs"
+    ],
+    "features": [
+      "LEED Platinum capable designs",
+      "Healthy, non-toxic materials",
+      "Architect-designed homes",
+      "Solar-ready construction",
+      "Steve Glenn's LivingHomes collection"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "ideabox",
+    "name": "Ideabox",
+    "description": "Ideabox creates small, modern prefab homes focused on smart design, sustainability, and affordability for conscious living.",
+    "metaDescription": "Get financing for Ideabox modern prefab homes. Connect with lenders specializing in small footprint modular home mortgages.",
+    "headquarters": "Salem, Oregon",
+    "founded": "2007",
+    "priceRange": "$150,000 - $450,000",
+    "homeTypes": [
+      "Modern Prefab",
+      "Small Homes",
+      "ADUs"
+    ],
+    "features": [
+      "Smart small-footprint designs",
+      "Sustainable materials focus",
+      "Pacific Northwest aesthetic",
+      "Efficient use of space",
+      "Affordable modern design"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "connect-homes",
+    "name": "Connect Homes",
+    "description": "Connect Homes builds modern, sustainable prefab homes designed by renowned architects with a focus on indoor-outdoor California living.",
+    "metaDescription": "Find approved lenders for Connect Homes. Get pre-qualified for modern prefab home financing with specialized construction loan experts.",
+    "headquarters": "Los Angeles, California",
+    "founded": "2013",
+    "priceRange": "$400,000 - $1,200,000+",
+    "homeTypes": [
+      "Modern Prefab",
+      "ADUs",
+      "Multi-Family"
+    ],
+    "features": [
+      "Architect-designed homes",
+      "Indoor-outdoor living focus",
+      "Pre-wired for solar",
+      "California modern aesthetic",
+      "Efficient construction timeline"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "unity-homes",
+    "name": "Unity Homes",
+    "description": "Unity Homes builds high-performance prefab homes with Passive House-level efficiency, combining modern design with exceptional energy performance.",
+    "metaDescription": "Get financing for Unity Homes high-performance prefab homes. Connect with lenders experienced in Passive House and energy-efficient home mortgages.",
+    "headquarters": "Walpole, New Hampshire",
+    "founded": "2012",
+    "priceRange": "$400,000 - $900,000+",
+    "homeTypes": [
+      "High-Performance Prefab",
+      "Passive House",
+      "Modern Timber"
+    ],
+    "features": [
+      "Passive House performance levels",
+      "Timber frame construction",
+      "Exceptional energy efficiency",
+      "New England craftsmanship",
+      "Net-zero ready designs"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "karoleena",
+    "name": "Karoleena",
+    "description": "Karoleena creates luxury modern prefab homes with exceptional design and craftsmanship, focusing on the Canadian and US Pacific Northwest markets.",
+    "metaDescription": "Find approved lenders for Karoleena luxury prefab homes. Get specialized financing for high-end modern modular home construction.",
+    "headquarters": "Okanagan, British Columbia",
+    "founded": "2015",
+    "priceRange": "$500,000 - $1,500,000+",
+    "homeTypes": [
+      "Luxury Prefab",
+      "Modern Modular",
+      "Custom Homes"
+    ],
+    "features": [
+      "Luxury finishes standard",
+      "Architectural modern design",
+      "High-end material selection",
+      "Pacific Northwest aesthetic",
+      "Canadian craftsmanship"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "honomobo",
+    "name": "Honomobo",
+    "description": "Honomobo creates modern container-inspired modular homes with clean lines, smart technology integration, and quick installation times.",
+    "metaDescription": "Get pre-qualified for Honomobo modular home financing. Connect with lenders specializing in modern container-style prefab home mortgages.",
+    "headquarters": "Edmonton, Alberta",
+    "founded": "2015",
+    "priceRange": "$200,000 - $600,000+",
+    "homeTypes": [
+      "Container-Inspired Modular",
+      "ADUs",
+      "Multi-Unit"
+    ],
+    "features": [
+      "Container-inspired modern design",
+      "Stackable modular units",
+      "Quick installation (days, not months)",
+      "Smart home ready",
+      "Industrial modern aesthetic"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "jacobsen-homes",
+    "name": "Jacobsen Homes",
+    "description": "Jacobsen Homes is a Florida-based manufactured and modular home builder specializing in hurricane-resistant homes for Southern climates.",
+    "metaDescription": "Find approved lenders for Jacobsen Homes. Get pre-qualified for hurricane-resistant manufactured and modular home financing in Florida and the Southeast.",
+    "headquarters": "Safety Harbor, Florida",
+    "founded": "1959",
+    "priceRange": "$80,000 - $350,000",
+    "homeTypes": [
+      "Manufactured",
+      "Modular",
+      "Hurricane-Resistant"
+    ],
+    "features": [
+      "Hurricane-resistant construction",
+      "Florida building code compliant",
+      "Southern climate optimized",
+      "Energy-efficient designs",
+      "Extensive Florida dealer network"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "fleetwood-homes",
+    "name": "Fleetwood Homes",
+    "description": "Fleetwood Homes is a respected name in manufactured housing with over 70 years of experience building quality affordable homes. As part of the Cavco Industries family, Fleetwood offers a wide range of single and multi-section homes with customizable floor plans and energy-efficient features designed for modern living.",
+    "metaDescription": "Get financing for your Fleetwood Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Riverside, California",
+    "founded": "1950",
+    "priceRange": "$70,000 - $280,000",
+    "homeTypes": [
+      "Single-Wide",
+      "Double-Wide",
+      "Multi-Section",
+      "Manufactured"
+    ],
+    "features": [
+      "Over 70 years of manufacturing experience",
+      "Part of Cavco Industries family",
+      "Energy-efficient construction standards",
+      "Customizable floor plans",
+      "Affordable pricing with quality construction"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "legacy-housing",
+    "name": "Legacy Housing",
+    "description": "Legacy Housing Corporation is a vertically integrated producer of manufactured homes headquartered in Texas. They focus on affordable housing solutions with in-house financing options, making homeownership accessible to more Americans through their dealer network across the Southern United States.",
+    "metaDescription": "Get financing for your Legacy Housing modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Bedford, Texas",
+    "founded": "2005",
+    "priceRange": "$50,000 - $200,000",
+    "homeTypes": [
+      "Single-Wide",
+      "Double-Wide",
+      "Manufactured",
+      "Tiny Homes"
+    ],
+    "features": [
+      "Vertically integrated manufacturing",
+      "In-house financing available",
+      "Focus on affordable housing",
+      "Texas-based with Southern US presence",
+      "Quick production timelines"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "fairmont-homes",
+    "name": "Fairmont Homes",
+    "description": "Fairmont Homes is an Indiana-based modular home manufacturer known for quality craftsmanship and diverse floor plans. With decades of experience, they build customizable single and multi-section homes delivered throughout the Midwest and Eastern United States.",
+    "metaDescription": "Get financing for your Fairmont Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Nappanee, Indiana",
+    "founded": "1971",
+    "priceRange": "$100,000 - $350,000",
+    "homeTypes": [
+      "Modular",
+      "Cape Cod",
+      "Ranch",
+      "Two-Story"
+    ],
+    "features": [
+      "50+ years of manufacturing experience",
+      "Midwest craftsmanship and quality",
+      "Extensive customization options",
+      "Energy-efficient building practices",
+      "Strong dealer network in Eastern US"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "genesis-homes",
+    "name": "Genesis Homes",
+    "description": "Genesis Homes is a Tennessee-based modular home manufacturer offering affordable, customizable homes with a focus on Southern living. They produce a variety of floor plans from starter homes to larger family residences with options for traditional and contemporary designs.",
+    "metaDescription": "Get financing for your Genesis Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Deer Lodge, Tennessee",
+    "founded": "1995",
+    "priceRange": "$80,000 - $280,000",
+    "homeTypes": [
+      "Modular",
+      "Manufactured",
+      "Single-Wide",
+      "Double-Wide"
+    ],
+    "features": [
+      "Tennessee-based manufacturing",
+      "Focus on Southern markets",
+      "Customizable floor plans",
+      "Affordable pricing options",
+      "Traditional and contemporary styles"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "skyline-homes",
+    "name": "Skyline Homes",
+    "description": "Skyline Homes, now part of Skyline Champion Corporation, has been building manufactured and modular homes since 1951. Known for innovative designs and quality construction, they offer a wide range of floor plans from affordable starter homes to luxury multi-section residences.",
+    "metaDescription": "Get financing for your Skyline Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Elkhart, Indiana",
+    "founded": "1951",
+    "priceRange": "$85,000 - $400,000",
+    "homeTypes": [
+      "Manufactured",
+      "Modular",
+      "Park Models",
+      "Multi-Section"
+    ],
+    "features": [
+      "70+ years of manufacturing experience",
+      "Part of Skyline Champion Corporation",
+      "Wide variety of floor plans",
+      "Energy-efficient construction",
+      "National dealer network"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "chariot-eagle",
+    "name": "Chariot Eagle",
+    "description": "Chariot Eagle, a division of Skyline Champion, specializes in park models and destination homes designed for RV resorts, campgrounds, and vacation properties. Their compact, well-designed units offer full amenities in a smaller footprint ideal for seasonal or vacation use.",
+    "metaDescription": "Get financing for your Chariot Eagle modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Elkhart, Indiana",
+    "founded": "1985",
+    "priceRange": "$60,000 - $180,000",
+    "homeTypes": [
+      "Park Models",
+      "Destination Homes",
+      "Vacation Cabins"
+    ],
+    "features": [
+      "Specialized in park model homes",
+      "Part of Skyline Champion family",
+      "Compact, efficient designs",
+      "Full amenities in smaller footprint",
+      "Ideal for vacation and resort properties"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "redman-homes",
+    "name": "Redman Homes",
+    "description": "Redman Homes, part of the Champion Homes family, builds quality manufactured and modular homes with a focus on value and durability. With manufacturing facilities across the country, they offer regional customization and a variety of floor plans for different lifestyles and budgets.",
+    "metaDescription": "Get financing for your Redman Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Topeka, Kansas",
+    "founded": "1937",
+    "priceRange": "$75,000 - $300,000",
+    "homeTypes": [
+      "Manufactured",
+      "Modular",
+      "Single-Wide",
+      "Double-Wide"
+    ],
+    "features": [
+      "85+ years of home building experience",
+      "Part of Champion Homes family",
+      "Multiple manufacturing locations",
+      "Regional customization available",
+      "Strong value proposition"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "commodore-homes",
+    "name": "Commodore Homes",
+    "description": "Commodore Homes is a modular and manufactured home builder with a strong presence in the Eastern United States. Known for quality construction and variety of styles from traditional to contemporary, they offer customizable floor plans with a focus on craftsmanship and customer service.",
+    "metaDescription": "Get financing for your Commodore Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Goshen, Indiana",
+    "founded": "1952",
+    "priceRange": "$90,000 - $350,000",
+    "homeTypes": [
+      "Modular",
+      "Manufactured",
+      "Cape Cod",
+      "Ranch",
+      "Two-Story"
+    ],
+    "features": [
+      "70+ years of manufacturing experience",
+      "Strong Eastern US dealer network",
+      "Wide variety of architectural styles",
+      "Quality craftsmanship focus",
+      "Customizable floor plans"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "sunshine-homes",
+    "name": "Sunshine Homes",
+    "description": "Sunshine Homes is a Mississippi-based manufactured and modular home builder known for Southern charm and quality construction. They offer a range of floor plans from affordable single-sections to luxury multi-section homes, all built with attention to detail and regional preferences.",
+    "metaDescription": "Get financing for your Sunshine Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Red Bay, Alabama",
+    "founded": "1971",
+    "priceRange": "$70,000 - $250,000",
+    "homeTypes": [
+      "Manufactured",
+      "Modular",
+      "Single-Wide",
+      "Double-Wide",
+      "Triple-Wide"
+    ],
+    "features": [
+      "50+ years of home building",
+      "Southern US focus and expertise",
+      "Wide range of floor plans",
+      "Quality construction standards",
+      "Affordable luxury options"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "deer-valley-homebuilders",
+    "name": "Deer Valley Homebuilders",
+    "description": "Deer Valley Homebuilders is a Texas-based manufactured and modular home company known for quality construction and innovative designs. They focus on the Southern and Southwestern markets, offering homes that combine traditional craftsmanship with modern amenities.",
+    "metaDescription": "Get financing for your Deer Valley Homebuilders modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Sulphur Springs, Texas",
+    "founded": "2001",
+    "priceRange": "$80,000 - $300,000",
+    "homeTypes": [
+      "Manufactured",
+      "Modular",
+      "HUD Code",
+      "Double-Wide"
+    ],
+    "features": [
+      "Texas-based manufacturing",
+      "Focus on quality and value",
+      "Innovative floor plan designs",
+      "Energy-efficient construction",
+      "Southern and Southwestern focus"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "schult-homes",
+    "name": "Schult Homes",
+    "description": "Schult Homes, part of the Clayton Homes family, is known for innovative designs and quality manufactured housing. With facilities across the country, they offer a variety of floor plans from starter homes to luxury estates with extensive customization options.",
+    "metaDescription": "Get financing for your Schult Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Middlebury, Indiana",
+    "founded": "1934",
+    "priceRange": "$75,000 - $300,000",
+    "homeTypes": [
+      "Manufactured",
+      "Modular",
+      "Single-Section",
+      "Multi-Section"
+    ],
+    "features": [
+      "90+ years of home building experience",
+      "Part of Clayton Homes family",
+      "Innovative design leadership",
+      "Extensive customization options",
+      "National distribution network"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "marlette-homes",
+    "name": "Marlette Homes",
+    "description": "Marlette Homes, part of the Clayton Homes family, focuses on the Western United States market with quality manufactured and modular homes. Known for Pacific Northwest craftsmanship, they offer floor plans designed for regional preferences and building requirements.",
+    "metaDescription": "Get financing for your Marlette Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Hermiston, Oregon",
+    "founded": "1960",
+    "priceRange": "$85,000 - $320,000",
+    "homeTypes": [
+      "Manufactured",
+      "Modular",
+      "Single-Wide",
+      "Double-Wide"
+    ],
+    "features": [
+      "60+ years of Pacific Northwest building",
+      "Part of Clayton Homes family",
+      "Regional design expertise",
+      "Energy-efficient for Northwestern climate",
+      "Quality craftsmanship focus"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "livinghomes",
+    "name": "LivingHomes",
+    "description": "LivingHomes, now part of Plant Prefab, pioneered sustainable modern prefab homes designed by renowned architect Ray Kappe. Known for LEED Platinum certification and healthy building materials, they create architect-designed homes that prioritize environmental responsibility and modern aesthetics.",
+    "metaDescription": "Get financing for your LivingHomes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Rialto, California",
+    "founded": "2006",
+    "priceRange": "$450,000 - $1,200,000+",
+    "homeTypes": [
+      "Modern Prefab",
+      "LEED Platinum",
+      "ADUs",
+      "Custom Homes"
+    ],
+    "features": [
+      "Pioneer in sustainable prefab",
+      "LEED Platinum certified designs",
+      "Architect Ray Kappe designs",
+      "Non-toxic, healthy materials",
+      "Now part of Plant Prefab family"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "fabcab",
+    "name": "FabCab",
+    "description": "FabCab designs and builds modern, universally-designed prefab homes focused on accessibility and aging in place. Based in Seattle, their TimberCab line features open floor plans, sustainable materials, and designs that accommodate all stages of life.",
+    "metaDescription": "Get financing for your FabCab modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Seattle, Washington",
+    "founded": "2009",
+    "priceRange": "$300,000 - $700,000+",
+    "homeTypes": [
+      "Modern Prefab",
+      "Universal Design",
+      "ADUs",
+      "Accessible Homes"
+    ],
+    "features": [
+      "Universal design for all ages",
+      "Aging-in-place focus",
+      "Sustainable timber construction",
+      "Pacific Northwest aesthetic",
+      "Open, accessible floor plans"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "stillwater-dwellings",
+    "name": "Stillwater Dwellings",
+    "description": "Stillwater Dwellings creates modern prefab homes that blend contemporary design with the natural environment. Based in Washington State, they focus on sustainable construction, large windows for natural light, and designs that create a seamless connection between indoor and outdoor living.",
+    "metaDescription": "Get financing for your Stillwater Dwellings modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Spokane, Washington",
+    "founded": "2007",
+    "priceRange": "$350,000 - $900,000+",
+    "homeTypes": [
+      "Modern Prefab",
+      "Custom Modular",
+      "ADUs"
+    ],
+    "features": [
+      "Modern architectural design",
+      "Large windows and natural light",
+      "Indoor-outdoor living focus",
+      "Sustainable building practices",
+      "Pacific Northwest craftsmanship"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "irontown-homes",
+    "name": "Irontown Homes",
+    "description": "Irontown Homes is a Utah-based modular home builder combining modern design with quality craftsmanship. They offer a range of floor plans from contemporary to traditional, with a focus on energy efficiency and customization options for the Intermountain West market.",
+    "metaDescription": "Get financing for your Irontown Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Spanish Fork, Utah",
+    "founded": "2009",
+    "priceRange": "$200,000 - $600,000+",
+    "homeTypes": [
+      "Modular",
+      "Modern",
+      "Traditional",
+      "Custom"
+    ],
+    "features": [
+      "Utah-based manufacturing",
+      "Modern and traditional designs",
+      "Energy-efficient construction",
+      "Intermountain West focus",
+      "Customizable floor plans"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "ma-modular",
+    "name": "MA Modular",
+    "description": "MA Modular creates architect-designed modern prefab homes with a focus on sustainable living and clean aesthetics. Based in California, they offer flat-pack modular systems that can be customized and shipped efficiently, making modern design accessible across wider geographic areas.",
+    "metaDescription": "Get financing for your MA Modular modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Los Angeles, California",
+    "founded": "2015",
+    "priceRange": "$350,000 - $850,000+",
+    "homeTypes": [
+      "Modern Prefab",
+      "Flat-Pack Modular",
+      "ADUs",
+      "Custom Homes"
+    ],
+    "features": [
+      "Architect-designed modern homes",
+      "Efficient flat-pack shipping",
+      "Sustainable material focus",
+      "California modern aesthetic",
+      "Customizable modular systems"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "deltec-homes",
+    "name": "Deltec Homes",
+    "description": "Deltec Homes has been building unique round and hurricane-resistant prefab homes since 1968. Based in North Carolina, their distinctive circular designs offer superior wind resistance, energy efficiency, and panoramic views, making them popular in coastal and storm-prone regions.",
+    "metaDescription": "Get financing for your Deltec Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Asheville, North Carolina",
+    "founded": "1968",
+    "priceRange": "$200,000 - $700,000+",
+    "homeTypes": [
+      "Round Homes",
+      "Hurricane-Resistant",
+      "Prefab Kit",
+      "Custom Design"
+    ],
+    "features": [
+      "Unique round/circular design",
+      "Hurricane and high-wind resistant",
+      "Panoramic views from all rooms",
+      "Energy-efficient shape",
+      "55+ years of specialized experience"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "bensonwood",
+    "name": "Bensonwood",
+    "description": "Bensonwood combines traditional timber frame craftsmanship with modern prefab efficiency to create high-performance homes. Based in New Hampshire, they've been pioneers in sustainable building for over 45 years, offering both timber frame and Unity Homes brand products.",
+    "metaDescription": "Get financing for your Bensonwood modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Walpole, New Hampshire",
+    "founded": "1973",
+    "priceRange": "$400,000 - $1,200,000+",
+    "homeTypes": [
+      "Timber Frame",
+      "High-Performance Prefab",
+      "Custom Homes",
+      "Open-Built"
+    ],
+    "features": [
+      "Traditional timber frame expertise",
+      "50+ years of craftsmanship",
+      "High-performance building science",
+      "Open-Built modular system",
+      "Parent company of Unity Homes"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "proto-homes",
+    "name": "Proto Homes",
+    "description": "Proto Homes is a California-based prefab company focused on making modern design accessible and affordable. They offer streamlined, architect-designed homes with efficient production processes that reduce costs while maintaining high design standards.",
+    "metaDescription": "Get financing for your Proto Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Southern California",
+    "founded": "2018",
+    "priceRange": "$250,000 - $600,000+",
+    "homeTypes": [
+      "Modern Prefab",
+      "ADUs",
+      "Affordable Modern"
+    ],
+    "features": [
+      "Affordable modern design",
+      "Streamlined production process",
+      "California-focused delivery",
+      "Efficient, clean aesthetics",
+      "Quick build timelines"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "kithaus",
+    "name": "kitHAUS",
+    "description": "kitHAUS creates modern, minimalist prefab structures with a focus on ADUs, studios, and small homes. Based in Los Angeles, their modular steel and glass designs bring contemporary architecture to smaller footprints, ideal for backyard additions and compact living.",
+    "metaDescription": "Get financing for your kitHAUS modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Los Angeles, California",
+    "founded": "2008",
+    "priceRange": "$150,000 - $450,000+",
+    "homeTypes": [
+      "ADUs",
+      "Studios",
+      "Modern Prefab",
+      "Backyard Offices"
+    ],
+    "features": [
+      "Minimalist modern design",
+      "Steel and glass construction",
+      "ADU and small space focus",
+      "Quick installation times",
+      "Los Angeles design aesthetic"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "ritz-craft",
+    "name": "Ritz-Craft Corporation",
+    "description": "Ritz-Craft Corporation is one of the nation's largest modular home manufacturers, with facilities across the Eastern United States. Known for quality craftsmanship and extensive customization options, they build homes from starter models to luxury estates with traditional American architecture.",
+    "metaDescription": "Get financing for your Ritz-Craft Corporation modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Mifflinburg, Pennsylvania",
+    "founded": "1979",
+    "priceRange": "$150,000 - $500,000+",
+    "homeTypes": [
+      "Modular",
+      "Cape Cod",
+      "Colonial",
+      "Ranch",
+      "Two-Story",
+      "Custom"
+    ],
+    "features": [
+      "One of nation's largest modular builders",
+      "Multiple manufacturing facilities",
+      "Extensive customization options",
+      "Traditional American architecture",
+      "45+ years of quality building"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "simplex-homes",
+    "name": "Simplex Homes",
+    "description": "Simplex Homes is a Pennsylvania-based modular home manufacturer with over 50 years of experience. They specialize in multi-family, commercial, and residential modular construction, offering solutions from single-family homes to apartment complexes with consistent quality and efficiency.",
+    "metaDescription": "Get financing for your Simplex Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Scranton, Pennsylvania",
+    "founded": "1971",
+    "priceRange": "$175,000 - $450,000+",
+    "homeTypes": [
+      "Modular",
+      "Multi-Family",
+      "Commercial",
+      "Custom Residential"
+    ],
+    "features": [
+      "50+ years of modular expertise",
+      "Multi-family and commercial capability",
+      "Northeastern US focus",
+      "Custom design services",
+      "Quality-focused manufacturing"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "nationwide-homes",
+    "name": "Nationwide Homes",
+    "description": "Nationwide Homes is a Virginia-based modular home manufacturer with 50+ years of experience building quality custom homes. They specialize in everything from starter homes to luxury estates, with a focus on the Mid-Atlantic and Southeastern markets.",
+    "metaDescription": "Get financing for your Nationwide Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Martinsville, Virginia",
+    "founded": "1970",
+    "priceRange": "$150,000 - $500,000+",
+    "homeTypes": [
+      "Modular",
+      "Cape Cod",
+      "Ranch",
+      "Colonial",
+      "Custom"
+    ],
+    "features": [
+      "50+ years of home building",
+      "Virginia-based craftsmanship",
+      "Wide range of floor plans",
+      "Custom design capability",
+      "Southeast and Mid-Atlantic focus"
+    ],
+    "category": ""
+  },
+  {
+    "slug": "excel-homes",
+    "name": "Excel Homes",
+    "description": "Excel Homes is a Pennsylvania-based modular home manufacturer known for quality construction and innovative designs. With a focus on the Northeastern United States, they offer a range of styles from traditional to contemporary with extensive customization options.",
+    "metaDescription": "Get financing for your Excel Homes modular home. ModFii connects buyers with lenders who specialize in factory-built housing. Compare loan options and get pre-approved.",
+    "headquarters": "Liverpool, Pennsylvania",
+    "founded": "1985",
+    "priceRange": "$150,000 - $400,000+",
+    "homeTypes": [
+      "Modular",
+      "Cape Cod",
+      "Ranch",
+      "Contemporary",
+      "Two-Story"
+    ],
+    "features": [
+      "35+ years of modular expertise",
+      "Northeastern US focus",
+      "Traditional and contemporary styles",
+      "Quality craftsmanship",
+      "Extensive customization options"
+    ],
+    "category": "Building Code"
+  }
+]

@@ -1,0 +1,1070 @@
+[
+  {
+    "slug": "alabama",
+    "name": "Alabama",
+    "abbreviation": "AL",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Alabama has a strong modular home market with lenders experienced in factory-built construction. Rural areas offer excellent USDA eligibility.",
+    "medianHomePrice": "$230,000",
+    "averageLoanAmount": "$185,000",
+    "prefabMarketGrowth": "+18%",
+    "popularAreas": [
+      "Birmingham",
+      "Huntsville",
+      "Mobile",
+      "Montgomery"
+    ],
+    "topManufacturers": [
+      "Clayton Homes",
+      "Champion Homes",
+      "Sunshine Homes",
+      "Deer Valley"
+    ]
+  },
+  {
+    "slug": "alaska",
+    "name": "Alaska",
+    "abbreviation": "AK",
+    "lendingClimate": "challenging",
+    "lendingDescription": "Alaska's remote locations and extreme climate create unique financing challenges, but specialized lenders exist for modular homes.",
+    "medianHomePrice": "$340,000",
+    "averageLoanAmount": "$275,000",
+    "prefabMarketGrowth": "+12%",
+    "popularAreas": [
+      "Anchorage",
+      "Fairbanks",
+      "Juneau",
+      "Wasilla"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Fleetwood Homes",
+      "Palm Harbor"
+    ]
+  },
+  {
+    "slug": "arizona",
+    "name": "Arizona",
+    "abbreviation": "AZ",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Arizona's hot housing market has driven strong demand for modular homes, with many lenders offering competitive prefab financing.",
+    "medianHomePrice": "$435,000",
+    "averageLoanAmount": "$350,000",
+    "prefabMarketGrowth": "+24%",
+    "popularAreas": [
+      "Phoenix",
+      "Tucson",
+      "Mesa",
+      "Scottsdale",
+      "Flagstaff"
+    ],
+    "topManufacturers": [
+      "Cavco Industries",
+      "Champion Homes",
+      "Clayton Homes",
+      "Fleetwood Homes"
+    ]
+  },
+  {
+    "slug": "arkansas",
+    "name": "Arkansas",
+    "abbreviation": "AR",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Arkansas offers affordable land and favorable lending conditions for modular homes, with strong USDA coverage in rural areas.",
+    "medianHomePrice": "$195,000",
+    "averageLoanAmount": "$155,000",
+    "prefabMarketGrowth": "+15%",
+    "popularAreas": [
+      "Little Rock",
+      "Fayetteville",
+      "Fort Smith",
+      "Bentonville"
+    ],
+    "topManufacturers": [
+      "Clayton Homes",
+      "Champion Homes",
+      "Sunshine Homes",
+      "Legacy Housing"
+    ]
+  },
+  {
+    "slug": "california",
+    "name": "California",
+    "abbreviation": "CA",
+    "lendingClimate": "moderate",
+    "lendingDescription": "California's high costs make modular homes attractive, but strict regulations and high loan amounts require experienced lenders. The state is actively promoting factory-built construction to address its housing crisis.",
+    "medianHomePrice": "$785,000",
+    "averageLoanAmount": "$625,000",
+    "prefabMarketGrowth": "+28%",
+    "popularAreas": [
+      "Los Angeles",
+      "San Francisco Bay Area",
+      "San Diego",
+      "Sacramento",
+      "Central Valley"
+    ],
+    "topManufacturers": [
+      "Dvele",
+      "Plant Prefab",
+      "Connect Homes",
+      "LivingHomes",
+      "kitHAUS",
+      "Proto Homes"
+    ]
+  },
+  {
+    "slug": "colorado",
+    "name": "Colorado",
+    "abbreviation": "CO",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Colorado's mountain communities and growing metros have embraced modular construction, with lenders experienced in challenging terrain.",
+    "medianHomePrice": "$540,000",
+    "averageLoanAmount": "$430,000",
+    "prefabMarketGrowth": "+22%",
+    "popularAreas": [
+      "Denver",
+      "Colorado Springs",
+      "Boulder",
+      "Fort Collins",
+      "Mountain Communities"
+    ],
+    "topManufacturers": [
+      "Method Homes",
+      "Irontown Homes",
+      "Champion Homes",
+      "Stillwater Dwellings"
+    ]
+  },
+  {
+    "slug": "connecticut",
+    "name": "Connecticut",
+    "abbreviation": "CT",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Connecticut's established housing market is seeing growing interest in modular homes as an affordable alternative to traditional construction.",
+    "medianHomePrice": "$380,000",
+    "averageLoanAmount": "$305,000",
+    "prefabMarketGrowth": "+14%",
+    "popularAreas": [
+      "Hartford",
+      "New Haven",
+      "Stamford",
+      "Bridgeport"
+    ],
+    "topManufacturers": [
+      "Simplex Homes",
+      "Ritz-Craft",
+      "Excel Homes",
+      "Commodore Homes"
+    ]
+  },
+  {
+    "slug": "delaware",
+    "name": "Delaware",
+    "abbreviation": "DE",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Delaware's compact size and favorable tax environment make it attractive for modular homes, with good lender availability.",
+    "medianHomePrice": "$350,000",
+    "averageLoanAmount": "$280,000",
+    "prefabMarketGrowth": "+16%",
+    "popularAreas": [
+      "Wilmington",
+      "Dover",
+      "Newark",
+      "Rehoboth Beach"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Commodore Homes",
+      "Ritz-Craft",
+      "Excel Homes"
+    ]
+  },
+  {
+    "slug": "florida",
+    "name": "Florida",
+    "abbreviation": "FL",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Florida leads the nation in manufactured housing, with abundant lender options and expertise in factory-built home financing. The state's hurricane building codes ensure modular homes are built to withstand severe weather.",
+    "medianHomePrice": "$410,000",
+    "averageLoanAmount": "$330,000",
+    "prefabMarketGrowth": "+26%",
+    "popularAreas": [
+      "Tampa",
+      "Orlando",
+      "Jacksonville",
+      "Miami",
+      "Fort Myers",
+      "Panhandle"
+    ],
+    "topManufacturers": [
+      "Palm Harbor Homes",
+      "Jacobsen Homes",
+      "Skyline Champion",
+      "Clayton Homes",
+      "Chariot Eagle"
+    ]
+  },
+  {
+    "slug": "georgia",
+    "name": "Georgia",
+    "abbreviation": "GA",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Georgia's diverse housing market embraces modular construction, with strong lender networks in both metro Atlanta and rural areas.",
+    "medianHomePrice": "$355,000",
+    "averageLoanAmount": "$285,000",
+    "prefabMarketGrowth": "+20%",
+    "popularAreas": [
+      "Atlanta",
+      "Savannah",
+      "Augusta",
+      "Macon",
+      "Columbus"
+    ],
+    "topManufacturers": [
+      "Clayton Homes",
+      "Champion Homes",
+      "Sunshine Homes",
+      "Legacy Housing"
+    ]
+  },
+  {
+    "slug": "hawaii",
+    "name": "Hawaii",
+    "abbreviation": "HI",
+    "lendingClimate": "challenging",
+    "lendingDescription": "Hawaii's unique location creates shipping challenges for modular homes, but growing interest is expanding lender options.",
+    "medianHomePrice": "$835,000",
+    "averageLoanAmount": "$670,000",
+    "prefabMarketGrowth": "+18%",
+    "popularAreas": [
+      "Honolulu",
+      "Maui",
+      "Big Island",
+      "Kauai"
+    ],
+    "topManufacturers": [
+      "HPM Building Supply",
+      "Honsador Lumber",
+      "Hawaii prefab specialists"
+    ]
+  },
+  {
+    "slug": "idaho",
+    "name": "Idaho",
+    "abbreviation": "ID",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Idaho's rapid growth has increased modular home demand, with lenders adapting to serve Boise's expansion and rural communities.",
+    "medianHomePrice": "$450,000",
+    "averageLoanAmount": "$360,000",
+    "prefabMarketGrowth": "+32%",
+    "popularAreas": [
+      "Boise",
+      "Meridian",
+      "Idaho Falls",
+      "Coeur d'Alene",
+      "Twin Falls"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Fleetwood Homes",
+      "Marlette Homes",
+      "Irontown Homes"
+    ]
+  },
+  {
+    "slug": "illinois",
+    "name": "Illinois",
+    "abbreviation": "IL",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Illinois offers diverse modular home opportunities from Chicago suburbs to rural farmland, with varying lender availability by region.",
+    "medianHomePrice": "$265,000",
+    "averageLoanAmount": "$215,000",
+    "prefabMarketGrowth": "+12%",
+    "popularAreas": [
+      "Chicago suburbs",
+      "Springfield",
+      "Rockford",
+      "Peoria",
+      "Champaign"
+    ],
+    "topManufacturers": [
+      "Ritz-Craft",
+      "Champion Homes",
+      "Commodore Homes",
+      "Fairmont Homes"
+    ]
+  },
+  {
+    "slug": "indiana",
+    "name": "Indiana",
+    "abbreviation": "IN",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Indiana's affordable housing market and manufacturing heritage create an ideal environment for modular home financing.",
+    "medianHomePrice": "$240,000",
+    "averageLoanAmount": "$190,000",
+    "prefabMarketGrowth": "+17%",
+    "popularAreas": [
+      "Indianapolis",
+      "Fort Wayne",
+      "Evansville",
+      "South Bend",
+      "Bloomington"
+    ],
+    "topManufacturers": [
+      "Fairmont Homes",
+      "Champion Homes",
+      "Commodore Homes",
+      "Schult Homes"
+    ]
+  },
+  {
+    "slug": "iowa",
+    "name": "Iowa",
+    "abbreviation": "IA",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Iowa's strong agricultural economy and affordable land make it ideal for modular homes, with excellent USDA coverage.",
+    "medianHomePrice": "$210,000",
+    "averageLoanAmount": "$170,000",
+    "prefabMarketGrowth": "+14%",
+    "popularAreas": [
+      "Des Moines",
+      "Cedar Rapids",
+      "Davenport",
+      "Iowa City",
+      "Sioux City"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Commodore Homes",
+      "Fairmont Homes"
+    ]
+  },
+  {
+    "slug": "kansas",
+    "name": "Kansas",
+    "abbreviation": "KS",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Kansas offers affordable modular home opportunities with strong USDA coverage.",
+    "medianHomePrice": "$225,000",
+    "averageLoanAmount": "$180,000",
+    "prefabMarketGrowth": "+13%",
+    "popularAreas": [
+      "Kansas City area",
+      "Wichita",
+      "Topeka"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Clayton Homes"
+    ]
+  },
+  {
+    "slug": "kentucky",
+    "name": "Kentucky",
+    "abbreviation": "KY",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Kentucky's affordable housing market creates strong opportunities for modular home financing.",
+    "medianHomePrice": "$215,000",
+    "averageLoanAmount": "$175,000",
+    "prefabMarketGrowth": "+16%",
+    "popularAreas": [
+      "Louisville",
+      "Lexington",
+      "Bowling Green"
+    ],
+    "topManufacturers": [
+      "Clayton Homes",
+      "Champion Homes"
+    ]
+  },
+  {
+    "slug": "louisiana",
+    "name": "Louisiana",
+    "abbreviation": "LA",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Louisiana's hurricane-prone coast requires special considerations for modular homes.",
+    "medianHomePrice": "$225,000",
+    "averageLoanAmount": "$180,000",
+    "prefabMarketGrowth": "+15%",
+    "popularAreas": [
+      "New Orleans",
+      "Baton Rouge",
+      "Shreveport"
+    ],
+    "topManufacturers": [
+      "Clayton Homes",
+      "Champion Homes"
+    ]
+  },
+  {
+    "slug": "maine",
+    "name": "Maine",
+    "abbreviation": "ME",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Maine's rural character makes energy-efficient modular homes attractive.",
+    "medianHomePrice": "$360,000",
+    "averageLoanAmount": "$290,000",
+    "prefabMarketGrowth": "+19%",
+    "popularAreas": [
+      "Portland",
+      "Bangor",
+      "Lewiston"
+    ],
+    "topManufacturers": [
+      "Excel Homes",
+      "Ritz-Craft"
+    ]
+  },
+  {
+    "slug": "maryland",
+    "name": "Maryland",
+    "abbreviation": "MD",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Maryland's mix of urban suburbs and rural Eastern Shore creates varied opportunities.",
+    "medianHomePrice": "$405,000",
+    "averageLoanAmount": "$325,000",
+    "prefabMarketGrowth": "+15%",
+    "popularAreas": [
+      "Baltimore suburbs",
+      "Montgomery County",
+      "Eastern Shore"
+    ],
+    "topManufacturers": [
+      "Ritz-Craft",
+      "Champion Homes",
+      "Commodore Homes"
+    ]
+  },
+  {
+    "slug": "massachusetts",
+    "name": "Massachusetts",
+    "abbreviation": "MA",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Massachusetts' high costs are driving modular home interest.",
+    "medianHomePrice": "$585,000",
+    "averageLoanAmount": "$470,000",
+    "prefabMarketGrowth": "+22%",
+    "popularAreas": [
+      "Boston suburbs",
+      "Worcester",
+      "Springfield",
+      "Cape Cod"
+    ],
+    "topManufacturers": [
+      "Simplex Homes",
+      "Epoch Homes"
+    ]
+  },
+  {
+    "slug": "michigan",
+    "name": "Michigan",
+    "abbreviation": "MI",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Michigan's manufacturing heritage includes strong modular home production.",
+    "medianHomePrice": "$240,000",
+    "averageLoanAmount": "$195,000",
+    "prefabMarketGrowth": "+18%",
+    "popularAreas": [
+      "Detroit suburbs",
+      "Grand Rapids",
+      "Ann Arbor",
+      "Upper Peninsula"
+    ],
+    "topManufacturers": [
+      "Commodore Homes",
+      "Redman Homes",
+      "Fairmont Homes"
+    ]
+  },
+  {
+    "slug": "minnesota",
+    "name": "Minnesota",
+    "abbreviation": "MN",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Minnesota's cold climate makes energy-efficient modular homes attractive.",
+    "medianHomePrice": "$330,000",
+    "averageLoanAmount": "$265,000",
+    "prefabMarketGrowth": "+16%",
+    "popularAreas": [
+      "Minneapolis-St. Paul",
+      "Rochester",
+      "Duluth"
+    ],
+    "topManufacturers": [
+      "Excel Homes",
+      "Champion Homes",
+      "Fairmont Homes"
+    ]
+  },
+  {
+    "slug": "mississippi",
+    "name": "Mississippi",
+    "abbreviation": "MS",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Mississippi's affordable land creates favorable conditions for modular financing.",
+    "medianHomePrice": "$180,000",
+    "averageLoanAmount": "$145,000",
+    "prefabMarketGrowth": "+14%",
+    "popularAreas": [
+      "Jackson",
+      "Gulfport-Biloxi",
+      "Hattiesburg"
+    ],
+    "topManufacturers": [
+      "Clayton Homes",
+      "Sunshine Homes",
+      "Champion Homes"
+    ]
+  },
+  {
+    "slug": "missouri",
+    "name": "Missouri",
+    "abbreviation": "MO",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Missouri's central location and affordable housing market support strong financing options.",
+    "medianHomePrice": "$245,000",
+    "averageLoanAmount": "$195,000",
+    "prefabMarketGrowth": "+15%",
+    "popularAreas": [
+      "St. Louis",
+      "Kansas City",
+      "Springfield",
+      "Columbia"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Clayton Homes",
+      "Fairmont Homes"
+    ]
+  },
+  {
+    "slug": "montana",
+    "name": "Montana",
+    "abbreviation": "MT",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Montana's rural character requires specialized modular home lenders.",
+    "medianHomePrice": "$450,000",
+    "averageLoanAmount": "$360,000",
+    "prefabMarketGrowth": "+28%",
+    "popularAreas": [
+      "Billings",
+      "Missoula",
+      "Great Falls",
+      "Bozeman"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Fleetwood Homes"
+    ]
+  },
+  {
+    "slug": "nebraska",
+    "name": "Nebraska",
+    "abbreviation": "NE",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Nebraska's affordable land and agricultural economy create ideal conditions.",
+    "medianHomePrice": "$235,000",
+    "averageLoanAmount": "$190,000",
+    "prefabMarketGrowth": "+13%",
+    "popularAreas": [
+      "Omaha",
+      "Lincoln",
+      "Grand Island"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Commodore Homes"
+    ]
+  },
+  {
+    "slug": "nevada",
+    "name": "Nevada",
+    "abbreviation": "NV",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Nevada's growing population is driving modular home interest.",
+    "medianHomePrice": "$440,000",
+    "averageLoanAmount": "$355,000",
+    "prefabMarketGrowth": "+25%",
+    "popularAreas": [
+      "Las Vegas",
+      "Henderson",
+      "Reno",
+      "Sparks"
+    ],
+    "topManufacturers": [
+      "Cavco Industries",
+      "Champion Homes",
+      "Fleetwood Homes"
+    ]
+  },
+  {
+    "slug": "new-hampshire",
+    "name": "New Hampshire",
+    "abbreviation": "NH",
+    "lendingClimate": "moderate",
+    "lendingDescription": "New Hampshire's mountains and lakes attract modular home buyers.",
+    "medianHomePrice": "$450,000",
+    "averageLoanAmount": "$360,000",
+    "prefabMarketGrowth": "+17%",
+    "popularAreas": [
+      "Manchester",
+      "Nashua",
+      "Concord",
+      "Lakes Region"
+    ],
+    "topManufacturers": [
+      "Simplex Homes",
+      "Excel Homes"
+    ]
+  },
+  {
+    "slug": "new-jersey",
+    "name": "New Jersey",
+    "abbreviation": "NJ",
+    "lendingClimate": "moderate",
+    "lendingDescription": "New Jersey's high construction costs make modular homes attractive.",
+    "medianHomePrice": "$495,000",
+    "averageLoanAmount": "$400,000",
+    "prefabMarketGrowth": "+16%",
+    "popularAreas": [
+      "Central Jersey",
+      "Jersey Shore",
+      "Northwest Jersey"
+    ],
+    "topManufacturers": [
+      "Ritz-Craft",
+      "Champion Homes",
+      "Simplex Homes"
+    ]
+  },
+  {
+    "slug": "new-mexico",
+    "name": "New Mexico",
+    "abbreviation": "NM",
+    "lendingClimate": "favorable",
+    "lendingDescription": "New Mexico's affordable land creates strong opportunities for modular homes.",
+    "medianHomePrice": "$295,000",
+    "averageLoanAmount": "$240,000",
+    "prefabMarketGrowth": "+20%",
+    "popularAreas": [
+      "Albuquerque",
+      "Santa Fe",
+      "Las Cruces",
+      "Taos"
+    ],
+    "topManufacturers": [
+      "Cavco Industries",
+      "Clayton Homes",
+      "Palm Harbor Homes"
+    ]
+  },
+  {
+    "slug": "new-york",
+    "name": "New York",
+    "abbreviation": "NY",
+    "lendingClimate": "moderate",
+    "lendingDescription": "New York's diverse markets from NYC suburbs to Upstate create varied opportunities.",
+    "medianHomePrice": "$415,000",
+    "averageLoanAmount": "$335,000",
+    "prefabMarketGrowth": "+18%",
+    "popularAreas": [
+      "Hudson Valley",
+      "Long Island",
+      "Upstate NY",
+      "Finger Lakes"
+    ],
+    "topManufacturers": [
+      "Ritz-Craft",
+      "Simplex Homes",
+      "Excel Homes",
+      "Commodore Homes"
+    ]
+  },
+  {
+    "slug": "north-carolina",
+    "name": "North Carolina",
+    "abbreviation": "NC",
+    "lendingClimate": "favorable",
+    "lendingDescription": "North Carolina's growing population and diverse geography support strong modular home financing.",
+    "medianHomePrice": "$340,000",
+    "averageLoanAmount": "$275,000",
+    "prefabMarketGrowth": "+24%",
+    "popularAreas": [
+      "Charlotte",
+      "Raleigh-Durham",
+      "Asheville",
+      "Wilmington",
+      "Greensboro"
+    ],
+    "topManufacturers": [
+      "Clayton Homes",
+      "Champion Homes",
+      "Sunshine Homes"
+    ]
+  },
+  {
+    "slug": "north-dakota",
+    "name": "North Dakota",
+    "abbreviation": "ND",
+    "lendingClimate": "moderate",
+    "lendingDescription": "North Dakota's rural character and energy economy create unique opportunities.",
+    "medianHomePrice": "$280,000",
+    "averageLoanAmount": "$225,000",
+    "prefabMarketGrowth": "+12%",
+    "popularAreas": [
+      "Fargo",
+      "Bismarck",
+      "Grand Forks",
+      "Minot"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Excel Homes"
+    ]
+  },
+  {
+    "slug": "ohio",
+    "name": "Ohio",
+    "abbreviation": "OH",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Ohio's manufacturing heritage and affordable housing market create strong conditions.",
+    "medianHomePrice": "$230,000",
+    "averageLoanAmount": "$185,000",
+    "prefabMarketGrowth": "+16%",
+    "popularAreas": [
+      "Columbus",
+      "Cleveland",
+      "Cincinnati",
+      "Toledo",
+      "Akron"
+    ],
+    "topManufacturers": [
+      "Commodore Homes",
+      "Champion Homes",
+      "Fairmont Homes",
+      "Ritz-Craft"
+    ]
+  },
+  {
+    "slug": "oklahoma",
+    "name": "Oklahoma",
+    "abbreviation": "OK",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Oklahoma's affordable land and manufactured housing tradition support excellent options.",
+    "medianHomePrice": "$200,000",
+    "averageLoanAmount": "$160,000",
+    "prefabMarketGrowth": "+17%",
+    "popularAreas": [
+      "Oklahoma City",
+      "Tulsa",
+      "Norman",
+      "Edmond"
+    ],
+    "topManufacturers": [
+      "Clayton Homes",
+      "Champion Homes",
+      "Legacy Housing"
+    ]
+  },
+  {
+    "slug": "oregon",
+    "name": "Oregon",
+    "abbreviation": "OR",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Oregon's environmental focus and housing costs drive modular home interest.",
+    "medianHomePrice": "$485,000",
+    "averageLoanAmount": "$390,000",
+    "prefabMarketGrowth": "+26%",
+    "popularAreas": [
+      "Portland",
+      "Eugene",
+      "Salem",
+      "Bend",
+      "Medford"
+    ],
+    "topManufacturers": [
+      "Stillwater Dwellings",
+      "FabCab",
+      "Marlette Homes",
+      "Method Homes"
+    ]
+  },
+  {
+    "slug": "pennsylvania",
+    "name": "Pennsylvania",
+    "abbreviation": "PA",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Pennsylvania is a modular home manufacturing hub, with abundant lender expertise.",
+    "medianHomePrice": "$275,000",
+    "averageLoanAmount": "$220,000",
+    "prefabMarketGrowth": "+18%",
+    "popularAreas": [
+      "Philadelphia suburbs",
+      "Pittsburgh",
+      "Harrisburg",
+      "Allentown",
+      "Poconos"
+    ],
+    "topManufacturers": [
+      "Ritz-Craft",
+      "Commodore Homes",
+      "Simplex Homes",
+      "Excel Homes",
+      "Nationwide Homes"
+    ]
+  },
+  {
+    "slug": "rhode-island",
+    "name": "Rhode Island",
+    "abbreviation": "RI",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Rhode Island's small size limits modular home sites, but high costs make prefab attractive.",
+    "medianHomePrice": "$425,000",
+    "averageLoanAmount": "$340,000",
+    "prefabMarketGrowth": "+14%",
+    "popularAreas": [
+      "Providence",
+      "Warwick",
+      "Cranston",
+      "Newport area"
+    ],
+    "topManufacturers": [
+      "Simplex Homes",
+      "Excel Homes"
+    ]
+  },
+  {
+    "slug": "south-carolina",
+    "name": "South Carolina",
+    "abbreviation": "SC",
+    "lendingClimate": "favorable",
+    "lendingDescription": "South Carolina's affordable land and growing population create excellent opportunities.",
+    "medianHomePrice": "$305,000",
+    "averageLoanAmount": "$245,000",
+    "prefabMarketGrowth": "+22%",
+    "popularAreas": [
+      "Charleston",
+      "Columbia",
+      "Greenville",
+      "Myrtle Beach"
+    ],
+    "topManufacturers": [
+      "Clayton Homes",
+      "Champion Homes",
+      "Sunshine Homes"
+    ]
+  },
+  {
+    "slug": "south-dakota",
+    "name": "South Dakota",
+    "abbreviation": "SD",
+    "lendingClimate": "favorable",
+    "lendingDescription": "South Dakota's affordable land makes modular homes practical, with excellent USDA coverage.",
+    "medianHomePrice": "$295,000",
+    "averageLoanAmount": "$240,000",
+    "prefabMarketGrowth": "+16%",
+    "popularAreas": [
+      "Sioux Falls",
+      "Rapid City",
+      "Aberdeen",
+      "Black Hills"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Excel Homes"
+    ]
+  },
+  {
+    "slug": "tennessee",
+    "name": "Tennessee",
+    "abbreviation": "TN",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Tennessee's growing population and modular manufacturing presence create excellent financing options.",
+    "medianHomePrice": "$335,000",
+    "averageLoanAmount": "$270,000",
+    "prefabMarketGrowth": "+23%",
+    "popularAreas": [
+      "Nashville",
+      "Memphis",
+      "Knoxville",
+      "Chattanooga",
+      "Murfreesboro"
+    ],
+    "topManufacturers": [
+      "Clayton Homes",
+      "Champion Homes",
+      "Deer Valley Homebuilders"
+    ]
+  },
+  {
+    "slug": "texas",
+    "name": "Texas",
+    "abbreviation": "TX",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Texas leads in manufactured housing with abundant land, favorable regulations, and extensive lender expertise.",
+    "medianHomePrice": "$315,000",
+    "averageLoanAmount": "$255,000",
+    "prefabMarketGrowth": "+28%",
+    "popularAreas": [
+      "Houston",
+      "Dallas-Fort Worth",
+      "Austin",
+      "San Antonio",
+      "Hill Country"
+    ],
+    "topManufacturers": [
+      "Clayton Homes",
+      "Palm Harbor Homes",
+      "Legacy Housing",
+      "Deer Valley Homebuilders",
+      "Solitaire Homes"
+    ]
+  },
+  {
+    "slug": "utah",
+    "name": "Utah",
+    "abbreviation": "UT",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Utah's rapid growth and rising prices are driving modular home interest.",
+    "medianHomePrice": "$510,000",
+    "averageLoanAmount": "$410,000",
+    "prefabMarketGrowth": "+30%",
+    "popularAreas": [
+      "Salt Lake City",
+      "Provo",
+      "Ogden",
+      "St. George"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Irontown Homes"
+    ]
+  },
+  {
+    "slug": "vermont",
+    "name": "Vermont",
+    "abbreviation": "VT",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Vermont's rural character makes energy-efficient modular homes attractive.",
+    "medianHomePrice": "$380,000",
+    "averageLoanAmount": "$305,000",
+    "prefabMarketGrowth": "+18%",
+    "popularAreas": [
+      "Burlington",
+      "Montpelier",
+      "Rutland",
+      "Stowe area"
+    ],
+    "topManufacturers": [
+      "Bensonwood",
+      "Simplex Homes"
+    ]
+  },
+  {
+    "slug": "virginia",
+    "name": "Virginia",
+    "abbreviation": "VA",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Virginia's diverse markets from DC suburbs to rural areas offer varied opportunities.",
+    "medianHomePrice": "$395,000",
+    "averageLoanAmount": "$320,000",
+    "prefabMarketGrowth": "+19%",
+    "popularAreas": [
+      "Northern Virginia",
+      "Richmond",
+      "Virginia Beach",
+      "Roanoke"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Ritz-Craft",
+      "Nationwide Homes",
+      "Commodore Homes"
+    ]
+  },
+  {
+    "slug": "washington",
+    "name": "Washington",
+    "abbreviation": "WA",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Washington's high costs and environmental focus drive strong modular home interest.",
+    "medianHomePrice": "$575,000",
+    "averageLoanAmount": "$460,000",
+    "prefabMarketGrowth": "+24%",
+    "popularAreas": [
+      "Seattle",
+      "Tacoma",
+      "Spokane",
+      "Bellevue",
+      "Olympia"
+    ],
+    "topManufacturers": [
+      "Method Homes",
+      "Stillwater Dwellings",
+      "FabCab",
+      "Marlette Homes"
+    ]
+  },
+  {
+    "slug": "west-virginia",
+    "name": "West Virginia",
+    "abbreviation": "WV",
+    "lendingClimate": "favorable",
+    "lendingDescription": "West Virginia's affordable land and rural character create strong modular opportunities.",
+    "medianHomePrice": "$165,000",
+    "averageLoanAmount": "$135,000",
+    "prefabMarketGrowth": "+14%",
+    "popularAreas": [
+      "Charleston",
+      "Huntington",
+      "Morgantown",
+      "Wheeling"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Commodore Homes",
+      "Ritz-Craft"
+    ]
+  },
+  {
+    "slug": "wisconsin",
+    "name": "Wisconsin",
+    "abbreviation": "WI",
+    "lendingClimate": "favorable",
+    "lendingDescription": "Wisconsin's manufacturing heritage supports strong modular home financing.",
+    "medianHomePrice": "$280,000",
+    "averageLoanAmount": "$225,000",
+    "prefabMarketGrowth": "+15%",
+    "popularAreas": [
+      "Milwaukee",
+      "Madison",
+      "Green Bay",
+      "Appleton"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Excel Homes",
+      "Commodore Homes"
+    ]
+  },
+  {
+    "slug": "wyoming",
+    "name": "Wyoming",
+    "abbreviation": "WY",
+    "lendingClimate": "moderate",
+    "lendingDescription": "Wyoming's rural character requires specialized modular home lenders.",
+    "medianHomePrice": "$325,000",
+    "averageLoanAmount": "$260,000",
+    "prefabMarketGrowth": "+18%",
+    "popularAreas": [
+      "Cheyenne",
+      "Casper",
+      "Jackson Hole",
+      "Laramie"
+    ],
+    "topManufacturers": [
+      "Champion Homes",
+      "Fleetwood Homes"
+    ]
+  }
+]

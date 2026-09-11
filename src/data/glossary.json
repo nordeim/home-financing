@@ -1,0 +1,238 @@
+[
+  {
+    "term": "Adjustable-Rate Mortgage (ARM)",
+    "definition": "A mortgage with an interest rate that changes periodically based on market conditions. Initial rates are often lower than fixed-rate mortgages but can increase over time, affecting your monthly payments."
+  },
+  {
+    "term": "Amortization",
+    "definition": "The process of paying off a loan through regular payments over time. Each payment covers both principal and interest, with early payments weighted more toward interest and later payments toward principal."
+  },
+  {
+    "term": "Appraisal",
+    "definition": "A professional assessment of a property's market value conducted by a licensed appraiser. Required by lenders to ensure the home is worth the loan amount being requested."
+  },
+  {
+    "term": "ADU (Accessory Dwelling Unit)",
+    "definition": "A secondary housing unit on a single-family property. Also called granny flats, in-law suites, or backyard cottages. Many modular manufacturers now offer ADU-specific designs."
+  },
+  {
+    "term": "Building Permit",
+    "definition": "Official approval from local government to construct or modify a structure. Required before modular home installation and inspected at various stages during the set and finish process."
+  },
+  {
+    "term": "Builder Risk Insurance",
+    "definition": "Insurance coverage that protects a home under construction from damage, theft, or vandalism. Required by most construction lenders until the home is complete and permanent homeowner's insurance takes effect."
+  },
+  {
+    "term": "Certificate of Eligibility (COE)",
+    "definition": "Document from the VA confirming a veteran's eligibility for VA loan benefits. Can be obtained online through the VA's eBenefits portal or through your lender."
+  },
+  {
+    "term": "Certificate of Occupancy (CO)",
+    "definition": "Document issued by local building department confirming a home meets all codes and is safe to occupy. Required before moving in and before construction loan converts to permanent financing."
+  },
+  {
+    "term": "Chattel Loan",
+    "definition": "A loan for personal property rather than real estate. Used for manufactured homes not on permanent foundations. Typically has higher interest rates and shorter terms than traditional mortgages."
+  },
+  {
+    "term": "Closing Costs",
+    "definition": "Fees and expenses paid at the closing of a real estate transaction, typically 2-5% of the loan amount. Includes appraisal fees, title insurance, origination fees, and prepaid items like taxes and insurance."
+  },
+  {
+    "term": "Construction-to-Permanent Loan",
+    "definition": "A single loan that finances construction and converts to a permanent mortgage upon completion. Also called a one-time close loan, it saves money by avoiding two separate closings."
+  },
+  {
+    "term": "Conventional Loan",
+    "definition": "A mortgage not backed by a government agency (FHA, VA, USDA). Typically requires higher credit scores (620+) and larger down payments (3-20%) but offers competitive rates for qualified borrowers."
+  },
+  {
+    "term": "Conforming Loan",
+    "definition": "A mortgage that meets Fannie Mae or Freddie Mac guidelines, including loan limits. In 2024, the conforming loan limit is $766,550 in most areas, higher in designated high-cost areas."
+  },
+  {
+    "term": "Debt-to-Income Ratio (DTI)",
+    "definition": "The percentage of monthly gross income that goes toward debt payments including the proposed mortgage. Lenders typically want DTI below 43-50%, though some programs allow higher ratios."
+  },
+  {
+    "term": "Down Payment",
+    "definition": "The upfront cash payment made when purchasing a home, expressed as a percentage of the purchase price. Ranges from 0% (VA, USDA) to 3.5% (FHA) to 20%+ (conventional without PMI)."
+  },
+  {
+    "term": "Draw Schedule",
+    "definition": "The timeline for releasing construction loan funds in stages as work is completed. Typical draws include foundation, framing/set, rough-in, drywall, and final completion."
+  },
+  {
+    "term": "Earnest Money",
+    "definition": "A deposit made to demonstrate serious intent to purchase, typically 1-3% of purchase price. Held in escrow and applied to closing costs or down payment at closing."
+  },
+  {
+    "term": "Equity",
+    "definition": "The difference between a property's market value and the amount owed on mortgages. Builds over time as you pay down the loan principal and property appreciates in value."
+  },
+  {
+    "term": "Escrow",
+    "definition": "A neutral third party that holds funds and documents during a real estate transaction. Also refers to the account where monthly property taxes and insurance payments are held by your lender."
+  },
+  {
+    "term": "FHA Loan",
+    "definition": "A mortgage insured by the Federal Housing Administration. Offers low down payments (3.5% with 580+ credit score) and flexible credit requirements, making homeownership accessible to more buyers."
+  },
+  {
+    "term": "Fixed-Rate Mortgage",
+    "definition": "A mortgage with an interest rate that remains constant for the entire loan term, typically 15 or 30 years. Provides predictable monthly payments regardless of market rate changes."
+  },
+  {
+    "term": "Foundation",
+    "definition": "The structural base that supports a home. Modular homes require permanent foundations (slab, crawl space, or basement) to qualify for mortgage financing and be classified as real property."
+  },
+  {
+    "term": "Funding Fee (VA)",
+    "definition": "A one-time fee charged on VA loans to help fund the program for future veterans. Ranges from 1.25% to 3.3% depending on down payment amount and whether it's first or subsequent use."
+  },
+  {
+    "term": "Guarantee Fee (USDA)",
+    "definition": "Fees charged on USDA loans: 1% upfront guarantee fee and 0.35% annual fee. Lower than FHA mortgage insurance, making USDA loans very affordable for eligible rural buyers."
+  },
+  {
+    "term": "General Contractor (GC)",
+    "definition": "The primary contractor responsible for overseeing construction, hiring subcontractors, and ensuring work meets specifications. Required for most construction loans to manage the modular home installation."
+  },
+  {
+    "term": "HELOC (Home Equity Line of Credit)",
+    "definition": "A revolving line of credit secured by home equity. Can be used to finance ADUs, home improvements, or as a source of down payment for a second property."
+  },
+  {
+    "term": "HUD Code",
+    "definition": "Federal building standards for manufactured homes, established in 1976 by the Department of Housing and Urban Development. Different from state/local building codes that govern modular home construction."
+  },
+  {
+    "term": "HUD Tag",
+    "definition": "A red certification label affixed to manufactured homes confirming they meet federal HUD construction standards. Modular homes do not have HUD tags\u2014they have state inspection labels instead."
+  },
+  {
+    "term": "Interest Reserve",
+    "definition": "Funds set aside within a construction loan to cover interest payments during the build phase. Allows borrowers to avoid making out-of-pocket interest payments during construction."
+  },
+  {
+    "term": "Interest-Only Payment",
+    "definition": "A payment that covers only the interest due, not principal. Common during construction loan build phase, keeping payments low until the home is complete and permanent financing begins."
+  },
+  {
+    "term": "IRC (International Residential Code)",
+    "definition": "Building code standards adopted by most states for residential construction. Modular homes are built to IRC standards in the factory, same as site-built homes."
+  },
+  {
+    "term": "Jumbo Loan",
+    "definition": "A mortgage that exceeds conforming loan limits set by Fannie Mae and Freddie Mac ($766,550 in most areas for 2024). Requires stronger credit, larger down payments, and often carries slightly higher rates."
+  },
+  {
+    "term": "Land Equity",
+    "definition": "The value of land you own outright that can count toward down payment requirements on construction loans. If you own your lot free and clear, its value reduces or eliminates cash needed at closing."
+  },
+  {
+    "term": "Loan-to-Value Ratio (LTV)",
+    "definition": "The ratio of the loan amount to the property's appraised value, expressed as a percentage. Lower LTV means more equity and often qualifies for better interest rates and no PMI."
+  },
+  {
+    "term": "Lock (Rate Lock)",
+    "definition": "An agreement where a lender guarantees a specific interest rate for a set period while your loan is processed. Construction loans may offer extended locks or float-down options."
+  },
+  {
+    "term": "Manufactured Home",
+    "definition": "A home built entirely in a factory to federal HUD code, transported on a permanent chassis. Different from modular homes, which are built to state/local codes and always placed on permanent foundations."
+  },
+  {
+    "term": "MIP (Mortgage Insurance Premium)",
+    "definition": "Insurance required on FHA loans to protect the lender against default. Includes upfront premium (1.75% of loan) and annual premium (0.55% of loan balance, paid monthly)."
+  },
+  {
+    "term": "Modular Home",
+    "definition": "A home built in sections (modules) in a factory to state and local building codes, then transported to the site and assembled on a permanent foundation. Classified and financed as real property, same as site-built homes."
+  },
+  {
+    "term": "Module",
+    "definition": "A prefabricated section of a modular home built in the factory. Most modular homes consist of 2-6 modules that are joined together on-site to create the complete home."
+  },
+  {
+    "term": "One-Time Close",
+    "definition": "A construction loan that converts to a permanent mortgage without a second closing, saving time and money. You lock your rate upfront and only pay closing costs once."
+  },
+  {
+    "term": "Origination Fee",
+    "definition": "A fee charged by lenders for processing a new loan application, typically 0.5-1% of the loan amount. Covers underwriting, processing, and administrative costs."
+  },
+  {
+    "term": "Permanent Foundation",
+    "definition": "A foundation that permanently affixes a home to land, such as concrete slab, crawl space, or full basement. Required for modular homes to qualify for traditional mortgage financing."
+  },
+  {
+    "term": "PMI (Private Mortgage Insurance)",
+    "definition": "Insurance required on conventional loans with less than 20% down payment, protecting the lender against default. Can be removed once you reach 20% equity through payments or appreciation."
+  },
+  {
+    "term": "Pre-Approval",
+    "definition": "A lender's conditional commitment to lend a specific amount based on verified income, credit, and assets. Stronger than pre-qualification and shows sellers you're a serious buyer."
+  },
+  {
+    "term": "Pre-Qualification",
+    "definition": "An initial estimate of how much you may be able to borrow, based on self-reported financial information. Less rigorous than pre-approval but helpful for initial planning."
+  },
+  {
+    "term": "Prefab Home",
+    "definition": "General term for any home with components manufactured off-site in a factory. Includes modular homes, manufactured homes, panelized homes, and prefab ADUs."
+  },
+  {
+    "term": "Principal",
+    "definition": "The original amount borrowed on a loan, not including interest. Your monthly payment reduces principal over time, building equity in your home."
+  },
+  {
+    "term": "Real Property",
+    "definition": "Land and anything permanently attached to it. Modular homes on permanent foundations are classified as real property and financed the same as traditional site-built homes."
+  },
+  {
+    "term": "RVIA Certification",
+    "definition": "Certification from the RV Industry Association that a structure meets recreational vehicle construction standards. Required for RV loan financing on tiny homes on wheels."
+  },
+  {
+    "term": "Set Day",
+    "definition": "The day a modular home is delivered and placed (set) on its foundation using a crane. A major milestone in the construction process, typically completed in one day for most homes."
+  },
+  {
+    "term": "Site Work",
+    "definition": "Preparation of land for construction, including clearing, grading, foundation installation, utility connections (water, sewer, electric), and driveway. Can represent 15-25% of total project cost."
+  },
+  {
+    "term": "Stick-Built",
+    "definition": "A traditional home constructed entirely on-site from individual components. Often used as comparison point for modular homes, which offer similar quality with faster construction timelines."
+  },
+  {
+    "term": "Title",
+    "definition": "Legal document proving ownership of property. Clear title is required for mortgage financing and is verified through a title search before closing."
+  },
+  {
+    "term": "Title Insurance",
+    "definition": "Insurance protecting the lender and/or owner against defects in title or ownership claims. Required by lenders and purchased at closing for a one-time premium."
+  },
+  {
+    "term": "Two-Time Close",
+    "definition": "A construction loan that requires refinancing to a separate permanent mortgage after construction is complete. Involves two closings and two sets of closing costs."
+  },
+  {
+    "term": "Underwriting",
+    "definition": "The process by which a lender evaluates risk and decides whether to approve a loan. Underwriters verify income, assets, credit, and property value to ensure the loan meets guidelines."
+  },
+  {
+    "term": "USDA Loan",
+    "definition": "A mortgage guaranteed by the U.S. Department of Agriculture for eligible rural and suburban areas. Offers $0 down payment and low fees for borrowers meeting income limits."
+  },
+  {
+    "term": "VA Loan",
+    "definition": "A mortgage guaranteed by the Department of Veterans Affairs for eligible veterans, active-duty service members, and surviving spouses. Offers $0 down payment, no PMI, and competitive rates."
+  },
+  {
+    "term": "Zoning",
+    "definition": "Local regulations controlling how land can be used, including residential density, building setbacks, and structure types. Verify zoning allows modular homes before purchasing land or signing contracts."
+  }
+]

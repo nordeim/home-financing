@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="ModFii">
+  <rect width="64" height="64" rx="14" fill="#275C48"/>
+  <path d="M14 42V22l9 12 9-12v20" stroke="#F8F4EE" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M36 42V22h6.5c5.4 0 9.5 3.6 9.5 10s-4.1 10-9.5 10H36Z" stroke="#E8A317" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M18 46h28" stroke="#E8A317" stroke-width="2.4" stroke-linecap="round"/>
+</svg>
