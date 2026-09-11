@@ -1,6 +1,6 @@
 import { CalculatorApp } from "@/components/calculator-app";
 import { Breadcrumbs } from "@/components/page-shell";
-import { BadgeCheck, Banknote, ChevronDown, FileText, Home, Percent, ShieldCheck } from "lucide-react";
+import { BadgeCheck, Banknote, Calculator, ChevronDown, CircleCheck, FileText, Home, Percent } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ButtonLink, Container } from "@/components/ui";
@@ -66,7 +66,18 @@ export default function CalculatorPage() {
     <main className="pb-20">
       <section className="pt-28">
         <Container>
-          <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Payment Calculator" }]} />
+          <Breadcrumbs
+            items={[
+              { name: "Home", href: "/" },
+              { name: "Modular Home Financing", href: "/modular-home-financing" },
+              { name: "Payment Calculator" },
+            ]}
+            chevron
+          />
+          <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground">
+            <Calculator className="h-4 w-4 text-primary" aria-hidden />
+            Free Calculator
+          </p>
           <h1 className="mt-4 max-w-xl font-display text-4xl font-bold md:text-5xl">
             Modular Home Payment Calculator
           </h1>
@@ -77,7 +88,7 @@ export default function CalculatorPage() {
           <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2">
             {TRUST_CHIPS.map((chip) => (
               <span key={chip} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-                <ShieldCheck className="h-4 w-4 text-primary" aria-hidden />
+                <CircleCheck className="h-4 w-4 text-primary" aria-hidden />
                 {chip}
               </span>
             ))}

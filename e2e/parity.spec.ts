@@ -134,9 +134,12 @@ test.describe("live-source parity (pass 3)", () => {
     expect(background).not.toBe("rgba(0, 0, 0, 0)");
   });
 
-  test("intro section carries the source eyebrow label", async ({ page }) => {
+  test("intro section has no eyebrow label (source renders none)", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText("Your Prefab Financing Partner")).toBeVisible();
+    // 2026-09-13 correction: the live source homepage has NO eyebrow above the
+    // "Modular & Prefab Home Loans" intro — the pass-3 addition overshot the
+    // source (the phrase only exists in source og: meta descriptions).
+    await expect(page.getByText("Your Prefab Financing Partner")).toHaveCount(0);
   });
 
   test("closing CTA carries the source trust line", async ({ page }) => {
@@ -189,5 +192,67 @@ test.describe("live-source parity (pass 3)", () => {
     await expect(section).toBeVisible();
     const cls = await section.getAttribute("class");
     expect(cls).toContain("bg-accent");
+  });
+});
+
+/**
+ * Pass-4 live-source parity pins (2026-09-13).
+ *
+ * Derived from the same source-vs-clone methodology as pass 3:
+ * docs/REMEDIATION_PLAN_pass4.md holds the evidence table
+ * (computed-style probes + de-minified source hero JSX + asset byte-compare).
+ */
+test.describe("live-source parity (pass 4)", () => {
+  test("home hero uses the source overlay recipe with a bottom fade and no grid texture", async ({ page }) => {
+    await page.goto("/");
+    const hero = page.locator("main section").first();
+    // Source layering: photo + horizontal primary wash + bottom fade into the
+    // wordmark strip; the pass-2 hero-grid texture is not in the source.
+    await expect(hero.locator("div[class*='bg-gradient-to-r'][class*='from-primary/95']")).toHaveCount(1);
+    await expect(hero.locator("div[class*='bg-gradient-to-b'][class*='to-primary/95']")).toHaveCount(1);
+    await expect(hero.locator(".hero-grid")).toHaveCount(0);
+  });
+
+  test("hub hero carries the source last-updated line, truth callout, second CTA, and four stat chips", async ({ page }) => {
+    await page.goto("/modular-home-financing");
+    await expect(page.getByText(/Last Updated: January 2026/i)).toBeVisible();
+    await expect(page.getByText("Here's the truth:")).toBeVisible();
+    await expect(page.getByText("But most lenders don't understand that.")).toBeVisible();
+    await expect(page.getByText("ModFii exists to solve this.")).toBeVisible();
+    await expect(page.getByRole("link", { name: /Get Pre-Approved Now/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Compare Loan Options/i })).toBeVisible();
+    const hero = page.locator("main section").filter({ has: page.getByRole("heading", { level: 1 }) });
+    await expect(hero.getByText("0.5%", { exact: true })).toBeVisible();
+    await expect(hero.getByText("94%", { exact: true })).toBeVisible();
+  });
+
+  test("FHA loan-options page matches source hero: highlight line, updated line, dual CTAs", async ({ page }) => {
+    await page.goto("/modular-home-financing/loan-options/fha");
+    await expect(page.locator("h1 span.text-accent")).toHaveText(/Modular Homes/i);
+    await expect(page.getByText(/Last Updated: January 2026/i)).toBeVisible();
+    await expect(page.getByRole("link", { name: /Check FHA Eligibility/i }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /View Requirements/i })).toBeVisible();
+  });
+
+  test("VA loan-options page matches source hero: updated line, dual CTAs, author strip", async ({ page }) => {
+    await page.goto("/modular-home-financing/loan-options/va");
+    await expect(page.getByText(/Last Updated: January 2026/i)).toBeVisible();
+    await expect(page.locator("h1 span.text-accent")).toHaveText(/Modular Homes/i);
+    await expect(page.getByRole("link", { name: /Check VA Eligibility/i }).first()).toBeVisible();
+    await expect(page.getByText("Written by")).toBeVisible();
+    await expect(page.getByText("Sarah Williams")).toBeVisible();
+  });
+
+  test("learn hub cards do not duplicate the word read", async ({ page }) => {
+    await page.goto("/learn");
+    await expect(page.getByText(/read read/i)).toHaveCount(0);
+    await expect(page.getByText(/15 min read/).first()).toBeVisible();
+  });
+
+  test("calculator hero carries the source Free Calculator pill and middle breadcrumb", async ({ page }) => {
+    await page.goto("/calculator");
+    await expect(page.getByText("Free Calculator")).toBeVisible();
+    const crumbs = page.getByRole("navigation", { name: "Breadcrumb" });
+    await expect(crumbs.getByText("Modular Home Financing")).toBeVisible();
   });
 });

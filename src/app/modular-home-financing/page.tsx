@@ -12,6 +12,7 @@ export default function Page() {
     <GuideScreen
       guideKey="modular-home-financing"
       crumbs={[{ name: "Home", href: "/" }, { name: "Modular Home Financing" }]}
+      crumbsOutside
     />
   );
 }

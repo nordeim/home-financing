@@ -1,3 +1,6 @@
+import type { ComponentType } from "react";
+import { FileText, Home, MapPin, User } from "lucide-react";
+
 export interface GuideStat {
   label: string;
   value: string;
@@ -9,12 +12,20 @@ export interface GuideSection {
   bullets?: string[];
 }
 
+export interface GuideAuthor {
+  name: string;
+  role: string;
+  credential?: string;
+}
+
 export interface GuidePageContent {
   slug: string;
   title: string;
   /** Optional second title line rendered in the brand amber (modfii.com hub style). */
   highlight?: string;
   eyebrow: string;
+  /** Contextual icon for the eyebrow pill (source varies it per page; default Star). */
+  eyebrowIcon?: ComponentType<{ className?: string }>;
   description: string;
   heroImage?: "/images/hero-prefab.jpg" | "/images/green-home.jpg" | "/images/adu-backyard.jpg" | "/images/tiny-home.jpg" | "/images/interior-living.jpg";
   stats?: GuideStat[];
@@ -22,6 +33,15 @@ export interface GuidePageContent {
   faqs?: Array<{ question: string; answer: string }>;
   related?: Array<{ href: string; title: string; description: string }>;
   cta: string;
+  /** Extra hero CTAs (source renders a pair on hub + loan pages). Overrides the default single /get-started CTA when present. */
+  ctas?: Array<{ label: string; href: string; variant?: "secondary" | "onPrimary" | "accent" | "outline" }>;
+  /** Source renders "Last Updated: …" under the hero breadcrumbs (hub + loan pages). */
+  updated?: string;
+  /** Source hub "Here's the truth" glass callout paragraphs (lead phrase + body). */
+  callout?: Array<{ lead: string; text: string }>;
+  /** Source shows a written-by / reviewed-by strip directly under the hero. */
+  author?: GuideAuthor;
+  reviewedBy?: GuideAuthor;
 }
 
 export const GUIDES: Record<string, GuidePageContent> = {
@@ -31,11 +51,31 @@ export const GUIDES: Record<string, GuidePageContent> = {
     highlight: "Made Simple",
     eyebrow: "50+ Specialized Lenders",
     description:
-      "Get matched with lenders who finance prefab and modular homes as real property—not as trailers. Compare FHA, VA, USDA, conventional, and construction-to-permanent options.",
+      "Most banks don't understand prefab construction—leading to delays, denials, and lost deposits. ModFii connects you with lenders who specialize in modular home financing, so you close faster and save thousands.",
     heroImage: "/images/hero-prefab.jpg",
+    updated: "January 2026",
+    callout: [
+      {
+        lead: "Here's the truth:",
+        text: "Modular homes are built in factories to the same building codes as site-built homes. They're real property. They appreciate like traditional homes. And they qualify for FHA, VA, USDA, and conventional mortgages—just like any other home.",
+      },
+      {
+        lead: "But most lenders don't understand that.",
+        text: "The result? Good buyers get rejected, overpay on rates, or wait months for approvals that should take days. Manufacturers lose sales. Deposits get forfeited.",
+      },
+      {
+        lead: "ModFii exists to solve this.",
+        text: "We match you with lenders who specialize in factory-built construction and close loans in days, not months—with a 94% approval rate.",
+      },
+    ],
+    ctas: [
+      { label: "Get Pre-Approved Now", href: "/get-started", variant: "secondary" },
+      { label: "Compare Loan Options", href: "/modular-home-financing/loan-options", variant: "onPrimary" },
+    ],
     stats: [
       { label: "Approval rate", value: "94%" },
       { label: "Typical approval", value: "7 days" },
+      { label: "Closing fee", value: "0.5%" },
       { label: "Avg. buyer savings", value: "$12K" },
     ],
     sections: [
@@ -329,14 +369,19 @@ export const GUIDES: Record<string, GuidePageContent> = {
   },
   "loan-options-fha": {
     slug: "modular-home-financing/loan-options/fha",
-    title: "FHA Loans for Modular Homes",
-    eyebrow: "FHA",
-    description: "Low down payment FHA financing for modular and manufactured homes on permanent foundations.",
-    stats: [
-      { label: "Down payment", value: "3.5%" },
-      { label: "Credit", value: "580+" },
-      { label: "Foundation", value: "Permanent" },
+    title: "FHA Loans for",
+    highlight: "Modular Homes",
+    eyebrow: "Government-Backed Financing",
+    eyebrowIcon: Home,
+    description:
+      "Get into your modular home with just 3.5% down. FHA loans offer flexible credit requirements and competitive rates—but you need a lender who understands prefab construction.",
+    updated: "January 2026",
+    ctas: [
+      { label: "Check FHA Eligibility", href: "/get-started", variant: "accent" },
+      { label: "View Requirements", href: "/modular-home-financing/fha-modular-manufactured", variant: "onPrimary" },
     ],
+    author: { name: "Jane Morrison", role: "Senior Mortgage Analyst", credential: "NMLS Licensed" },
+    reviewedBy: { name: "Sarah Williams", role: "Government Loan Specialist", credential: "VA Loan Expert" },
     sections: [
       {
         heading: "FHA property rules that matter",
@@ -350,9 +395,19 @@ export const GUIDES: Record<string, GuidePageContent> = {
   },
   "loan-options-va": {
     slug: "modular-home-financing/loan-options/va",
-    title: "VA Loans for Modular & Prefab Homes",
-    eyebrow: "VA",
-    description: "Zero-down VA financing when your modular or prefab home is real property on a permanent foundation.",
+    title: "VA Loans for",
+    highlight: "Modular Homes",
+    eyebrow: "Exclusive Veteran Benefits",
+    eyebrowIcon: User,
+    description:
+      "You served your country—now get the home financing benefits you've earned. VA loans offer $0 down, no PMI, and the best rates available for modular home buyers.",
+    updated: "January 2026",
+    ctas: [
+      { label: "Check VA Eligibility", href: "/get-started", variant: "accent" },
+      { label: "View Requirements", href: "/modular-home-financing/va-modular-prefab", variant: "onPrimary" },
+    ],
+    author: { name: "Sarah Williams", role: "Government Loan Specialist", credential: "VA Loan Expert" },
+    reviewedBy: { name: "ModFii Editorial Team", role: "Content Team" },
     sections: [
       {
         heading: "Eligibility in brief",
@@ -366,9 +421,19 @@ export const GUIDES: Record<string, GuidePageContent> = {
   },
   "loan-options-usda": {
     slug: "modular-home-financing/loan-options/usda",
-    title: "USDA Loans for Modular Homes",
-    eyebrow: "USDA",
-    description: "Zero-down rural development loans for income-eligible modular buyers in USDA-eligible locations.",
+    title: "USDA Loans for",
+    highlight: "Modular Homes",
+    eyebrow: "Rural Development Financing",
+    eyebrowIcon: MapPin,
+    description:
+      "Building in a rural area? USDA loans offer $0 down payment for eligible buyers. More areas qualify than you might think—even many suburban locations.",
+    updated: "January 2026",
+    ctas: [
+      { label: "Check USDA Eligibility", href: "/get-started", variant: "accent" },
+      { label: "View Requirements", href: "/modular-home-financing/loan-options", variant: "onPrimary" },
+    ],
+    author: { name: "Sarah Williams", role: "Government Loan Specialist", credential: "VA Loan Expert" },
+    reviewedBy: { name: "ModFii Editorial Team", role: "Content Team" },
     sections: [
       {
         heading: "Two gates",
@@ -381,11 +446,20 @@ export const GUIDES: Record<string, GuidePageContent> = {
   },
   "loan-options-construction": {
     slug: "modular-home-financing/loan-options/construction-loan",
-    title: "Construction-to-Permanent Modular Loans",
-    eyebrow: "Single close",
+    title: "Construction-to-Permanent",
+    highlight: "Modular Loans",
+    eyebrow: "Single-Close Financing",
+    eyebrowIcon: FileText,
     description:
-      "One loan covering factory production, delivery, site work, and the permanent mortgage. Interest-only during the build, then principal and interest after the CO.",
+      "Building a custom modular home? Get one loan that covers factory production, delivery, site work, and automatically converts to your permanent mortgage. One closing. One loan.",
     heroImage: "/images/hero-prefab.jpg",
+    updated: "January 2026",
+    ctas: [
+      { label: "Get Pre-Approved", href: "/get-started", variant: "accent" },
+      { label: "How It Works", href: "/construction-loans", variant: "onPrimary" },
+    ],
+    author: { name: "Michael Chen", role: "Construction Finance Specialist", credential: "MBA" },
+    reviewedBy: { name: "ModFii Editorial Team", role: "Content Team" },
     sections: [
       {
         heading: "What's in the total project cost",

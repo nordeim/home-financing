@@ -1,31 +1,44 @@
 import { ButtonLink, Container, cn } from "@/components/ui";
 import type { GuidePageContent } from "@/lib/guides";
-import { ArrowRight, ChevronDown, Star } from "lucide-react";
+import { ArrowRight, Calendar, ChevronDown, ChevronRight, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
 
 export function Breadcrumbs({
   items,
   light = false,
   align = "left",
+  chevron = false,
+  className,
 }: {
   items: Array<{ name: string; href?: string }>;
   light?: boolean;
   align?: "left" | "center";
+  chevron?: boolean;
+  className?: string;
 }) {
   return (
-    <nav aria-label="Breadcrumb" className={`mb-8 text-sm ${light ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+    <nav
+      aria-label="Breadcrumb"
+      className={cn("text-sm", light ? "text-primary-foreground/70" : "text-muted-foreground", className)}
+    >
       <ol className={`flex flex-wrap items-center gap-2 ${align === "center" ? "justify-center" : ""}`}>
         {items.map((item, index) => (
           <li key={`${item.name}-${index}`} className="flex items-center gap-2">
-            {index > 0 ? <span aria-hidden>/</span> : null}
+            {index > 0 ? (
+              chevron ? (
+                <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
+              ) : (
+                <span aria-hidden>/</span>
+              )
+            ) : null}
             {item.href ? (
               <Link href={item.href} className="hover:text-inherit hover:underline">
                 {item.name}
               </Link>
             ) : (
-              <span className={light ? "text-primary-foreground" : "text-foreground"}>{item.name}</span>
+              <span className={cn("font-medium", light ? "text-primary-foreground" : "text-foreground")}>{item.name}</span>
             )}
           </li>
         ))}
@@ -38,9 +51,17 @@ export function Breadcrumbs({
  * Shared interior hero — centered, photo-backed with a deep forest overlay,
  * optional eyebrow pill, amber-highlighted second title line, stat chips and
  * CTA pair, mirroring the modfii.com page heroes.
+ *
+ * Pass-4 live-source alignment: optional `updated` line ("Last Updated: …",
+ * Calendar icon — source renders it under the breadcrumbs on hub + loan
+ * pages), contextual `eyebrowIcon`, optional hero `callout` paragraphs
+ * (source "Here's the truth" glass card), and `crumbsOutside` for pages
+ * where the source places breadcrumbs on the page background above the
+ * photo panel (e.g. /modular-home-financing).
  */
 export function PageHero({
   eyebrow,
+  eyebrowIcon: EyebrowIcon = Star,
   title,
   highlight,
   description,
@@ -48,33 +69,49 @@ export function PageHero({
   imageSrc,
   stats,
   ctas,
+  updated,
+  callout,
+  crumbsOutside = false,
 }: {
   eyebrow?: string;
+  eyebrowIcon?: ComponentType<{ className?: string }>;
   title: string;
   highlight?: string;
   description: string;
   crumbs: Array<{ name: string; href?: string }>;
   imageSrc?: string;
   stats?: Array<{ label: string; value: string }>;
-  ctas?: Array<{ label: string; href: string; variant?: "secondary" | "onPrimary" }>;
+  ctas?: Array<{ label: string; href: string; variant?: "secondary" | "onPrimary" | "accent" | "outline" }>;
+  updated?: string;
+  callout?: GuidePageContent["callout"];
+  crumbsOutside?: boolean;
 }) {
-  return (
-    <section className="relative isolate overflow-hidden bg-forest pb-16 pt-32 text-primary-foreground md:pb-20 md:pt-36">
+  // The source hero breadcrumb trail starts at the section level (no "Home"
+  // crumb inside the photo panel); the outside variant keeps the full trail.
+  const heroCrumbs = crumbsOutside ? crumbs : crumbs.filter((c) => c.name !== "Home");
+  const hero = (
+    <section className="relative isolate overflow-hidden bg-forest pb-16 pt-28 text-primary-foreground md:pb-20 md:pt-32">
       {imageSrc ? (
         <>
-          <Image src={imageSrc} alt="" fill className="object-cover opacity-35" sizes="100vw" priority />
-          <div className="absolute inset-0 bg-gradient-to-b from-forest/80 via-forest/85 to-forest/90" />
+          <Image src={imageSrc} alt="" fill className="object-cover opacity-45" sizes="100vw" priority />
+          <div className="absolute inset-0 bg-gradient-to-b from-forest/85 via-forest/80 to-forest/85" />
         </>
       ) : (
         <div className="absolute inset-0 bg-primary" />
       )}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(38_92%_50%/0.16),transparent_60%)]" />
       <Container className="relative z-10">
-        <Breadcrumbs items={crumbs} light align="center" />
+        {!crumbsOutside ? <Breadcrumbs items={heroCrumbs} light align="center" className="mb-8" /> : null}
         <div className="mx-auto max-w-4xl text-center">
+          {updated ? (
+            <p className="mb-5 flex items-center justify-center gap-1.5 text-sm text-primary-foreground/75">
+              <Calendar className="h-4 w-4" aria-hidden />
+              Last Updated: {updated}
+            </p>
+          ) : null}
           {eyebrow ? (
             <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
-              <Star className="h-4 w-4 fill-accent text-accent" aria-hidden />
+              <EyebrowIcon className="h-4 w-4 text-accent" aria-hidden />
               {eyebrow}
             </p>
           ) : null}
@@ -104,6 +141,17 @@ export function PageHero({
             </div>
           ) : null}
         </div>
+        {callout && callout.length > 0 ? (
+          <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-white/20 bg-white/10 p-8 text-left backdrop-blur-md">
+            <div className="space-y-4">
+              {callout.map((para) => (
+                <p key={para.lead} className="text-sm leading-relaxed text-white/85 md:text-base">
+                  <span className="font-bold text-white">{para.lead}</span> {para.text}
+                </p>
+              ))}
+            </div>
+          </div>
+        ) : null}
         {stats && stats.length > 0 ? (
           <div
             className={cn(
@@ -122,29 +170,85 @@ export function PageHero({
       </Container>
     </section>
   );
+
+  if (!crumbsOutside) {
+    return hero;
+  }
+  return (
+    <>
+      <section className="pt-24">
+        <Container>
+          <Breadcrumbs items={crumbs} className="mb-6" chevron />
+        </Container>
+      </section>
+      {hero}
+    </>
+  );
 }
 
 export function GuideView({
   guide,
   crumbs,
   children,
+  crumbsOutside = false,
 }: {
   guide: GuidePageContent;
   crumbs: Array<{ name: string; href?: string }>;
   children?: ReactNode;
+  crumbsOutside?: boolean;
 }) {
   return (
     <>
       <PageHero
         eyebrow={guide.eyebrow}
+        eyebrowIcon={guide.eyebrowIcon}
         title={guide.title}
         highlight={guide.highlight}
         description={guide.description}
         crumbs={crumbs}
         imageSrc={guide.heroImage}
         stats={guide.stats}
-        ctas={[{ label: guide.cta, href: "/get-started" }]}
+        ctas={guide.ctas ?? [{ label: guide.cta, href: "/get-started" }]}
+        updated={guide.updated}
+        callout={guide.callout}
+        crumbsOutside={crumbsOutside}
       />
+      {guide.author ? (
+        <section className="border-b border-border bg-card py-8">
+          <Container>
+            <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-12 gap-y-6">
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-primary">
+                  <GuideAuthorIcon />
+                </span>
+                <div className="text-sm">
+                  <p className="text-muted-foreground">Written by</p>
+                  <p className="font-semibold">
+                    {guide.author.name}
+                    {guide.author.credential ? <span className="ml-1.5 text-xs font-normal text-muted-foreground">{guide.author.credential}</span> : null}
+                  </p>
+                  <p className="text-muted-foreground">{guide.author.role}</p>
+                </div>
+              </div>
+              {guide.reviewedBy ? (
+                <div className="flex items-center gap-3">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-primary">
+                    <GuideAuthorIcon />
+                  </span>
+                  <div className="text-sm">
+                    <p className="text-muted-foreground">Reviewed by</p>
+                    <p className="font-semibold">
+                      {guide.reviewedBy.name}
+                      {guide.reviewedBy.credential ? <span className="ml-1.5 text-xs font-normal text-muted-foreground">{guide.reviewedBy.credential}</span> : null}
+                    </p>
+                    <p className="text-muted-foreground">{guide.reviewedBy.role}</p>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </Container>
+        </section>
+      ) : null}
       <Container className="grid gap-12 py-16 lg:grid-cols-[minmax(0,1fr)_280px]">
         <article>
           {guide.sections.map((section) => (
@@ -165,7 +269,7 @@ export function GuideView({
             </section>
           ))}
           {guide.faqs ? (
-            <section className="mt-12">
+            <section className="mt-12" id="faqs">
               <h2 className="mb-6 font-display text-2xl font-bold">Frequently asked questions</h2>
               <div className="space-y-4">
                 {guide.faqs.map((faq) => (
@@ -211,5 +315,23 @@ export function GuideView({
         </Container>
       ) : null}
     </>
+  );
+}
+
+function GuideAuthorIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+      aria-hidden
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4 3.6-6 8-6s8 2 8 6" />
+    </svg>
   );
 }

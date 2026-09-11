@@ -24,6 +24,8 @@
   --color-cream: hsl(40 40% 96%);
   --color-forest: hsl(155 42% 16%);
   --color-moss: hsl(150 22% 34%);
+  /* Calculator breakdown bar — source renders the Property Tax segment blue. */
+  --color-chart-tax: hsl(217 91% 60%);
 
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;

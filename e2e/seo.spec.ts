@@ -21,7 +21,7 @@ test.describe("sitemap.xml", () => {
     // Seeded dynamic entries
     expect(body).toContain("/learn/");
     expect(body).toContain("/modular-home-financing/manufacturers/");
-    // Every loc is absolute (uses NEXT_PUBLIC_SITE_URL = https://home-financing.jesspete.shop)
+    // Every loc is absolute (uses NEXT_PUBLIC_SITE_URL = https://modfii.jesspete.shop)
     const locs = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1] ?? "");
     expect(locs.length).toBeGreaterThan(10);
     expect(locs.every((loc) => /^https?:\/\//.test(loc))).toBe(true);
@@ -33,7 +33,7 @@ test.describe("sitemap.xml", () => {
     const body = await (await request.get("/sitemap.xml")).text();
     const locs = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1] ?? "");
     expect(locs.length).toBeGreaterThan(5);
-    // Sitemap uses NEXT_PUBLIC_SITE_URL (https://home-financing.jesspete.shop) — rewrite to local baseURL for fetch
+    // Sitemap uses NEXT_PUBLIC_SITE_URL (https://modfii.jesspete.shop) — rewrite to local baseURL for fetch
     const localOrigin = new URL(process.env.E2E_BASE_URL ?? `http://127.0.0.1:${process.env.E2E_PORT ?? 3002}`).origin;
     const broken: string[] = [];
     for (const loc of locs.slice(0, 30)) {

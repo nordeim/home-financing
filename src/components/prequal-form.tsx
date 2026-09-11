@@ -2,12 +2,12 @@
 
 import { Button, cn } from "@/components/ui";
 import type { ApplicationInput, LenderMatch } from "@/lib/matching";
-import { ArrowLeft, ArrowRight, Check, Clock, Home, Landmark, Lock, RefreshCw, Shield } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Clock, Hammer, Home, Lock, RefreshCw, Shield } from "lucide-react";
 import { useMemo, useState } from "react";
 
 const INTENTS = [
   { value: "buy", label: "Buy a prefab home", description: "Purchase a new factory-built home", icon: Home },
-  { value: "build", label: "Build on my land", description: "Place a new home on land I own or am buying", icon: Landmark },
+  { value: "build", label: "Build on my land", description: "Place a new home on land I own or am buying", icon: Hammer },
   { value: "refinance", label: "Refinance existing home", description: "Get a better rate on my current modular home", icon: RefreshCw },
 ];
 

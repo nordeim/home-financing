@@ -67,7 +67,7 @@ function ArticleCard({ article }: { article: LearnArticle }) {
       </h3>
       <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{article.description}</p>
       <p className="mt-4 text-xs text-muted-foreground">
-        {article.readTime} read · {article.authorName}
+        {article.readTime} · By {article.authorName}
       </p>
       <p className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
         Read more
@@ -325,7 +325,7 @@ export function LearnExplorer({ articles, featured }: { articles: LearnArticle[]
             <h2 className="font-display text-2xl font-bold group-hover:text-primary md:text-3xl">{featured.title}</h2>
             <p className="mt-2 max-w-3xl text-muted-foreground">{featured.description}</p>
             <p className="mt-3 text-sm text-muted-foreground">
-              {featured.readTime} read · {featured.authorName}, {featured.authorRole}
+              {featured.readTime} · By {featured.authorName}
             </p>
           </div>
           <span className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary md:flex">

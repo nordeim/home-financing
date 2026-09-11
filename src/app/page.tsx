@@ -3,18 +3,19 @@ import { Reveal } from "@/components/reveal";
 import { SITE } from "@/lib/catalog";
 import {
   ArrowRight,
-  BadgeCheck,
   Ban,
-  Building2,
+  BookOpen,
   Check,
   CheckCircle2,
   ChevronDown,
   Clock,
   DollarSign,
   FileText,
+  HelpCircle,
   Home,
   Leaf,
   Shield,
+  ShieldCheck,
   Star,
   Users,
   Zap,
@@ -56,7 +57,7 @@ const INTRO_CARDS = [
     body: "First-time buyers, families upgrading, retirees downsizing, and investors building rentals. We specialize in helping buyers rejected by traditional lenders who don't understand prefab. Credit scores from 580 accepted.",
   },
   {
-    icon: BadgeCheck,
+    icon: HelpCircle,
     title: "Why Prefab Financing Is Different",
     body: "Traditional lenders confuse modular homes with manufactured or mobile homes. Modular homes meet the same building codes as site-built, qualify for conventional financing, and are titled as real property. We match you with lenders who understand the distinction.",
   },
@@ -208,25 +209,25 @@ export default function HomePage() {
     <main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      {/* Hero — dark photo, white CTA, glass stats card (mirrors modfii.com) */}
-      <section className="relative isolate flex min-h-[92vh] items-center overflow-hidden bg-forest text-primary-foreground">
+      {/* Hero — source recipe: daylight photo, horizontal forest wash + bottom fade, glass stats card */}
+      <section className="relative isolate overflow-hidden bg-forest pb-16 pt-28 text-primary-foreground md:pb-20 md:pt-32">
         <Image
           src="/images/hero-prefab.jpg"
-          alt="Modern prefab home at dusk with warm interior light"
+          alt="Modern prefab home"
           fill
           priority
           className="object-cover"
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-forest/95 via-forest/80 to-forest/35" />
-        <div className="hero-grid absolute inset-0 opacity-40" />
-        <Container className="relative grid min-h-[92vh] items-center gap-10 py-28 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.8fr)]">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/90 to-primary/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-primary/95" />
+        <Container className="relative grid items-center gap-10 py-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.8fr)] lg:gap-16 md:py-20">
           <div>
             <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
               <Star className="h-4 w-4 fill-accent text-accent" aria-hidden />
               The #1 Prefab Home Mortgage Platform
             </p>
-            <h1 className="font-display text-4xl font-bold leading-[1.05] md:text-6xl lg:text-7xl">
+            <h1 className="font-display text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
               Stop Losing Your Dream Home to <span className="text-accent">Financing Nightmares</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg text-white/90 md:text-xl">
@@ -297,8 +298,7 @@ export default function HomePage() {
       <section className="py-20 md:py-24">
         <Container>
           <Reveal className="mx-auto mb-14 max-w-3xl text-center">
-            <p className="text-sm font-medium uppercase tracking-wider text-primary">Your Prefab Financing Partner</p>
-            <h2 className="mt-4 font-display text-3xl font-bold md:text-5xl">Modular &amp; Prefab Home Loans</h2>
+            <h2 className="font-display text-3xl font-bold md:text-5xl">Modular &amp; Prefab Home Loans</h2>
             <p className="mt-6 text-lg text-muted-foreground">
               ModFii is the leading marketplace connecting prefab, modular, and tiny home buyers with lenders who
               specialize in factory-built construction financing. We help you get approved faster, with better rates,
@@ -463,9 +463,8 @@ export default function HomePage() {
                   />
                   <div>
                     <p className="font-semibold">{story.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {story.title} · {story.location}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{story.title}</p>
+                    <p className="text-sm text-muted-foreground">{story.location}</p>
                   </div>
                 </figcaption>
                 <div className="mt-6 border-t border-border pt-5">
@@ -490,9 +489,9 @@ export default function HomePage() {
           </div>
           <div className="grid gap-6 md:grid-cols-3">
             {[
-              { icon: BadgeCheck, title: "Editorially Independent", body: "Our recommendations are based on research, not lender relationships. We earn referral fees, but this never influences our guidance." },
-              { icon: Building2, title: "Government Sources", body: "Information is sourced from official programs: FHA.gov, VA.gov, USDA.gov, CFPB, Fannie Mae, and Freddie Mac." },
-              { icon: CheckCircle2, title: "Expert Reviewed", body: "Content is written and reviewed by mortgage professionals with specialized experience in modular and prefab financing." },
+              { icon: ShieldCheck, title: "Editorially Independent", body: "Our recommendations are based on research, not lender relationships. We earn referral fees, but this never influences our guidance." },
+              { icon: BookOpen, title: "Government Sources", body: "Information is sourced from official programs: FHA.gov, VA.gov, USDA.gov, CFPB, Fannie Mae, and Freddie Mac." },
+              { icon: Users, title: "Expert Reviewed", body: "Content is written and reviewed by mortgage professionals with specialized experience in modular and prefab financing." },
             ].map((item) => (
               <div key={item.title} className="rounded-2xl border border-border bg-card p-8 text-center">
                 <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -564,7 +563,8 @@ export default function HomePage() {
               <ArrowRight className="h-4 w-4" />
             </ButtonLink>
           </div>
-          <p className="mt-5 text-sm text-primary-foreground/75">
+          <p className="mt-5 flex items-center justify-center gap-2 text-sm text-primary-foreground/75">
+            <Shield className="h-4 w-4" aria-hidden />
             No credit impact • 15-minute application • Cancel anytime
           </p>
         </Container>

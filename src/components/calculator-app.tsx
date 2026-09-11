@@ -9,7 +9,8 @@ import {
   type PaymentBreakdown,
   type PaymentInput,
 } from "@/lib/calculator";
-import { AlertTriangle, ArrowRight, Leaf } from "lucide-react";
+import { AlertTriangle, ArrowRight, Home, Leaf, Percent, Umbrella } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 
 function Field({
@@ -56,10 +57,12 @@ function Field({
   );
 }
 
-function SectionTitle({ children }: { children: string }) {
+function SectionTitle({ icon: Icon, children }: { icon: LucideIcon; children: string }) {
   return (
-    <h3 className="flex items-center gap-2 font-display text-lg font-bold">
-      <span className="h-4 w-1 rounded-full bg-accent" aria-hidden />
+    <h3 className="flex items-center gap-2.5 font-display text-lg font-bold">
+      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary text-primary" aria-hidden>
+        <Icon className="h-4 w-4" />
+      </span>
       {children}
     </h3>
   );
@@ -71,7 +74,7 @@ export function CalculatorApp() {
 
   const segments = [
     { label: "Principal & Interest", value: result.monthlyPi, color: "bg-primary" },
-    { label: "Property Tax", value: result.monthlyTax, color: "bg-accent" },
+    { label: "Property Tax", value: result.monthlyTax, color: "bg-chart-tax" },
     { label: "Insurance", value: result.monthlyInsurance, color: "bg-primary/50" },
     ...(result.monthlyPmi > 0 ? [{ label: "PMI", value: result.monthlyPmi, color: "bg-destructive/70" }] : []),
     ...(result.monthlyHoa > 0 ? [{ label: "HOA", value: result.monthlyHoa, color: "bg-muted-foreground/50" }] : []),
@@ -86,7 +89,7 @@ export function CalculatorApp() {
         onSubmit={(event) => event.preventDefault()}
       >
         <section className="space-y-6">
-          <SectionTitle>Home Details</SectionTitle>
+          <SectionTitle icon={Home}>Home Details</SectionTitle>
           <Field
             id="calc-price"
             label="Home Price"
@@ -118,7 +121,7 @@ export function CalculatorApp() {
         </section>
 
         <section className="space-y-6">
-          <SectionTitle>Loan Terms</SectionTitle>
+          <SectionTitle icon={Percent}>Loan Terms</SectionTitle>
           <Field
             id="calc-rate"
             label="Interest Rate"
@@ -147,7 +150,7 @@ export function CalculatorApp() {
         </section>
 
         <section className="space-y-6">
-          <SectionTitle>Taxes &amp; Insurance</SectionTitle>
+          <SectionTitle icon={Umbrella}>Taxes &amp; Insurance</SectionTitle>
           <Field
             id="calc-tax"
             label="Annual Property Tax"

@@ -50,7 +50,7 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-md">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 md:px-8">
         <Link href="/" className="flex items-center gap-2.5" aria-label="ModFii home">
           <Image src="/brand/modfii-logo-icon.svg" alt="" width={36} height={36} priority />
