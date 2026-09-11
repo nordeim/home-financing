@@ -21,16 +21,36 @@ const MORE = [
   { label: "Learn", href: "/learn", description: "Guides from mortgage specialists" },
 ];
 
+/**
+ * The homepage hero is a full-bleed dark photo, so the header sits
+ * transparent with light text until the user scrolls (modfii.com behavior).
+ * Interior pages start on a light header immediately.
+ */
 export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const menuId = useId();
 
-  useEffect(() => {
+  const overDarkHero = pathname === "/" && !scrolled;
+
+  // Close menus after client-side navigation. Adjusting state during render
+  // (React's "store info from previous renders" pattern) instead of a
+  // setState-in-effect, which triggers cascading renders.
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setOpen(false);
     setMoreOpen(false);
-  }, [pathname]);
+  }
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -40,11 +60,23 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-md">
+    <header
+      className={cn(
+        "fixed inset-x-0 top-0 z-50 border-b backdrop-blur-md transition-colors duration-300",
+        overDarkHero ? "border-transparent bg-transparent" : "border-border/80 bg-background/90",
+      )}
+    >
       <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 md:px-8">
         <Link href="/" className="flex items-center gap-2.5" aria-label="ModFii home">
           <Image src="/brand/modfii-logo-icon.svg" alt="" width={36} height={36} priority />
-          <span className="font-display text-xl font-bold tracking-tight text-foreground">ModFii</span>
+          <span
+            className={cn(
+              "font-display text-xl font-bold tracking-tight transition-colors",
+              overDarkHero ? "text-white" : "text-foreground",
+            )}
+          >
+            ModFii
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
@@ -53,8 +85,9 @@ export function SiteHeader() {
               key={item.href}
               href={item.href}
               className={cn(
-                "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
-                pathname === item.href && "text-foreground",
+                "rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-foreground",
+                overDarkHero ? "text-white/85 hover:text-white" : "text-muted-foreground",
+                pathname === item.href && !overDarkHero && "text-foreground",
               )}
             >
               {item.label}
@@ -63,7 +96,10 @@ export function SiteHeader() {
           <div className="relative">
             <button
               type="button"
-              className="inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+              className={cn(
+                "inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-foreground",
+                overDarkHero ? "text-white/85 hover:text-white" : "text-muted-foreground",
+              )}
               aria-expanded={moreOpen}
               onClick={() => setMoreOpen((value) => !value)}
             >
@@ -89,14 +125,22 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <ButtonLink href="/get-started" variant="accent" size="sm">
-            Get Pre-Qualified
+          <ButtonLink
+            href="/get-started"
+            variant={overDarkHero ? "onPrimary" : "primary"}
+            size="sm"
+            className={cn(overDarkHero && "border-transparent bg-forest text-white hover:bg-primary-600")}
+          >
+            Get Started
           </ButtonLink>
         </div>
 
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border lg:hidden"
+          className={cn(
+            "inline-flex h-10 w-10 items-center justify-center rounded-md border transition-colors lg:hidden",
+            overDarkHero ? "border-white/30 text-white" : "border-border text-foreground",
+          )}
           aria-expanded={open}
           aria-controls={menuId}
           aria-label={open ? "Close menu" : "Open menu"}
@@ -114,12 +158,13 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 className="rounded-md px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
+                onClick={() => setOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
-            <ButtonLink href="/get-started" variant="accent" className="mt-3">
-              Get Pre-Qualified
+            <ButtonLink href="/get-started" variant="primary" className="mt-3" onClick={() => setOpen(false)}>
+              Get Started
             </ButtonLink>
           </nav>
         </div>

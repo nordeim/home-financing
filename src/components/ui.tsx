@@ -51,16 +51,19 @@ export function ButtonLink({
   variant = "primary",
   size = "md",
   className,
+  onClick,
 }: {
   href: string;
   children: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
   className?: string;
+  onClick?: () => void;
 }) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-colors",
         variants[variant],
