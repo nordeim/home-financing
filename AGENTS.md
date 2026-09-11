@@ -28,8 +28,8 @@
 | `npm run lint` | ESLint flat config (`eslint.config.mjs` + `core-web-vitals`) |
 | `npm run lint:fix` | ESLint auto-fix |
 | `npm run typecheck` | `tsc --noEmit` (`skills` excluded via `tsconfig`) |
-| `npm run e2e` | Playwright E2E chromium (prod `next start` on 3002, 27 tests) |
-| `npm run test` | Vitest unit suite (31 tests — calculator / matching / rate-limit) |
+| `npm run e2e` | Playwright E2E chromium (prod `next start` on 3002, 44 tests; 43/44 without a DB) |
+| `npm run test` | Vitest unit suite (37 tests — calculator / matching / rate-limit / markdown) |
 | `npm run e2e:all` | Playwright both projects (chromium+webkit) |
 | `curl http://localhost:3000/api/health` | Readiness — pings DB + triggers `ensureSeeded()` |
 | `docker compose down -v` | **Destructive** — wipes `home_financing_data` volume |
@@ -41,7 +41,7 @@
 - **File-backed seeds are the write path.** Edit `src/data/*.json` + `src/lib/lenders.ts`, not Postgres rows. `ensureSeeded()` is idempotent via `globalThis.__modfiiSeedPromise` + `count(lenders) > 0` guard + `onConflictDoNothing`. Called in `/api/health` and `/api/applications` and via `npm run db:seed` (`src/scripts/seed.ts`) — reuse, don't duplicate.
 - **Visual parity with modfii.com is a design contract.** The header sits transparent (light text) over the homepage hero until scroll; interior heroes flow through `PageHero` (`src/components/page-shell.tsx`) — centered, photo-backed, star eyebrow pill, optional amber `highlight` title line, CTA pair, glass stat chips. Don't reintroduce left-aligned gradient heroes or an amber header CTA (it is a forest "Get Started" pill).
 - **Pool singleton.** Import `{ db, pool }` only from `@/db` (`src/db/index.ts`). `globalThis.__arenaNextJsPostgresqlPool` prevents HMR pool leaks. Never `new Pool()` inline.
-- **Server Components by default.** `"use client"` only for `site-header`, `prequal-form`, `calculator-app`. Never import a Server Component into a Client Component.
+- **Server Components by default.** `"use client"` only for `site-header`, `prequal-form`, `calculator-app`, `learn-explorer`, `reveal`. Never import a Server Component into a Client Component.
 - **`force-dynamic` only where DB is touched.** API routes (`src/app/api/*/route.ts`) have `export const dynamic = "force-dynamic"`. Content pages can render from `catalog` without DB.
 - **Drizzle lifecycle guarded.** `src/scripts/local-db.ts` `assertLocalDatabase()` refuses non-local `DATABASE_URL` for `migrate/seed/reset` (drops `public`+`drizzle` schemas + restores `pgcrypto/pg_trgm`). Migrations in `drizzle/` (`0000` 8 tables + `0001` founded 8→32) via `drizzle.config.ts` (TS primary) + `.json` fallback.
 - **Playwright on prod build.** `playwright.config.ts` runs `npx next start --port 3002` (not `dev`) with `reuseExistingServer:true`, 90s timeout, chromium+webkit, `x-forwarded-for` isolation for rate-limit tests.
@@ -56,7 +56,8 @@
 - **`drizzle.config.ts` (primary) + `.json` fallback** — both `out: ./drizzle`, `strict/verbose`, `url: home_financing_user:secret@localhost:5434/home_financing_dev` (runtime `DATABASE_URL` wins). Keep them in sync after schema edits (`npm run db:generate` writes to `drizzle/`).
 - **`tsconfig.json:strict:true`, `skipLibCheck:true`, `isolatedModules:true`, `exclude: [node_modules,skills]`.** `eslint.config.mjs` also ignores `skills/**` + `infrastructure/**` — operator-managed folders stay out of checks/tests/compilation. Don't add `z-ai-web-dev-sdk`; don't re-include `skills`.
 - **Rate limiter is in-memory `Map`.** `8 / 10 min` per IP on `POST /api/applications` (`clientKey` via `x-forwarded-for`/`x-real-ip`). Under-limits on multi-instance — migrate to Redis if scaling.
-- **Tests: Vitest unit + Playwright E2E.** 31 unit tests in `src/lib/*.test.ts` (`npm run test`) + 27 E2E tests in `e2e/` (`smoke`/`seo`/`funnel`/`assets`, chromium via `npm run e2e`). `assets.spec.ts` guards the six image assets + two `/compare/*` aliases (2026-09-11 incidents). The funnel valid-payload E2E needs Postgres; the rest run DB-less.
+- **Tests: Vitest unit + Playwright E2E.** 37 unit tests in `src/lib/*.test.ts` (`npm run test`) + 44 E2E tests in `e2e/` (`smoke`/`seo`/`funnel`/`assets`/`parity`, chromium via `npm run e2e`). `assets.spec.ts` guards fourteen image assets (6 heroes/OG + 5 manufacturer wordmarks + 3 testimonial avatars) + two `/compare/*` aliases (2026-09-11 incidents). `parity.spec.ts` pins the markdown-OOM regression (`#### ` articles must render) and the modfii.com visual-parity additions. The funnel valid-payload E2E needs Postgres; the rest run DB-less.
+- **Markdown renderer is loop-guarded.** `src/lib/markdown.tsx` renders `#### ` as `h4` and its paragraph branch always consumes ≥1 line — an H4 line once fell through and looped forever, OOM-ing the whole next-server process (2026-09-11 origin 502). Regression-pinned by `markdown.test.ts` + `parity.spec.ts`.
 - **Kebab route folders** (`modular-home-financing`, `construction-loans`), `kebab-case.json` data, `kebab-case.tsx` components (grandfathered; new components prefer `PascalCase.tsx` — don't mass-rename).
 
 ## Environment & Services
@@ -80,7 +81,7 @@
 - Validation: `src/lib/matching.ts:validateApplication()` (ZIP `^\d{5}$`, phone digits ≥10, `EMAIL_RE`).
 - Math: `src/lib/calculator.ts:PMI_ANNUAL_RATE = 0.0065`, site-built `1.15×`.
 
-*Last verified 2026-09-11 (post-remediation) against `package.json` (next ^16.3.4, react ^19.3.0, tailwind ^4.3.3, vitest ^3.2), `eslint.config.mjs` (skills + infrastructure ignored), `tsconfig.json`, `next.config.ts` (11 redirects), `drizzle.config.ts/json` (5434), `docker-compose.yml`, `src/db` (8 tables), `src/lib` (+ `*.test.ts`), `public/images/*` + `public/brand/og-image.jpg` (every referenced asset exists), `playwright.config.ts` (3002), `e2e/*` 27 tests, `vitest.config.ts`.*
+*Last verified 2026-09-11 (remediation pass 2: markdown OOM fix + modfii.com visual parity — wordmark logos, testimonial avatars, scroll reveals, accordion animation, footer socials/Legal, learn-hub and calculator rebuilds) against `package.json` (next ^16.3.4, react ^19.3.0, tailwind ^4.3.3, vitest ^3.2), `eslint.config.mjs` (skills + infrastructure ignored), `tsconfig.json`, `next.config.ts` (11 redirects), `drizzle.config.ts/json` (5434), `docker-compose.yml`, `src/db` (8 tables), `src/lib` (+ `*.test.ts`), `public/images/*` + `public/brand/og-image.jpg` (every referenced asset exists), `playwright.config.ts` (3002), `e2e/*` 27 tests, `vitest.config.ts`.*
 
 <!-- BEGIN:nextjs-agent-rules -->
 

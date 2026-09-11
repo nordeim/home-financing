@@ -127,7 +127,7 @@ IMPORTANT: File is read fresh for every conversation. Be brief and practical.
 - `src/lib/matching.ts` — `matchLenders()` scoring (`+20` credit floor, `+18` specialty, `+12` green, etc.) and `validateApplication()` (regex `EMAIL_RE`, ZIP `^\d{5}$`, phone digits ≥10). Keep scoring deterministic and tested.
 - `src/lib/rate-limit.ts` — in-memory `Map` buckets (`rateLimit(key, limit, windowMs)` + `clientKey(req)` via `x-forwarded-for`/`x-real-ip`). Note: single-instance memory — acceptable for now; document if moving to multi-instance.
 - `src/lib/lenders.ts` — `LENDER_SEEDS` + `LOAN_PRODUCT_SEEDS` are the canonical seed constants.
-- `src/lib/catalog.ts` + `src/lib/guides.ts` + `src/data/*.json` — typed catalog (`Manufacturer`, `StateGuide`, `Article`, `GlossaryTerm`). `src/lib/markdown.tsx` renders article `content` (markdown).
+- `src/lib/catalog.ts` + `src/lib/guides.ts` + `src/data/*.json` — typed catalog (`Manufacturer`, `StateGuide`, `Article`, `GlossaryTerm`). `src/lib/markdown.tsx` renders article `content` (markdown) — supports `#`–`####` headings; H4+ lines are handled explicitly and the paragraph branch always consumes ≥1 line (loop-safety after the 2026-09-11 OOM incident).
 
 ---
 
@@ -239,6 +239,8 @@ src/
     page-shell.tsx        # Shared page shell
     prequal-form.tsx      # Prequal form (client)
     calculator-app.tsx    # Calculator UI (client)
+    learn-explorer.tsx    # Learn hub island: search/filter chips/featured/tools/newsletter (client)
+    reveal.tsx            # Scroll-reveal wrapper for home intro (client)
     guide-screen.tsx      # Guide/article renderer
   data/
     articles.json         # Article corpus (source of truth)
@@ -267,7 +269,8 @@ drizzle/
   0001_sharp_stick.sql    # alter manufacturers.founded 8→32
   meta/_journal.json
  e2e/
-  smoke.spec.ts / seo.spec.ts / funnel.spec.ts  # Playwright 16 tests (chromium)
+  smoke.spec.ts / seo.spec.ts / funnel.spec.ts /  # Playwright 44 tests (chromium)
+  assets.spec.ts / parity.spec.ts
  playwright.config.ts      # E2E config (prod next start on 3002, reuseExistingServer)
  drizzle.config.ts         # TS config (primary)
  drizzle.config.json       # JSON fallback (keep in sync)
@@ -432,7 +435,7 @@ App Router Server Components + Route Handlers
 |-------|--------|------|------------|---------|
 | `/api/health` | GET | none | none | DB ping + `ensureSeeded()` — readiness probe |
 | `/api/applications` | POST | none | 8 / 10 min by IP | Validate → score → persist application + top-4 matches |
-| `/api/calculator` | GET/POST | none | none | Calculator endpoint (see `src/app/api/calculator/route.ts`) |
+| `/api/calculator` | POST | none | 60 / min per IP | Calculator endpoint (see `src/app/api/calculator/route.ts`) |
 
 - Request validation lives in `src/lib/matching.ts:validateApplication()` — keep error strings user-facing and stable (they're surfaced inline).
 - Response codes: `400` validation/JSON, `429` rate-limit, `500` persistence failure. No `401/403` on public funnel.
@@ -489,10 +492,11 @@ App Router Server Components + Route Handlers
 - **Typography:** `Outfit` (display/headings, `--font-outfit`) + `DM Sans` (body, `--font-dm-sans`) via `next/font/google` with `variable` + `display: swap`. Apply via `font-sans` / `font-display`.
 - **Header:** fixed `h-16`; on `/` it sits transparent with light text over the dark hero until ~12px of scroll, then transitions to `bg-background/90` + border; interior pages render light from first paint. CTA is a forest "Get Started" pill (never amber).
 - **PageHero (`src/components/page-shell.tsx`):** centered interior hero — photo background (one of the five `/images/*.jpg`) under a forest overlay, star eyebrow pill, optional amber `highlight` title line, CTA pair, glass stat chips; `Breadcrumbs` centered inside. All `GuideScreen` pages + learn/glossary/manufacturers flow through it.
-- **Homepage (`src/app/page.tsx`)** mirrors modfii.com section-for-section: photo hero + glass stats card, manufacturer wordmark strip, "Modular & Prefab Home Loans" intro (4 cards + loan chips), problem/solution (red vs green tinted cards with icons), green-mortgage photo band, 3-step icons + ghost numerals, 5-star testimonials with savings ledger, "Our Standards" trio, FAQ accordions, dotted-pattern closing CTA.
+- **Homepage (`src/app/page.tsx`)** mirrors modfii.com section-for-section: photo hero + glass stats card, manufacturer wordmark strip (real logo PNGs in `public/brand/wordmarks/`), "Modular & Prefab Home Loans" intro (4 cards + loan chips, scroll-revealed via `Reveal`), problem/solution (red vs green tinted cards with icons), green-mortgage photo band, 3-step icons + ghost numerals, 5-star testimonials with portrait avatars (`public/images/avatars/`) + savings ledger, "Our Standards" trio, animated FAQ accordions, dotted-pattern closing CTA.
+- **Motion:** `Reveal` (`src/components/reveal.tsx`) lazily reveals the home intro (opacity 0 + translateY, cards also scale 0.95, 300ms, staggered) matching modfii.com; `<details>` accordions animate via `::details-content` in `globals.css` (progressive enhancement, uses `--ease-brand`); `prefers-reduced-motion` forces `[data-reveal]` visible.
 - **Logo:** `public/brand/modfii-logo-icon.svg` is the canonical rotated-square mark used by modfii.com — don't revert to the legacy MD monogram.
 - **Layout rhythm:** `Container` max `1400px`, `px-4 md:px-8`, header `h-16` fixed + `backdrop-blur-md` + `border-b`.
-- **Iconography:** `lucide-react` only (v1.44 has no brand icons — wrap inline SVGs in a local component, see `LinkedInIcon` in `site-footer.tsx`).
+- **Iconography:** `lucide-react` only (v1.44 has no brand icons — wrap inline SVGs in local components, see `LinkedInIcon`/`TwitterIcon`/`FacebookIcon`/`YouTubeIcon` in `site-footer.tsx`). Footer also carries a Legal column (Privacy/Terms/NMLS) mirroring modfii.com.
 - **Anti-generic guard:** no purple gradients, no Inter/Roboto fallback without hierarchy, no undifferentiated card grids — editorial intent on every section.
 
 ---
@@ -571,4 +575,4 @@ This project is intentionally static-site-hostable with an optional Postgres bac
 
 ---
 
-*Last generated 2026-09-11 via `claude-md:create`; updated 2026-09-11 (remediation pass): untracked `.env` (real secrets had been committed in `d572d73` — rotate `BETTER_AUTH_SECRET`/`CRON_SECRET`), eslint ignores `skills/**`+`infrastructure/**` (lint 0/0), vitest 31 unit tests, e2e 27 tests incl. `assets.spec.ts` regression guards, six missing images added (`public/images/*.jpg` + `public/brand/og-image.jpg`), canonical logo SVG adopted, compare alias redirects, header/home/footer/PageHero/get-started restyled to mirror modfii.com, `.env.example` moved to `home_financing_*:5434`. Source of truth: package.json, tsconfig, next.config.ts, eslint.config.mjs, drizzle.config.ts/json, docker-compose.yml:5434, src/db, src/lib, src/scripts, e2e, vitest.config.ts. Preserve team-specific conventions when updating.*
+*Last generated 2026-09-11 via `claude-md:create`; updated 2026-09-11 (remediation pass 2): markdown H4/OOM fix + regression suites (unit 37, E2E 44), modfii.com visual parity (wordmark logos, testimonial avatars, `Reveal` scroll animations, animated accordions, footer socials + Legal, learn-hub + calculator rebuilds, get-started wizard parity, manufacturers tier bands + A–Z directory); earlier pass: untracked `.env` (real secrets had been committed in `d572d73` — rotate `BETTER_AUTH_SECRET`/`CRON_SECRET`), eslint ignores `skills/**`+`infrastructure/**` (lint 0/0), vitest 31 unit tests, e2e 27 tests incl. `assets.spec.ts` regression guards, six missing images added (`public/images/*.jpg` + `public/brand/og-image.jpg`), canonical logo SVG adopted, compare alias redirects, header/home/footer/PageHero/get-started restyled to mirror modfii.com, `.env.example` moved to `home_financing_*:5434`. Source of truth: package.json, tsconfig, next.config.ts, eslint.config.mjs, drizzle.config.ts/json, docker-compose.yml:5434, src/db, src/lib, src/scripts, e2e, vitest.config.ts. Preserve team-specific conventions when updating.*

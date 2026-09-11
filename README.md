@@ -4,7 +4,7 @@
 ![React](https://img.shields.io/badge/React-19.3-149eca?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9_strict-3178c6?logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.3-38bdf8?logo=tailwindcss)
-![Vitest](https://img.shields.io/badge/Vitest-3.2-6e9f18?logo=vitest)
+![Vitest](https://img.shields.io/badge/Vitest-3.2_37_tests-6e9f18?logo=vitest)
 ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-0.45-C5F277?logo=drizzle)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?logo=postgresql)
 ![License](https://img.shields.io/badge/license-Private-lightgrey)
@@ -45,8 +45,8 @@
 | Database | PostgreSQL | 17-alpine | 8 tables, `pgcrypto`/`pg_trgm` extensions |
 | Fonts | `next/font/google` | — | `Outfit` (display) + `DM Sans` (body), `variable` + `swap` |
 | Tooling | ESLint + `tsx` | 9.39.5 / 4.23 | Flat config + `eslint-config-next/core-web-vitals` + `tsx` for scripts |
-| Unit | Vitest | 3.2 | 31 tests over `src/lib/{calculator,matching,rate-limit}` (`npm run test`) |
-| E2E | Playwright + `@axe-core` | 1.63 + 4.13 | 27 tests (chromium), `playwright.config.ts` prod `next start` on 3002 |
+| Unit | Vitest | 3.2 | 37 tests over `src/lib/{calculator,matching,rate-limit,markdown}` (`npm run test`) |
+| E2E | Playwright + `@axe-core` | 1.63 + 4.13 | 44 tests (chromium), `playwright.config.ts` prod `next start` on 3002 |
 
 ```mermaid
 flowchart TB
@@ -114,6 +114,7 @@ sequenceDiagram
     📄 site-header.tsx            # Fixed header, NAV+MORE, mobile drawer (client)
     📄 site-footer.tsx / page-shell.tsx / guide-screen.tsx
     📄 prequal-form.tsx / calculator-app.tsx  # Client islands
+    📄 learn-explorer.tsx / reveal.tsx        # Client islands (learn hub + scroll reveal)
   📂 data/
     📄 articles.json / manufacturers.json / states.json / glossary.json  # Source corpora
   📂 db/
@@ -129,11 +130,12 @@ sequenceDiagram
   📂 scripts/                     # DB lifecycle (local-guarded)
     📄 local-db.ts / migrate.ts / seed.ts / reset.ts
 📂 drizzle/                       # Migrations (0000 8 tables + 0001 founded 8→32, meta/_journal.json)
-📂 e2e/                           # Playwright: smoke / seo / funnel / assets specs (27 tests)
+📂 e2e/                           # Playwright: smoke / seo / funnel / assets / parity specs (44 tests)
 📄 playwright.config.ts           # E2E config (prod next start on 3002, reuseExistingServer)
 📄 drizzle.config.ts / .json      # TS primary + JSON fallback (keep in sync, url 5434)
 📂 infrastructure/postgres/init/  # pgcrypto + pg_trgm extensions
-📂 public/brand/                  # modfii-logo-icon.svg, og-image.jpg
+📂 public/brand/                  # modfii-logo-icon.svg, og-image.jpg, wordmarks/*.png (5 manufacturer logos)
+📂 public/images/avatars/         # 3 testimonial portraits
 📄 next.config.ts                 # images.unoptimized + 11 redirects
 📄 docker-compose.yml             # PG17 on host 5434 (home_financing_*)
 📄 .env.example                   # Template (scandihaven_* legacy names — real DB is home_financing_*)
@@ -275,9 +277,9 @@ Tokens live **only** in `src/app/globals.css:@theme` — never add `tailwind.con
 
 ## Testing & Verification
 
-**Unit:** Vitest 3.2 (`vitest.config.ts`, `@` alias), co-located `src/lib/{calculator,matching,rate-limit}.test.ts` — **31 tests** over the pure domains (amortization/PMI, scoring/validation, in-memory limiter). `npm run test` / `test:watch` / `test:coverage`.
+**Unit:** Vitest 3.2 (`vitest.config.ts`, `@` alias), co-located `src/lib/{calculator,matching,rate-limit,markdown}.test.ts` — **37 tests** over the pure domains (amortization/PMI, scoring/validation, in-memory limiter, markdown rendering incl. the 2026-09-11 H4/OOM regression). `npm run test` / `test:watch` / `test:coverage`.
 
-**E2E:** Playwright 1.63 + `@axe-core/playwright` 4.13, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), `e2e/` **27 tests** (chromium) — `smoke` (home/nav/footer, get-started, calculator, health, 404, axe critical) + `seo` (sitemap absolute locs + host-rewrite, robots, title/OG) + `funnel` (POST `/api/applications` 400/200 with `x-forwarded-for` isolation, burst 429) + `assets` (six image assets 200, no broken `<img>` on the image-led pages, `/compare/*` parity aliases resolve). With Postgres: **27/27**; without a DB: 26/27 (funnel happy-path persistence is the only DB-dependent test).
+**E2E:** Playwright 1.63 + `@axe-core/playwright` 4.13, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), `e2e/` **44 tests** (chromium) — `smoke` (home/nav/footer, get-started, calculator, health, 404, axe critical) + `seo` (sitemap absolute locs + host-rewrite, robots, title/OG) + `funnel` (POST `/api/applications` 400/200 with `x-forwarded-for` isolation, burst 429) + `assets` (fourteen image assets 200, no broken `<img>` on the image-led pages, `/compare/*` parity aliases resolve) + `parity` (markdown-OOM regression on the two H4 articles, wordmark logos + testimonial avatars on home, learn-hub search/filter/featured/tools, calculator breakdown bar + PMI alert, footer socials + Legal column, get-started step chip/ZIP helper/privacy note). With Postgres: **44/44**; without a DB: 43/44 (funnel happy-path persistence is the only DB-dependent test).
 
 **Current verification:**
 ```bash
@@ -305,6 +307,7 @@ curl http://localhost:3000/api/health   # readiness probe (also triggers ensureS
 | `EADDRINUSE 3000` for E2E webServer | `scandihaven` also on 3000 | Playwright now defaults to `3002` (`E2E_PORT`) for home-financing |
 | `pm2` not found | Not used | Ignore |
 | `react-hooks/set-state-in-effect` lint error | Header menus were reset via a `useEffect` on `pathname` | Fixed 2026-09-11 via React's adjust-state-during-render pattern in `site-header.tsx`; `npm run lint` is now clean |
+| `/learn/*` article OOMs the server (origin 502) | `#### ` (H4) lines hit the markdown paragraph branch, which broke without consuming the line — infinite React-element allocation until the heap died | Fixed 2026-09-11: H4 branch + always-consume-a-line loop guard in `src/lib/markdown.tsx`; pinned by `markdown.test.ts` + `e2e/parity.spec.ts` |
 | Auth `Invalid origin` | `BETTER_AUTH_URL` still `localhost` in prod | Set `BETTER_AUTH_URL` to canonical public origin + list extras in `BETTER_AUTH_TRUSTED_ORIGINS` |
 | `sharp` deadlock in sandbox | Image optimizer stress | Set `DISABLE_IMAGE_OPTIMIZER=1` (kept in `turbo.json:globalEnv` when used) |
 | `.env` committed / secrets leaked | `.env` was tracked before the gitignore rule existed | Untracked 2026-09-11 (`git rm --cached .env`). **Rotate `BETTER_AUTH_SECRET` + `CRON_SECRET`** — they remain in git history |
@@ -348,4 +351,4 @@ Private — `package.json:private: true`, no `LICENSE` file. Not licensed for pu
 
 ---
 
-*Last verified 2026-09-11 (post-remediation) against `package.json` (Next 16.3 + React 19.3 + Tailwind 4.3 + Vitest 3.2 + Playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills + infrastructure excluded), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (+ 31 unit tests), `public/images/*` + `public/brand/*` (all referenced assets present), `playwright.config.ts` (3002), `e2e/*` 27 tests, `src/app/page.tsx` + `src/components/*` (modfii.com parity design), `.env.example`, `.gitignore`.*
+*Last verified 2026-09-11 (remediation pass 2: markdown H4/OOM fix, modfii.com visual parity — real wordmark logos, testimonial avatars, scroll-reveal animations, animated accordions, footer social icons + Legal section, learn-hub rebuild with search/filters/featured/tools/newsletter, calculator rebuild with breakdown bar/loan summary/PMI alert/how-to/explore/FAQ/related sections, get-started wizard parity, manufacturers tier bands + A–Z directory) against `package.json` (Next 16.3 + React 19.3 + Tailwind 4.3 + Vitest 3.2 + Playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills + infrastructure excluded), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (+ 31 unit tests), `public/images/*` + `public/brand/*` (all referenced assets present), `playwright.config.ts` (3002), `e2e/*` 27 tests, `src/app/page.tsx` + `src/components/*` (modfii.com parity design), `.env.example`, `.gitignore`.*
