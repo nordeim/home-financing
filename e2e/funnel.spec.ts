@@ -72,7 +72,8 @@ test.describe("funnel API", () => {
 test.describe("funnel UI", () => {
   test("get-started shows lenders after submit (or validation)", async ({ page }) => {
     await page.goto("/get-started");
-    await expect(page.getByRole("heading", { name: /get matched/i })).toBeVisible();
+    // level 1 — the pass-3 three-step band adds a "Get Matched" card heading
+    await expect(page.getByRole("heading", { level: 1, name: /get matched/i })).toBeVisible();
     // Fill minimal fields if form is present
     const nameInput = page.getByLabel(/name/i);
     if (await nameInput.isVisible()) {

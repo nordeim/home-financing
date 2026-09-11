@@ -89,8 +89,8 @@ export default function CalculatorPage() {
         <CalculatorApp />
       </Container>
 
-      {/* How to use — cream icon band (source parity) */}
-      <section className="mt-20 bg-cream py-16">
+      {/* How to use — warm amber band (source parity: peach wash below the calculator) */}
+      <section className="mt-20 bg-accent/15 py-16">
         <Container>
           <h2 className="text-center font-display text-3xl font-bold md:text-4xl">How to Use the Calculator</h2>
           <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -108,7 +108,7 @@ export default function CalculatorPage() {
       </section>
 
       {/* Explore financing options */}
-      <section className="py-16">
+      <section className="bg-accent/15 py-16">
         <Container>
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl font-bold md:text-4xl">Explore Financing Options</h2>
@@ -138,7 +138,7 @@ export default function CalculatorPage() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-cream py-16">
+      <section className="bg-accent/15 py-16">
         <Container>
           <h2 className="text-center font-display text-3xl font-bold md:text-4xl">Frequently Asked Questions</h2>
           <div className="mx-auto mt-10 max-w-3xl space-y-4">
@@ -159,7 +159,7 @@ export default function CalculatorPage() {
       </section>
 
       {/* Related resources */}
-      <section className="py-16">
+      <section className="bg-accent/15 pb-16 pt-2">
         <Container>
           <h2 className="font-display text-3xl font-bold">Related Resources</h2>
           <div className="mt-8 grid gap-6 sm:grid-cols-2">

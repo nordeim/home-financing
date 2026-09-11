@@ -14,26 +14,23 @@ const NAV = [
   { label: "FAQ", href: "/#faq" },
 ];
 
+// Live modfii.com dropdown carries exactly these two items (2026-09-12 probe).
 const MORE = [
   { label: "ADU Financing", href: "/adu-financing", description: "Backyard homes & in-law suites" },
   { label: "Tiny Home Financing", href: "/tiny-home-financing", description: "Small homes on foundation or wheels" },
-  { label: "Calculator", href: "/calculator", description: "Estimate monthly payment" },
-  { label: "Learn", href: "/learn", description: "Guides from mortgage specialists" },
 ];
 
 /**
- * The homepage hero is a full-bleed dark photo, so the header sits
- * transparent with light text until the user scrolls (modfii.com behavior).
- * Interior pages start on a light header immediately.
+ * Live modfii.com renders a light frosted header in every state — over the
+ * homepage hero, after scroll, and on mobile (computed-style probe
+ * 2026-09-12: rgba(253,253,252,0.8) + blur). The earlier
+ * transparent-over-dark treatment does not match the source and is gone.
  */
 export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const menuId = useId();
-
-  const overDarkHero = pathname === "/" && !scrolled;
 
   // Close menus after client-side navigation. Adjusting state during render
   // (React's "store info from previous renders" pattern) instead of a
@@ -46,13 +43,6 @@ export function SiteHeader() {
   }
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
@@ -60,22 +50,12 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-50 border-b backdrop-blur-md transition-colors duration-300",
-        overDarkHero ? "border-transparent bg-transparent" : "border-border/80 bg-background/90",
-      )}
-    >
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 md:px-8">
         <Link href="/" className="flex items-center gap-2.5" aria-label="ModFii home">
           <Image src="/brand/modfii-logo-icon.svg" alt="" width={36} height={36} priority />
-          <span
-            className={cn(
-              "font-display text-xl font-bold tracking-tight transition-colors",
-              overDarkHero ? "text-white" : "text-foreground",
-            )}
-          >
-            ModFii
+          <span className="font-display text-xl font-bold tracking-tight text-foreground">
+            Mod<span className="text-primary">Fii</span>
           </span>
         </Link>
 
@@ -85,9 +65,8 @@ export function SiteHeader() {
               key={item.href}
               href={item.href}
               className={cn(
-                "rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-foreground",
-                overDarkHero ? "text-white/85 hover:text-white" : "text-muted-foreground",
-                pathname === item.href && !overDarkHero && "text-foreground",
+                "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
+                pathname === item.href && "text-foreground",
               )}
             >
               {item.label}
@@ -96,10 +75,7 @@ export function SiteHeader() {
           <div className="relative">
             <button
               type="button"
-              className={cn(
-                "inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-foreground",
-                overDarkHero ? "text-white/85 hover:text-white" : "text-muted-foreground",
-              )}
+              className="inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               aria-expanded={moreOpen}
               onClick={() => setMoreOpen((value) => !value)}
             >
@@ -125,22 +101,14 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <ButtonLink
-            href="/get-started"
-            variant={overDarkHero ? "onPrimary" : "primary"}
-            size="sm"
-            className={cn(overDarkHero && "border-transparent bg-forest text-white hover:bg-primary-600")}
-          >
+          <ButtonLink href="/get-started" variant="primary" size="sm">
             Get Started
           </ButtonLink>
         </div>
 
         <button
           type="button"
-          className={cn(
-            "inline-flex h-10 w-10 items-center justify-center rounded-md border transition-colors lg:hidden",
-            overDarkHero ? "border-white/30 text-white" : "border-border text-foreground",
-          )}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border text-foreground transition-colors lg:hidden"
           aria-expanded={open}
           aria-controls={menuId}
           aria-label={open ? "Close menu" : "Open menu"}

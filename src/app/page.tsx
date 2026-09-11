@@ -1,4 +1,4 @@
-import { Badge, ButtonLink, Container } from "@/components/ui";
+import { ButtonLink, Container } from "@/components/ui";
 import { Reveal } from "@/components/reveal";
 import { SITE } from "@/lib/catalog";
 import {
@@ -297,7 +297,8 @@ export default function HomePage() {
       <section className="py-20 md:py-24">
         <Container>
           <Reveal className="mx-auto mb-14 max-w-3xl text-center">
-            <h2 className="font-display text-3xl font-bold md:text-5xl">Modular &amp; Prefab Home Loans</h2>
+            <p className="text-sm font-medium uppercase tracking-wider text-primary">Your Prefab Financing Partner</p>
+            <h2 className="mt-4 font-display text-3xl font-bold md:text-5xl">Modular &amp; Prefab Home Loans</h2>
             <p className="mt-6 text-lg text-muted-foreground">
               ModFii is the leading marketplace connecting prefab, modular, and tiny home buyers with lenders who
               specialize in factory-built construction financing. We help you get approved faster, with better rates,
@@ -399,36 +400,11 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* Green mortgage band */}
-      <section className="relative overflow-hidden py-20 md:py-24">
-        <Image src="/images/green-home.jpg" alt="" fill className="object-cover opacity-20" sizes="100vw" />
-        <div className="absolute inset-0 bg-primary/90" />
-        <Container className="relative grid items-center gap-10 lg:grid-cols-2">
-          <div className="text-primary-foreground">
-            <Badge className="mb-4 bg-accent text-accent-foreground">Green mortgages</Badge>
-            <h2 className="font-display text-3xl font-bold md:text-5xl">Your sustainability should lower the rate.</h2>
-            <p className="mt-5 text-lg text-primary-foreground/80">
-              ENERGY STAR, HERS, and high-performance prefab packages can unlock discounted rates. We document
-              manufacturer specs so eco-focused lenders can actually price the efficiency.
-            </p>
-          </div>
-          <div className="overflow-hidden rounded-2xl border border-white/15">
-            <Image
-              src="/images/interior-living.jpg"
-              alt="Bright living room inside a modern prefab home"
-              width={1200}
-              height={800}
-              className="h-full w-full object-cover"
-            />
-          </div>
-        </Container>
-      </section>
-
       {/* How it works */}
       <section id="how-it-works" className="bg-card py-20 md:py-32">
         <Container>
           <div className="mx-auto mb-16 max-w-3xl text-center">
-            <span className="text-sm font-medium uppercase tracking-wider text-primary">How it works</span>
+            <span className="text-sm font-medium uppercase tracking-wider text-primary">How It Works</span>
             <h2 className="mt-4 font-display text-3xl font-bold md:text-5xl">
               From Application to Keys in 3 Simple Steps
             </h2>
@@ -458,12 +434,6 @@ export default function HomePage() {
                 ) : null}
               </div>
             ))}
-          </div>
-          <div className="mt-12 text-center">
-            <ButtonLink href="/get-started" size="lg">
-              See Your Options
-              <ArrowRight className="h-4 w-4" />
-            </ButtonLink>
           </div>
         </Container>
       </section>
@@ -594,6 +564,9 @@ export default function HomePage() {
               <ArrowRight className="h-4 w-4" />
             </ButtonLink>
           </div>
+          <p className="mt-5 text-sm text-primary-foreground/75">
+            No credit impact • 15-minute application • Cancel anytime
+          </p>
         </Container>
       </section>
     </main>

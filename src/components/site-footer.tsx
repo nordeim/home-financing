@@ -102,7 +102,9 @@ export function SiteFooter() {
         <div>
           <Link href="/" className="mb-4 inline-flex items-center gap-2">
             <Image src="/brand/modfii-logo-icon.svg" alt="" width={36} height={36} />
-            <span className="font-display text-xl font-bold">ModFii</span>
+            <span className="font-display text-xl font-bold text-foreground">
+              Mod<span className="text-primary">Fii</span>
+            </span>
           </Link>
           <p className="mb-4 max-w-xs text-muted-foreground">
             The first mortgage marketplace built exclusively for prefab and modular homes.
@@ -192,7 +194,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-6 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between md:px-8">
-          <p>© 2026 ModFii. All rights reserved. NMLS #{SITE.nmls}</p>
+          <p>© 2026 ModFii. All rights reserved.</p>
           <div className="flex flex-wrap gap-4">
             <Link href="/about" className="hover:text-foreground">
               About Us
@@ -210,7 +212,15 @@ export function SiteFooter() {
         </div>
         <p className="mx-auto max-w-[1400px] px-4 pb-8 text-xs leading-relaxed text-muted-foreground md:px-8">
           ModFii is a mortgage marketplace, not a lender. We connect borrowers with lenders who specialize in modular
-          and prefab home financing. Equal Housing Opportunity.
+          and prefab home financing. Equal Housing Opportunity.{" "}
+          <a
+            href="https://www.nmlsconsumeraccess.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-foreground"
+          >
+            NMLS Consumer Access
+          </a>
         </p>
       </div>
     </footer>

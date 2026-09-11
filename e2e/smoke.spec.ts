@@ -20,7 +20,8 @@ test.describe("home smoke", () => {
     // Header CTA is "Get Started" (modfii.com parity); hero CTA also routes to /get-started
     await page.getByRole("link", { name: /^get started$/i }).first().click();
     await expect(page).toHaveURL(/\/get-started/);
-    await expect(page.getByRole("heading", { name: /get matched/i })).toBeVisible();
+    // level 1 — the pass-3 three-step band adds a "Get Matched" card heading
+    await expect(page.getByRole("heading", { level: 1, name: /get matched/i })).toBeVisible();
   });
 
   test("calculator renders with inputs", async ({ page }) => {
