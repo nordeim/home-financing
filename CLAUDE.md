@@ -5,7 +5,7 @@ IMPORTANT: File is read fresh for every conversation. Be brief and practical.
 # ModFii — Home Financing (Prefab Mortgage Marketplace)
 
 > **Brand:** ModFii — "The #1 Prefab Home Mortgage Platform" — prefab/modular/ADU/tiny-home financing marketplace matching borrowers to prefab-specialist lenders.
-> **Stack:** Next.js 16.3 (App Router) + React 19.3 + TypeScript 5.9 strict + Tailwind CSS v4.3 CSS-first `@theme` + Drizzle ORM 0.45 + PostgreSQL 17 + `pg` + `next/font` (DM Sans + Outfit) + lucide-react + Drizzle Kit 0.31 / `tsx` 4.23 + Vitest 3.2 (unit, 31 tests) + Playwright 1.63 + `@axe-core/playwright` 4.13 (E2E, 27 tests). Package manager: npm (package-lock.json).
+> **Stack:** Next.js 16.3 (App Router) + React 19.3 + TypeScript 5.9 strict + Tailwind CSS v4.3 CSS-first `@theme` + Drizzle ORM 0.45 + PostgreSQL 17 + `pg` + `next/font` (DM Sans + Outfit) + lucide-react + Drizzle Kit 0.31 / `tsx` 4.23 + Vitest 3.2 (unit, 37 tests) + Playwright 1.63 + `@axe-core/playwright` 4.13 (E2E, 44 tests per project — 31 declarations + 14 asset-title variants). Package manager: npm (package-lock.json).
 > **Repo:** `home-financing` (package.json name `nextjs-postgresql-template` — legacy; brand is **ModFii**). Single app, no monorepo/turborepo.
 
 ---
@@ -286,8 +286,8 @@ public/
 
 ### Current State (post-remediation 2026-09-11)
 
-- **Vitest unit runner installed** — `vitest.config.ts` (node env, `@` alias), `src/lib/{calculator,matching,rate-limit}.test.ts` — **31 tests, all passing** (`npm run test` / `test:watch` / `test:coverage`). Pure/deterministic domains only; DB-touching code stays under Playwright.
-- **Playwright E2E** — `@playwright/test 1.63.0` + `@axe-core/playwright 4.13.0`, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), **27 tests** (chromium): `smoke.spec.ts` (home/nav/footer, get-started via the "Get Started" CTA, calculator, health, 404, axe critical), `seo.spec.ts` (sitemap absolute locs + host-rewrite, robots, title, OG), `funnel.spec.ts` (POST `/api/applications` 400/200 + `x-forwarded-for` isolated, burst 429, UI no-500), `assets.spec.ts` (six referenced image assets return 200, no broken `<img>` on `/`, `/adu-financing`, `/tiny-home-financing`, and the two `/compare/*` alias redirects resolve). With Postgres: 27/27; without DB: 26/27 (funnel valid-payload is the only DB-dependent test).
+- **Vitest unit runner installed** — `vitest.config.ts` (node env, `@` alias), `src/lib/{calculator,matching,rate-limit,markdown}.test.ts` — **37 tests, all passing** (`npm run test` / `test:watch` / `test:coverage`). Pure/deterministic domains only; DB-touching code stays under Playwright. (`calculator 11 + matching 13 + rate-limit 7 + markdown 6` — markdown pins the 2026-09-11 H4/OOM incident.)
+- **Playwright E2E** — `@playwright/test 1.63.0` + `@axe-core/playwright 4.13.0`, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), **44 tests per project** (31 declarations expanding via 14 asset-title variants): `smoke.spec.ts` (7 — home/nav/footer, get-started via the "Get Started" CTA, calculator, health, 404, axe critical), `seo.spec.ts` (6 — sitemap absolute locs + host-rewrite, robots, title, OG), `funnel.spec.ts` (4 — POST `/api/applications` 400/200 + `x-forwarded-for` isolated, burst 429, UI no-500), `assets.spec.ts` (19 runtime — 14 referenced image assets return 200 + no broken `<img>` on `/`, `/adu-financing`, `/tiny-home-financing`, and the two `/compare/*` alias redirects resolve), `parity.spec.ts` (8 — markdown-OOM regression on H4 articles + wordmark logos + testimonial avatars + learn-hub search/filter/featured/tools + calculator breakdown/PMI + footer Socials/Legal + wizard). With Postgres: 44/44; without DB: 43/44 (funnel valid-payload is the only DB-dependent test).
 - **Manual verification still:** `npm run lint` (now 0 errors / 0 warnings) + `npm run typecheck` + `npm run build` + `curl /api/health`.
 
 ### Target Pyramid (next)
@@ -298,7 +298,7 @@ public/
 ### Test Commands
 
 ```bash
-npm run test         # vitest run (31 unit tests)
+npm run test         # vitest run (37 unit tests)
 npm run test:watch   # vitest watch mode
 npm run lint         # eslint . (0 errors / 0 warnings)
 npm run typecheck    # tsc --noEmit (skills excluded)
@@ -324,8 +324,8 @@ npm run e2e:all      # playwright chromium+webkit
 npm run lint        # eslint .  (flat config, core-web-vitals; 0 errors / 0 warnings)
 npm run lint:fix    # eslint . --fix
 npm run typecheck   # tsc --noEmit (skills excluded via tsconfig)
-npm run test        # vitest run (31 unit tests)
-npm run e2e         # playwright (chromium, 27 tests)
+npm run test        # vitest run (37 unit tests = calculator 11 + matching 13 + rate-limit 7 + markdown 6)
+npm run e2e         # playwright (chromium, 44 tests per project — 31 declarations + 14 asset variants)
 ```
 
 - Config: `eslint.config.mjs` — `defineConfig([...nextCoreWebVitals, globalIgnores([".next/**","out/**","build/**","next-env.d.ts","skills/**","infrastructure/**"])])`. Keep flat config; do not revert to `.eslintrc`. `skills/` + `infrastructure/` are operator-managed and excluded from all checks/tests/compilation.
@@ -543,7 +543,7 @@ This project is intentionally static-site-hostable with an optional Postgres bac
 
 ## Continuous Improvement
 
-- **Unit tests:** vitest is installed — `src/lib/*.test.ts` co-located, `npm run test` (31 tests). Keep unit tests on pure domains; DB paths belong to Playwright E2E.
+- **Unit tests:** vitest is installed — `src/lib/*.test.ts` co-located, `npm run test` (37 tests: calculator 11 + matching 13 + rate-limit 7 + markdown 6). Keep unit tests on pure domains; DB paths belong to Playwright E2E.
 - **When content grows:** consider moving `src/data/*.json` to Content Collections or a headless CMS — but keep the file-backed seed pattern until the migration is ADR'd and redirect-tested.
 - **When DB load grows:** add `pgBouncer` or Drizzle `migrate` workflow (`drizzle-kit generate` + `drizzle-kit migrate`) instead of ad-hoc `push`.
 - **After each task:** run `npm run lint && npm run typecheck`, reflect on what broke, and update this file if the workflow changed.
@@ -575,4 +575,4 @@ This project is intentionally static-site-hostable with an optional Postgres bac
 
 ---
 
-*Last generated 2026-09-11 via `claude-md:create`; updated 2026-09-11 (remediation pass 2): markdown H4/OOM fix + regression suites (unit 37, E2E 44), modfii.com visual parity (wordmark logos, testimonial avatars, `Reveal` scroll animations, animated accordions, footer socials + Legal, learn-hub + calculator rebuilds, get-started wizard parity, manufacturers tier bands + A–Z directory); earlier pass: untracked `.env` (real secrets had been committed in `d572d73` — rotate `BETTER_AUTH_SECRET`/`CRON_SECRET`), eslint ignores `skills/**`+`infrastructure/**` (lint 0/0), vitest 31 unit tests, e2e 27 tests incl. `assets.spec.ts` regression guards, six missing images added (`public/images/*.jpg` + `public/brand/og-image.jpg`), canonical logo SVG adopted, compare alias redirects, header/home/footer/PageHero/get-started restyled to mirror modfii.com, `.env.example` moved to `home_financing_*:5434`. Source of truth: package.json, tsconfig, next.config.ts, eslint.config.mjs, drizzle.config.ts/json, docker-compose.yml:5434, src/db, src/lib, src/scripts, e2e, vitest.config.ts. Preserve team-specific conventions when updating.*
+*Last generated 2026-09-11 via `claude-md:create`; updated 2026-09-11 (remediation pass 2): markdown H4/OOM fix + regression suites (unit 37, E2E 44 per project), modfii.com visual parity (wordmark logos, testimonial avatars, `Reveal` scroll animations, animated accordions, footer socials + Legal, learn-hub + calculator rebuilds, get-started wizard parity, manufacturers tier bands + A–Z directory); earlier pass: untracked `.env` (real secrets had been committed in `d572d73` — rotate `BETTER_AUTH_SECRET`/`CRON_SECRET`), eslint ignores `skills/**`+`infrastructure/**` (lint 0/0), vitest 31 unit tests, e2e 27 tests incl. `assets.spec.ts` regression guards, six missing images added (`public/images/*.jpg` + `public/brand/og-image.jpg`), canonical logo SVG adopted, compare alias redirects, header/home/footer/PageHero/get-started restyled to mirror modfii.com, `.env.example` moved to `home_financing_*:5434`. Source of truth: package.json, tsconfig, next.config.ts, eslint.config.mjs, drizzle.config.ts/json, docker-compose.yml:5434, src/db, src/lib, src/scripts, e2e, vitest.config.ts. Preserve team-specific conventions when updating.*

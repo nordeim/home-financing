@@ -1,0 +1,50 @@
+$ git pull
+remote: Enumerating objects: 78, done.
+remote: Counting objects: 100% (78/78), done.
+remote: Compressing objects: 100% (26/26), done.
+remote: Total 49 (delta 21), reused 49 (delta 21), pack-reused 0 (from 0)
+Unpacking objects: 100% (49/49), 80.07 KiB | 308.00 KiB/s, done.
+From github.com:nordeim/home-financing
+   3d9ee55..a1b2e67  main       -> origin/main
+Updating 3d9ee55..a1b2e67
+Fast-forward
+ AGENTS.md                                             |  11 +++--
+ CLAUDE.md                                             |  16 ++++---
+ README.md                                             |  19 ++++----
+ e2e/assets.spec.ts                                    |   8 ++++
+ e2e/parity.spec.ts                                    |  92 ++++++++++++++++++++++++++++++++++++
+ home-financing_SKILL.md                               |  44 ++++++++++--------
+ public/brand/wordmarks/dutch-housing-DfGaFGP9.png     | Bin 0 -> 4436 bytes
+ public/brand/wordmarks/dvele-qHduDYI9.png             | Bin 0 -> 4440 bytes
+ public/brand/wordmarks/excel-homes-7uiBs08K.png       | Bin 0 -> 5342 bytes
+ public/brand/wordmarks/plant-prefab-BZiOWTM8.png      | Bin 0 -> 16903 bytes
+ public/brand/wordmarks/skyline.png                    | Bin 0 -> 1666 bytes
+ public/images/avatars/james-thornton.jpg              | Bin 0 -> 5478 bytes
+ public/images/avatars/marcus-elena-rodriguez.jpg      | Bin 0 -> 9449 bytes
+ public/images/avatars/sarah-chen.jpg                  | Bin 0 -> 9944 bytes
+ src/app/calculator/page.tsx                           | 220 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---------
+ src/app/get-started/page.tsx                          |  38 +++++++++++++--
+ src/app/globals.css                                   |  27 +++++++++++
+ src/app/learn/page.tsx                                |  66 +++++++++++++-------------
+ src/app/modular-home-financing/manufacturers/page.tsx | 107 +++++++++++++++++++++++++++++++++---------
+ src/app/page.tsx                                      |  87 ++++++++++++++++++----------------
+ src/components/calculator-app.tsx                     | 342 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--------------------------------------------------
+ src/components/learn-explorer.tsx                     | 379 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/components/prequal-form.tsx                       |  61 ++++++++++++++++--------
+ src/components/reveal.tsx                             |  64 +++++++++++++++++++++++++
+ src/components/site-footer.tsx                        |  80 ++++++++++++++++++++++++++++----
+ src/lib/markdown.test.ts                              |  73 +++++++++++++++++++++++++++++
+ src/lib/markdown.tsx                                  |  18 ++++++++
+ 27 files changed, 1442 insertions(+), 310 deletions(-)
+ create mode 100644 e2e/parity.spec.ts
+ create mode 100644 public/brand/wordmarks/dutch-housing-DfGaFGP9.png
+ create mode 100644 public/brand/wordmarks/dvele-qHduDYI9.png
+ create mode 100644 public/brand/wordmarks/excel-homes-7uiBs08K.png
+ create mode 100644 public/brand/wordmarks/plant-prefab-BZiOWTM8.png
+ create mode 100644 public/brand/wordmarks/skyline.png
+ create mode 100644 public/images/avatars/james-thornton.jpg
+ create mode 100644 public/images/avatars/marcus-elena-rodriguez.jpg
+ create mode 100644 public/images/avatars/sarah-chen.jpg
+ create mode 100644 src/components/learn-explorer.tsx
+ create mode 100644 src/components/reveal.tsx
+ create mode 100644 src/lib/markdown.test.ts

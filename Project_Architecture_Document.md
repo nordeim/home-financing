@@ -3,7 +3,7 @@
 **Classification:** Internal Engineering Reference
 **Status:** DEFINITIVE, PRODUCTION-LOCKED BLUEPRINT
 **Companion Documents:** `CLAUDE.md` (agent spec) · `AGENTS.md` (compact cheat-sheet) · `README.md` (operator guide)
-**Last Updated:** 2026-09-11
+**Last Updated:** 2026-09-12 (v1.1 — docs normalization + H4 fix + parity feat alignment)
 **Audience:** Senior Engineers, Tech Leads, DevOps, Onboarding Engineers, and AI Coding Agents
 **Rule:** Every architectural decision in this document traces to a specific rationale. Nothing is here "because it's popular."
 
@@ -14,6 +14,7 @@ Every change is tagged: `[RES]` = web research, `[SR]` = self-review, `[CA]` = c
 - `[SYN, CLAUDE.md+AGENTS.md+README.md]` Initial PAD distilled from 3 companion docs (post-remediation 2026-09-11) and verified against `package.json`, `tsconfig.json`, `next.config.ts`, `drizzle.config.*`, `docker-compose.yml`, `src/db/schema.ts`, `src/lib/*.ts`, `src/app/**`, `e2e/**`, `public/**`, and live probes (`/api/health` → `ok:true`, `/api/applications` → 4 matches, `sitemap.xml` → 152 locs, `lint/typecheck/test/build/e2e` all green).
 - `[SR, docker ps]` Postgres `home_financing_postgres` `postgres:17-alpine` `5434` `(healthy)` with `pgcrypto 1.3 + pg_trgm 1.6` — seed counts `8/40/50/23/59/5` proven via `psql count(*)`.
 - `[CA, build]` Next build `43/43` (`○ 36 static + ƒ 7 dynamic`) with 11 redirects validated; `images.unoptimized:true` locked.
+- `[CA, 2026-09-12 v1.1 docs normalization]` Normalized test counts `31→37` (vitest: added `markdown.test.ts` 6) and `27→44` per project (playwright: `assets 6→19` + `parity 8`), updated ADR-006 `3→4 files` (`58→81` total), added `reveal.tsx`/`learn-explorer.tsx`/`src/app/{loading,error}.tsx` to §3.2/§12, global `loading`/`error` fallback covers 7 dynamic routes (ADR-001 consequence), verified `lint 0/0` + `typecheck` + `37/37` + `build 43/43` + `44/44` chromium (88 with webkit). Evidence: `docs/AUDIT_REPORT.md` + `docs/audit-evidence/{f61cf67,a9eb492,a1b2e67}.patch` (hex-proof `[` artifact — no `grid-cols-inmax` typo).
 
 ---
 
@@ -73,8 +74,8 @@ Every version is pinned from `package.json` / `docker-compose.yml` / `drizzle.co
 | Type Support | `@types/node`, `@types/react`, `@types/react-dom` | `^22.20.2`, `^19.3.0`, `^19.3.0` | Complete `tsc --noEmit` coverage for `strict` build. |
 | Build Scripting | `tsx` | `^4.23.13` | Runs `src/scripts/migrate.ts/seed.ts/reset.ts` as ESM without compile step. |
 | Linting | ESLint + `eslint-config-next` | `^9.39.5` + `^16.3.4` (`core-web-vitals`) | Flat config (`eslint.config.mjs` + `defineConfig`), `globalIgnores([.next,out,build,next-env,skills,infrastructure])` — operator-managed folders excluded. |
-| Unit Testing | Vitest | `^3.2.7` (`vitest/config`, `environment: node`) | Co-located `src/lib/*.test.ts` on pure domains only; DB paths stay under Playwright. `include: src/**/*.test.ts`. |
-| E2E Testing | Playwright + `@axe-core/playwright` | `^1.63.0` + `^4.13.0` | Prod `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `timeout: 30000/5000`, projects `chromium + webkit`, `x-forwarded-for` isolation for rate-limit tests. 27 tests (with DB). |
+| Unit Testing | Vitest | `^3.2.7` (`vitest/config`, `environment: node`) | Co-located `src/lib/*.test.ts` on pure domains only (calculator 11 + matching 13 + rate-limit 7 + markdown 6 = 37); DB paths stay under Playwright. `include: src/**/*.test.ts`. |
+| E2E Testing | Playwright + `@axe-core/playwright` | `^1.63.0` + `^4.13.0` | Prod `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `timeout: 30000/5000`, projects `chromium + webkit`, `x-forwarded-for` isolation for rate-limit tests. 44 per project — 31 declarations + 14 asset-title variants (88 with webkit, 44/44 with DB, 43/44 DB-less). |
 | Package Manager | npm | `package-lock.json` (not pnpm) | Single-app, no monorepo/turborepo. `npm install` path; `db:setup → lint → typecheck → test → build → e2e` is the pre-PR gate. |
 
 ### 1.3 Architecture Decision Records (ADRs)
@@ -82,9 +83,9 @@ Every version is pinned from `package.json` / `docker-compose.yml` / `drizzle.co
 #### ADR-001: Next.js 16.3 App Router + React 19 Server Components
 
 - **Context:** Hybrid needed — SEO-driven editorial corpus (23 articles + 50 states + 40 manufacturers, `sitemap.xml` with 152 locs) plus a transactional funnel that validates + scores + persists. Must support `metadataBase`/`generateMetadata`, `sitemap.ts`/`robots.ts`, and per-route `force-dynamic` without middleware.
-- **Decision:** Next.js `^16.3.4` App Router only (`src/app/**` with `page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`). Server Components by default; `"use client"` only on `site-header.tsx`, `prequal-form.tsx`, `calculator-app.tsx`. No `pages/` directory. No `middleware.ts`/`proxy.ts` (proxy concerns at reverse proxy). `images.unoptimized:true` in `next.config.ts`.
+- **Decision:** Next.js `^16.3.4` App Router only (`src/app/**` with `page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`). Server Components by default; `"use client"` only on `site-header.tsx`, `prequal-form.tsx`, `calculator-app.tsx`, `learn-explorer.tsx`, `reveal.tsx`, and `error.tsx` (global fallback) — 6 client islands total. No `pages/` directory. No `middleware.ts`/`proxy.ts` (proxy concerns at reverse proxy). `images.unoptimized:true` in `next.config.ts`.
 - **Rationale:** RSC streaming + `next/font` variable fonts + `next/image` `priority` even when unoptimized; `export const dynamic = "force-dynamic"` scoped to DB-touching routes (`/api/*`) while content pages remain static-prerenderable (build `○ 36 static + ƒ 7 dynamic`). `redirects()` validated at build (11 permanent/temporary) prevents 404 after slug renames — pinned by `assets.spec.ts`.
-- **Consequences:** Positive — SEO parity with `modfii.com`, correct RSC boundaries caught by `next build`. Negative — must not import Server Component into Client Component (breaks build); every segment that fetches should add `loading.tsx`/`error.tsx` incrementally (many still missing).
+- **Consequences:** Positive — SEO parity with `modfii.com`, correct RSC boundaries caught by `next build`. Negative — must not import Server Component into Client Component (breaks build); global `src/app/{loading,error}.tsx` now cover dynamic segments (7 dynamic routes) as fallback — per-segment `loading.tsx`/`error.tsx` remain incremental.
 - **Alternatives Rejected:** `pages/` + `getServerSideProps` (cannot express `force-dynamic` per handler as cleanly, no RSC streaming), Vite SPA (loses `metadata` API, `sitemap.ts`/`robots.ts` conventions, and server-side `ensureSeeded()` projection).
 
 #### ADR-002: File-Backed Content Projection (`src/data/*.json` + `LENDER_SEEDS` → PG)
@@ -119,11 +120,11 @@ Every version is pinned from `package.json` / `docker-compose.yml` / `drizzle.co
 - **Consequences:** Positive — zero infra cost, E2E can assert `429`. Negative — resets on restart, per-instance only.
 - **Alternatives Rejected:** Upstash Redis from day-0 (overkill for single deploy), no limiter (burst abuse on public funnel).
 
-#### ADR-006: Vitest Unit (31) + Playwright Prod-Build E2E (27) — Pure vs. DB Boundary
+#### ADR-006: Vitest Unit (37) + Playwright Prod-Build E2E (44) — Pure vs. DB Boundary
 
 - **Context:** Logic (PMI, amortization, scoring, validation, limiter) is deterministic and pure; persistence and sitemap + alias routing are DB/deployment-shaped and need prod-build parity (dev HMR diverged from prod in prior `scandihaven` audit).
-- **Decision:** Vitest `3.2.7` (node env, `@` alias, `include: src/**/*.test.ts`) for `src/lib/{calculator,matching,rate-limit}.test.ts` — **31 tests** on pure domains only. Playwright `1.63.0` + `@axe-core/playwright 4.13.0` for `e2e/{smoke,seo,funnel,assets}.spec.ts` — **27 tests** (chromium default, webkit via `e2e:all`) running `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `expect:5000`. `assets.spec.ts` pins the two `2026-09-11` incidents: 6 image assets `200` + 2 `/compare/*` parity aliases resolve. Funnel valid-payload E2E needs Postgres (migrated+seeded); the other 26 run DB-less.
-- **Rationale:** `lint (0/0)` + `typecheck` + `test (31/31)` is the fast local gate; `build (43/43)` validates redirects + RSC boundaries + `skills` exclusion; `e2e` on the shipped artifact catches what `dev` HMR hides.
+- **Decision:** Vitest `3.2.7` (node env, `@` alias, `include: src/**/*.test.ts`) for `src/lib/{calculator,matching,rate-limit,markdown}.test.ts` — **37 tests** (calculator 11 + matching 13 + rate-limit 7 + markdown 6) on pure domains only — markdown pins the 2026-09-11 H4/OOM regression (both killing articles). Playwright `1.63.0` + `@axe-core/playwright 4.13.0` for `e2e/{smoke,seo,funnel,assets,parity}.spec.ts` — **44 per project** (31 declarations + 14 asset-title variants, 88 with webkit) running `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `expect:5000`. `assets.spec.ts` pins the two `2026-09-11` incidents: 14 image assets `200` (6 heroes/OG + 5 wordmarks + 3 avatars) + 3 broken-img checks + 2 `/compare/*` parity aliases resolve. `parity.spec.ts` pins H4 OOM + wordmarks/avatars/learn-hub/calculator/footer/wizard. Funnel valid-payload E2E needs Postgres (migrated+seeded); the other 43 run DB-less.
+- **Rationale:** `lint (0/0)` + `typecheck` + `test (37/37)` is the fast local gate; `build (43/43)` validates redirects + RSC boundaries + `skills` exclusion; `e2e 44/44` on the shipped artifact catches what `dev` HMR hides (assets 19 runtime + parity 8).
 - **Consequences:** Positive — `build` + `e2e` catch alias 404s and broken `<img>` before deploy. Negative — `reuseExistingServer:true` requires `x-forwarded-for` isolation for rate-limit tests; E2E needs `E2E_PORT=3002` because `3000` is occupied by the sibling `scandihaven` repo in this dev host.
 - **Alternatives Rejected:** Unit-only (would miss alias/image regressions), E2E on `dev` (HMR drift), `pg-mem`/testcontainers for API integration (not yet — documented as next).
 
@@ -300,7 +301,7 @@ home-financing/                          ← single app, no monorepo/turborepo
 ├── docker-compose.yml                   ← postgres:17-alpine on host 5434 (home_financing_*)
 ├── tsconfig.json                        ← strict, skipLibCheck, isolatedModules, @/*→./src/*, exclude skills
 ├── eslint.config.mjs                    ← flat config + core-web-vitals + globalIgnores(.next,out,build,next-env,skills,infrastructure)
-├── vitest.config.ts                     ← alias @→./src, environment node, include src/**/*.test.ts
+├── vitest.config.ts                     ← alias @→./src, environment node, include src/**/*.test.ts (calculator 11 + matching 13 + rate-limit 7 + markdown 6 = 37)
 ├── playwright.config.ts                 ← testDir ./e2e, prod next start 3002, reuseExistingServer:true, chromium+webkit
 ├── AGENTS.md                            ← compact agent cheat-sheet (this PAD complements it)
 ├── CLAUDE.md                            ← full agent spec (~600 lines, 6-phase workflow, already the spec side of this PAD)
@@ -815,14 +816,15 @@ No queue, worker, or async pipeline is running in this iteration. `CRON_SECRET` 
 
 | Category | Framework | Files | Tests | Location | DB | Command |
 |----------|-----------|-------|-------|----------|----|---------|
-| Unit — pure domains | Vitest `3.2.7` (`node`) | 3 | 31 | `src/lib/calculator.test.ts` (11), `matching.test.ts` (13), `rate-limit.test.ts` (7) | None | `npm run test` / `test:watch` / `test:coverage` |
+| Unit — pure domains | Vitest `3.2.7` (`node`) | 4 | 37 | `src/lib/calculator.test.ts` (11), `matching.test.ts` (13), `rate-limit.test.ts` (7), `markdown.test.ts` (6) | None | `npm run test` / `test:watch` / `test:coverage` |
 | E2E — smoke | Playwright `1.63.0` + `@axe-core/playwright 4.13.0` | 1 | 7 | `e2e/smoke.spec.ts` | Optional (`health` tolerates `200|500`) | `npm run e2e` |
 | E2E — SEO | Playwright | 1 | 6 | `e2e/seo.spec.ts` | Optional | (same) |
 | E2E — funnel | Playwright | 1 | 4 | `e2e/funnel.spec.ts` | **Required** for valid-payload 200 path (other 3 run DB-less) | (same) |
-| E2E — assets | Playwright | 1 | 9 (6 looped) | `e2e/assets.spec.ts` | None | (same) |
-| **Total** | Vitest + Playwright | 7 | **58 (31+27)** | `src/lib/*.test.ts` + `e2e/*.spec.ts` | See notes | `npm run db:setup → lint → typecheck → test → build → e2e` |
+| E2E — assets | Playwright | 1 | 19 (14 looped) | `e2e/assets.spec.ts` | None | (same) |
+| E2E — parity | Playwright | 1 | 8 | `e2e/parity.spec.ts` | **Required** for H4 OOM / wordmarks+avatars/learn-hub/calculator/footer/wizard (other 43 DB-less) | (same) |
+| **Total** | Vitest + Playwright | 8 | **81 (37+44)** | `src/lib/*.test.ts` + `e2e/*.spec.ts` | See notes | `npm run db:setup → lint → typecheck → test → build → e2e` |
 
-With Postgres: **27/27** E2E (chromium). Without DB: **26/27** (funnel valid-payload is the only DB-dependent test). `e2e:all` runs `chromium + webkit`.
+With Postgres: **44/44** E2E (chromium, 31 declarations + 14 asset-title variants). Without DB: **43/44** (funnel valid-payload is the only DB-dependent test — expects `200` with `application_matches` persistence; other 43 verify static/SEO/assets/parity). `e2e:all` runs `chromium + webkit` (88 total).
 
 ### 8.2 Test Patterns
 
@@ -853,9 +855,9 @@ With Postgres: **27/27** E2E (chromium). Without DB: **26/27** (funnel valid-pay
 npm run db:setup      # migrate + seed idempotent → 8/40/50/23/59/5
 npm run lint          # ESLint flat (0 errors / 0 warnings) — skills/infrastructure excluded
 npm run typecheck     # tsc --noEmit (skills excluded)
-npm run test          # vitest 31/31
+npm run test          # vitest 37/37 (11+13+7+6, incl. markdown H4/OOM regression)
 npm run build         # next build — validates redirects + RSC boundaries + skills excluded
-npm run e2e           # playwright chromium 27/27 (prod next start on 3002; valid-payload needs DB)
+npm run e2e           # playwright chromium 44/44 per project (31 declarations + 14 asset variants; valid-payload needs DB)
 curl -s http://localhost:3002/api/health | jq  # { ok:true, status:ok, db:true }
 curl -s http://localhost:3002/sitemap.xml | grep -c "<loc>"  # 152
 ```
@@ -941,9 +943,9 @@ Canonical from `.env.example` + `docker-compose.yml` + `src/db/index.ts` + `src/
 |-------|------|------|
 | Install | `npm ci` (lockfile `package-lock.json`) | Lockfile must match `package.json` |
 | DB provision | `docker compose up -d` + `npm run db:setup` (CI) | `migrate` + `seed` idempotent; `docker compose logs -f postgres` shows `pgcrypto: t` |
-| Quality | `npm run lint` (flat + `core-web-vitals`) + `npm run typecheck` + `npm run test` | `lint 0/0`, `typecheck` pass (`skills` excluded), `test 31/31` |
+| Quality | `npm run lint` (flat + `core-web-vitals`) + `npm run typecheck` + `npm run test` | `lint 0/0`, `typecheck` pass (`skills` excluded), `test 37/37 (11+13+7+6)` |
 | Build | `npm run build` | `43/43` pages, redirects validated, RSC boundaries proven |
-| E2E | `npm run e2e` (prod `next start` on `3002`) + `npm run e2e:all` (chromium+webkit) | `27/27` (with DB) / `26/27` (without DB, funnel valid-payload blocked) |
+| E2E | `npm run e2e` (prod `next start` on `3002`) + `npm run e2e:all` (chromium+webkit) | `44/44` (with DB, per project) / `43/44` (without DB, funnel valid-payload blocked) |
 | Readiness | `curl http://localhost:3002/api/health` | `{ ok:true, status:ok, db:true }` |
 | Deploy | Vercel / Node SSR (no `standalone` yet — add `output:"standalone"` in `next.config.ts` if containerizing) | `NEXT_PUBLIC_SITE_URL` + `BETTER_AUTH_URL` must be `https://modfii.jesspete.shop` or sitemap/OG/auth break |
 
@@ -1021,7 +1023,7 @@ DATABASE_URL=postgresql://user:pass@localhost:5432/home_financing_dev npm run de
 | `npm run lint` | `eslint.config.mjs` | Flat ESLint (0/0) |
 | `npm run lint:fix` | `eslint.config.mjs` | `--fix` |
 | `npm run typecheck` | `tsconfig.json` | `tsc --noEmit` (`skills` excluded) |
-| `npm run test` | `vitest.config.ts` | `vitest run` 31 tests |
+| `npm run test` | `vitest.config.ts` | `vitest run` 37 tests (11+13+7+6) |
 | `npm run test:watch` | `vitest` | Watch mode |
 | `npm run test:coverage` | `vitest` | Coverage |
 | `npm run e2e` | `playwright.config.ts` | `playwright --project=chromium` (prod 3002) — funnel valid-payload needs `db:setup` |
@@ -1068,7 +1070,7 @@ DATABASE_URL=postgresql://user:pass@localhost:5432/home_financing_dev npm run de
 | **LOW** | `CRON_SECRET` and `STRIPE_*` / `RESEND_API_KEY` not yet consumed in code (log transport only) | Env is over-specified relative to implemented features | **Open** — wire when jobs/checkout/email ships; until then they are reserved keys |
 | **LOW** | `pm run dev` on `:3000` collides with sibling `scandihaven` on same dev host | Requires `E2E_PORT=3002` / `next dev --port 3002` | **Accepted** — `playwright.config.ts` defaults to `3002`; document in `AGENTS.md` |
 
-No `CRITICAL` open issues. `lint 0/0`, `typecheck` pass, `31/31` unit, `27/27` E2E (with DB), `build 43/43`, live probes green as of `2026-09-11`.
+No `CRITICAL` open issues. `lint 0/0`, `typecheck` pass, `37/37` unit (11+13+7+6), `44/44` E2E per project (43/44 DB-less), `build 43/43`, live probes green as of `2026-09-12`.
 
 ---
 
@@ -1100,9 +1102,12 @@ No `CRITICAL` open issues. `lint 0/0`, `typecheck` pass, `31/31` unit, `27/27` E
 | `drizzle.config.ts` / `.json` | ~15 each | TS primary + JSON fallback (`5434`, `strict/verbose`) — keep in sync |
 | `next.config.ts` | ~25 | `images.unoptimized:true` + `redirects()` 11 entries |
 | `docker-compose.yml` | ~45 | PG 17 `5434`, init `00-create-extensions.sql`, volume `home_financing_data`, healthcheck |
-| `vitest.config.ts` | ~15 | Node env, alias `@→./src`, `include src/**/*.test.ts` |
+| `vitest.config.ts` | ~15 | Node env, alias `@→./src`, `include src/**/*.test.ts` (4 files, 37 tests) |
+| `src/components/reveal.tsx` | 64 | Scroll-reveal wrapper (`IntersectionObserver`, `data-reveal`, 300ms, `prefers-reduced-motion` kill) — mirrors modfii.com |
+| `src/components/learn-explorer.tsx` | 379 | Learn hub client island (search/filter/Featured/Interactive Tools/newsletter, reuses `calculatePayment()`) |
+| `src/app/loading.tsx` + `error.tsx` | ~20+30 | Global RSC loading skeleton + error boundary (`"use client"` reset) — fallback for 7 dynamic routes |
 | `playwright.config.ts` | ~40 | Prod `next start` 3002, `reuseExistingServer:true`, chromium+webkit |
-| `e2e/{smoke,seo,funnel,assets}.spec.ts` | 63/77/94/74 | 27 E2E tests (smoke 7, seo 6, funnel 4, assets 9 looped) incl. alias/image regression guards |
+| `e2e/{smoke,seo,funnel,assets,parity}.spec.ts` | 63/77/94/74/92 | 44 E2E tests per project (smoke 7, seo 6, funnel 4, assets 19, parity 8) incl. H4-OOM + alias/image regression guards |
 | `src/lib/*.test.ts` | 81/110/57 | 31 Vitest unit tests co-located on pure domains |
 | `public/images/*.jpg` + `brand/*` | 6+3 assets | Hero/site imagery + `modfii-logo-icon.svg` + `og-image.jpg` |
 | `tsconfig.json` | ~35 | `strict`, `skipLibCheck`, `isolatedModules`, `@/*→./src/*`, `exclude: [node_modules,skills]`, `incremental` |
@@ -1137,4 +1142,4 @@ No `CRITICAL` open issues. `lint 0/0`, `typecheck` pass, `31/31` unit, `27/27` E
 
 ---
 
-*Last verified 2026-09-11 (post-remediation + DB init + PAD) against `package.json` (next ^16.3.4, react ^19.3.0, tailwind ^4.3.3, vitest ^3.2, playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills+infrastructure ignored), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (+ 31 tests), `public/images/*` + `public/brand/*` (every referenced asset exists), `playwright.config.ts` (3002), `e2e/*` 27 tests (27/27 with DB), `vitest` 31/31, `next build` 43/43, live `curl /api/health` → `ok:true` + `applications` funnel `4 matches` + `rate-limit 429` + `sitemap 152`, `docker exec psql count(*)` `8/40/50/23/59/5` plus live `applications 2 / application_matches 8`. Source of truth: `package.json`, `tsconfig.json`, `next.config.ts`, `eslint.config.mjs`, `drizzle.config.ts/.json`, `docker-compose.yml:5434`, `src/db`, `src/lib`, `src/scripts`, `e2e`, `vitest.config.ts`, `.env.example`, live DB probes.*
+*Last verified 2026-09-12 (PAD v1.1 — remediation pass 2 + docs normalization: markdown H4/OOM fix (loop-guard + 6 unit + 2 E2E `parity` pinned) + modfii.com parity feat `a9eb492` (wordmarks 5 + avatars 3 + `Reveal`/`learn-explorer`/`calculator` rebuilds) + counts `37/37` vitest = 11+13+7+6 + `44/44` per project playwright = smoke 7+seo 6+funnel 4+assets 19+parity 8 + global `src/app/{loading,error}.tsx` fallback) against `package.json` (next ^16.3.4, react ^19.3.0, tailwind ^4.3.3, vitest ^3.2, playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills+infrastructure ignored), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (37 tests), `public/brand/wordmarks 5` + `public/images/avatars 3` + `public/images 5` + `brand/og-image.jpg`, `playwright.config.ts` (3002), `e2e/*` 44 per project (44/44 with DB, 43/44 DB-less), `vitest` 37/37, `next build` 43/43, live `curl /api/health` → `ok:true` + `applications` funnel `4 matches` + `rate-limit 429` + `sitemap 152`, `docker exec psql count(*)` `8/40/50/23/59/5` plus live `applications 2 / application_matches 8`. Source of truth: `package.json`, `tsconfig.json`, `next.config.ts`, `eslint.config.mjs`, `drizzle.config.ts/.json`, `docker-compose.yml:5434`, `src/db`, `src/lib`, `src/scripts`, `e2e`, `vitest.config.ts`, `.env.example`, live DB probes. Evidence: `docs/AUDIT_REPORT.md` + `docs/audit-evidence/{f61cf67,a9eb492,a1b2e67}.patch` (hex-proof `[` artifact).*

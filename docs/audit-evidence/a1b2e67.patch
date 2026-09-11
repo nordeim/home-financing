@@ -1,0 +1,356 @@
+commit a1b2e67cd54c7172b9b062e19f552e4311519f36
+Author: ModFii Remediation Agent <agent@modfii.local>
+Date:   Fri Sep 11 16:25:59 2026 +0000
+
+    docs: align AGENTS/CLAUDE/README/SKILL with remediation pass 2
+    
+    - test counts: vitest 31 -> 37 (markdown suite), Playwright 27 -> 44
+      (parity spec + 14 pinned image assets); per-file counts corrected
+      (seo 5, assets 19 runtime, smoke 7, funnel 4, parity 10)
+    - document the markdown H4/OOM incident, root cause, fix and guards
+      (LL-17 + two audit-history rows in SKILL.md; troubleshooting rows)
+    - calculator endpoint is POST-only with 60/min rate limit (was GET/POST)
+    - client islands: add learn-explorer.tsx + reveal.tsx
+    - SKILL.md corrections: hero rhythm measured values (min-h-[92vh],
+      canonical grid classes, flex wordmark strip), aside is h-fit (not
+      sticky), STATIC_PATHS 39, 13-field funnel, --shadow-lift/--ease-brand
+      actual usage, no CI configured (no .github/), no turbo.json,
+      1,140-line count conflation fixed
+    - note: reported 'grid-cols-inmax' typo was a tooling display artifact;
+      byte-level inspection shows the classes were always canonical
+      grid-cols-[minmax(...)] — no code change required
+
+diff --git a/AGENTS.md b/AGENTS.md
+index 62c7506..2976d0d 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -28,8 +28,8 @@
+ | `npm run lint` | ESLint flat config (`eslint.config.mjs` + `core-web-vitals`) |
+ | `npm run lint:fix` | ESLint auto-fix |
+ | `npm run typecheck` | `tsc --noEmit` (`skills` excluded via `tsconfig`) |
+-| `npm run e2e` | Playwright E2E chromium (prod `next start` on 3002, 27 tests) |
+-| `npm run test` | Vitest unit suite (31 tests — calculator / matching / rate-limit) |
++| `npm run e2e` | Playwright E2E chromium (prod `next start` on 3002, 44 tests; 43/44 without a DB) |
++| `npm run test` | Vitest unit suite (37 tests — calculator / matching / rate-limit / markdown) |
+ | `npm run e2e:all` | Playwright both projects (chromium+webkit) |
+ | `curl http://localhost:3000/api/health` | Readiness — pings DB + triggers `ensureSeeded()` |
+ | `docker compose down -v` | **Destructive** — wipes `home_financing_data` volume |
+@@ -41,7 +41,7 @@
+ - **File-backed seeds are the write path.** Edit `src/data/*.json` + `src/lib/lenders.ts`, not Postgres rows. `ensureSeeded()` is idempotent via `globalThis.__modfiiSeedPromise` + `count(lenders) > 0` guard + `onConflictDoNothing`. Called in `/api/health` and `/api/applications` and via `npm run db:seed` (`src/scripts/seed.ts`) — reuse, don't duplicate.
+ - **Visual parity with modfii.com is a design contract.** The header sits transparent (light text) over the homepage hero until scroll; interior heroes flow through `PageHero` (`src/components/page-shell.tsx`) — centered, photo-backed, star eyebrow pill, optional amber `highlight` title line, CTA pair, glass stat chips. Don't reintroduce left-aligned gradient heroes or an amber header CTA (it is a forest "Get Started" pill).
+ - **Pool singleton.** Import `{ db, pool }` only from `@/db` (`src/db/index.ts`). `globalThis.__arenaNextJsPostgresqlPool` prevents HMR pool leaks. Never `new Pool()` inline.
+-- **Server Components by default.** `"use client"` only for `site-header`, `prequal-form`, `calculator-app`. Never import a Server Component into a Client Component.
++- **Server Components by default.** `"use client"` only for `site-header`, `prequal-form`, `calculator-app`, `learn-explorer`, `reveal`. Never import a Server Component into a Client Component.
+ - **`force-dynamic` only where DB is touched.** API routes (`src/app/api/*/route.ts`) have `export const dynamic = "force-dynamic"`. Content pages can render from `catalog` without DB.
+ - **Drizzle lifecycle guarded.** `src/scripts/local-db.ts` `assertLocalDatabase()` refuses non-local `DATABASE_URL` for `migrate/seed/reset` (drops `public`+`drizzle` schemas + restores `pgcrypto/pg_trgm`). Migrations in `drizzle/` (`0000` 8 tables + `0001` founded 8→32) via `drizzle.config.ts` (TS primary) + `.json` fallback.
+ - **Playwright on prod build.** `playwright.config.ts` runs `npx next start --port 3002` (not `dev`) with `reuseExistingServer:true`, 90s timeout, chromium+webkit, `x-forwarded-for` isolation for rate-limit tests.
+@@ -56,7 +56,8 @@
+ - **`drizzle.config.ts` (primary) + `.json` fallback** — both `out: ./drizzle`, `strict/verbose`, `url: home_financing_user:secret@localhost:5434/home_financing_dev` (runtime `DATABASE_URL` wins). Keep them in sync after schema edits (`npm run db:generate` writes to `drizzle/`).
+ - **`tsconfig.json:strict:true`, `skipLibCheck:true`, `isolatedModules:true`, `exclude: [node_modules,skills]`.** `eslint.config.mjs` also ignores `skills/**` + `infrastructure/**` — operator-managed folders stay out of checks/tests/compilation. Don't add `z-ai-web-dev-sdk`; don't re-include `skills`.
+ - **Rate limiter is in-memory `Map`.** `8 / 10 min` per IP on `POST /api/applications` (`clientKey` via `x-forwarded-for`/`x-real-ip`). Under-limits on multi-instance — migrate to Redis if scaling.
+-- **Tests: Vitest unit + Playwright E2E.** 31 unit tests in `src/lib/*.test.ts` (`npm run test`) + 27 E2E tests in `e2e/` (`smoke`/`seo`/`funnel`/`assets`, chromium via `npm run e2e`). `assets.spec.ts` guards the six image assets + two `/compare/*` aliases (2026-09-11 incidents). The funnel valid-payload E2E needs Postgres; the rest run DB-less.
++- **Tests: Vitest unit + Playwright E2E.** 37 unit tests in `src/lib/*.test.ts` (`npm run test`) + 44 E2E tests in `e2e/` (`smoke`/`seo`/`funnel`/`assets`/`parity`, chromium via `npm run e2e`). `assets.spec.ts` guards fourteen image assets (6 heroes/OG + 5 manufacturer wordmarks + 3 testimonial avatars) + two `/compare/*` aliases (2026-09-11 incidents). `parity.spec.ts` pins the markdown-OOM regression (`#### ` articles must render) and the modfii.com visual-parity additions. The funnel valid-payload E2E needs Postgres; the rest run DB-less.
++- **Markdown renderer is loop-guarded.** `src/lib/markdown.tsx` renders `#### ` as `h4` and its paragraph branch always consumes ≥1 line — an H4 line once fell through and looped forever, OOM-ing the whole next-server process (2026-09-11 origin 502). Regression-pinned by `markdown.test.ts` + `parity.spec.ts`.
+ - **Kebab route folders** (`modular-home-financing`, `construction-loans`), `kebab-case.json` data, `kebab-case.tsx` components (grandfathered; new components prefer `PascalCase.tsx` — don't mass-rename).
+ 
+ ## Environment & Services
+@@ -80,7 +81,7 @@
+ - Validation: `src/lib/matching.ts:validateApplication()` (ZIP `^\d{5}$`, phone digits ≥10, `EMAIL_RE`).
+ - Math: `src/lib/calculator.ts:PMI_ANNUAL_RATE = 0.0065`, site-built `1.15×`.
+ 
+-*Last verified 2026-09-11 (post-remediation) against `package.json` (next ^16.3.4, react ^19.3.0, tailwind ^4.3.3, vitest ^3.2), `eslint.config.mjs` (skills + infrastructure ignored), `tsconfig.json`, `next.config.ts` (11 redirects), `drizzle.config.ts/json` (5434), `docker-compose.yml`, `src/db` (8 tables), `src/lib` (+ `*.test.ts`), `public/images/*` + `public/brand/og-image.jpg` (every referenced asset exists), `playwright.config.ts` (3002), `e2e/*` 27 tests, `vitest.config.ts`.*
++*Last verified 2026-09-11 (remediation pass 2: markdown OOM fix + modfii.com visual parity — wordmark logos, testimonial avatars, scroll reveals, accordion animation, footer socials/Legal, learn-hub and calculator rebuilds) against `package.json` (next ^16.3.4, react ^19.3.0, tailwind ^4.3.3, vitest ^3.2), `eslint.config.mjs` (skills + infrastructure ignored), `tsconfig.json`, `next.config.ts` (11 redirects), `drizzle.config.ts/json` (5434), `docker-compose.yml`, `src/db` (8 tables), `src/lib` (+ `*.test.ts`), `public/images/*` + `public/brand/og-image.jpg` (every referenced asset exists), `playwright.config.ts` (3002), `e2e/*` 27 tests, `vitest.config.ts`.*
+ 
+ <!-- BEGIN:nextjs-agent-rules -->
+ 
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 98c4882..3a03879 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -127,7 +127,7 @@ IMPORTANT: File is read fresh for every conversation. Be brief and practical.
+ - `src/lib/matching.ts` — `matchLenders()` scoring (`+20` credit floor, `+18` specialty, `+12` green, etc.) and `validateApplication()` (regex `EMAIL_RE`, ZIP `^\d{5}$`, phone digits ≥10). Keep scoring deterministic and tested.
+ - `src/lib/rate-limit.ts` — in-memory `Map` buckets (`rateLimit(key, limit, windowMs)` + `clientKey(req)` via `x-forwarded-for`/`x-real-ip`). Note: single-instance memory — acceptable for now; document if moving to multi-instance.
+ - `src/lib/lenders.ts` — `LENDER_SEEDS` + `LOAN_PRODUCT_SEEDS` are the canonical seed constants.
+-- `src/lib/catalog.ts` + `src/lib/guides.ts` + `src/data/*.json` — typed catalog (`Manufacturer`, `StateGuide`, `Article`, `GlossaryTerm`). `src/lib/markdown.tsx` renders article `content` (markdown).
++- `src/lib/catalog.ts` + `src/lib/guides.ts` + `src/data/*.json` — typed catalog (`Manufacturer`, `StateGuide`, `Article`, `GlossaryTerm`). `src/lib/markdown.tsx` renders article `content` (markdown) — supports `#`–`####` headings; H4+ lines are handled explicitly and the paragraph branch always consumes ≥1 line (loop-safety after the 2026-09-11 OOM incident).
+ 
+ ---
+ 
+@@ -239,6 +239,8 @@ src/
+     page-shell.tsx        # Shared page shell
+     prequal-form.tsx      # Prequal form (client)
+     calculator-app.tsx    # Calculator UI (client)
++    learn-explorer.tsx    # Learn hub island: search/filter chips/featured/tools/newsletter (client)
++    reveal.tsx            # Scroll-reveal wrapper for home intro (client)
+     guide-screen.tsx      # Guide/article renderer
+   data/
+     articles.json         # Article corpus (source of truth)
+@@ -267,7 +269,8 @@ drizzle/
+   0001_sharp_stick.sql    # alter manufacturers.founded 8→32
+   meta/_journal.json
+  e2e/
+-  smoke.spec.ts / seo.spec.ts / funnel.spec.ts  # Playwright 16 tests (chromium)
++  smoke.spec.ts / seo.spec.ts / funnel.spec.ts /  # Playwright 44 tests (chromium)
++  assets.spec.ts / parity.spec.ts
+  playwright.config.ts      # E2E config (prod next start on 3002, reuseExistingServer)
+  drizzle.config.ts         # TS config (primary)
+  drizzle.config.json       # JSON fallback (keep in sync)
+@@ -432,7 +435,7 @@ App Router Server Components + Route Handlers
+ |-------|--------|------|------------|---------|
+ | `/api/health` | GET | none | none | DB ping + `ensureSeeded()` — readiness probe |
+ | `/api/applications` | POST | none | 8 / 10 min by IP | Validate → score → persist application + top-4 matches |
+-| `/api/calculator` | GET/POST | none | none | Calculator endpoint (see `src/app/api/calculator/route.ts`) |
++| `/api/calculator` | POST | none | 60 / min per IP | Calculator endpoint (see `src/app/api/calculator/route.ts`) |
+ 
+ - Request validation lives in `src/lib/matching.ts:validateApplication()` — keep error strings user-facing and stable (they're surfaced inline).
+ - Response codes: `400` validation/JSON, `429` rate-limit, `500` persistence failure. No `401/403` on public funnel.
+@@ -489,10 +492,11 @@ App Router Server Components + Route Handlers
+ - **Typography:** `Outfit` (display/headings, `--font-outfit`) + `DM Sans` (body, `--font-dm-sans`) via `next/font/google` with `variable` + `display: swap`. Apply via `font-sans` / `font-display`.
+ - **Header:** fixed `h-16`; on `/` it sits transparent with light text over the dark hero until ~12px of scroll, then transitions to `bg-background/90` + border; interior pages render light from first paint. CTA is a forest "Get Started" pill (never amber).
+ - **PageHero (`src/components/page-shell.tsx`):** centered interior hero — photo background (one of the five `/images/*.jpg`) under a forest overlay, star eyebrow pill, optional amber `highlight` title line, CTA pair, glass stat chips; `Breadcrumbs` centered inside. All `GuideScreen` pages + learn/glossary/manufacturers flow through it.
+-- **Homepage (`src/app/page.tsx`)** mirrors modfii.com section-for-section: photo hero + glass stats card, manufacturer wordmark strip, "Modular & Prefab Home Loans" intro (4 cards + loan chips), problem/solution (red vs green tinted cards with icons), green-mortgage photo band, 3-step icons + ghost numerals, 5-star testimonials with savings ledger, "Our Standards" trio, FAQ accordions, dotted-pattern closing CTA.
++- **Homepage (`src/app/page.tsx`)** mirrors modfii.com section-for-section: photo hero + glass stats card, manufacturer wordmark strip (real logo PNGs in `public/brand/wordmarks/`), "Modular & Prefab Home Loans" intro (4 cards + loan chips, scroll-revealed via `Reveal`), problem/solution (red vs green tinted cards with icons), green-mortgage photo band, 3-step icons + ghost numerals, 5-star testimonials with portrait avatars (`public/images/avatars/`) + savings ledger, "Our Standards" trio, animated FAQ accordions, dotted-pattern closing CTA.
++- **Motion:** `Reveal` (`src/components/reveal.tsx`) lazily reveals the home intro (opacity 0 + translateY, cards also scale 0.95, 300ms, staggered) matching modfii.com; `<details>` accordions animate via `::details-content` in `globals.css` (progressive enhancement, uses `--ease-brand`); `prefers-reduced-motion` forces `[data-reveal]` visible.
+ - **Logo:** `public/brand/modfii-logo-icon.svg` is the canonical rotated-square mark used by modfii.com — don't revert to the legacy MD monogram.
+ - **Layout rhythm:** `Container` max `1400px`, `px-4 md:px-8`, header `h-16` fixed + `backdrop-blur-md` + `border-b`.
+-- **Iconography:** `lucide-react` only (v1.44 has no brand icons — wrap inline SVGs in a local component, see `LinkedInIcon` in `site-footer.tsx`).
++- **Iconography:** `lucide-react` only (v1.44 has no brand icons — wrap inline SVGs in local components, see `LinkedInIcon`/`TwitterIcon`/`FacebookIcon`/`YouTubeIcon` in `site-footer.tsx`). Footer also carries a Legal column (Privacy/Terms/NMLS) mirroring modfii.com.
+ - **Anti-generic guard:** no purple gradients, no Inter/Roboto fallback without hierarchy, no undifferentiated card grids — editorial intent on every section.
+ 
+ ---
+@@ -571,4 +575,4 @@ This project is intentionally static-site-hostable with an optional Postgres bac
+ 
+ ---
+ 
+-*Last generated 2026-09-11 via `claude-md:create`; updated 2026-09-11 (remediation pass): untracked `.env` (real secrets had been committed in `d572d73` — rotate `BETTER_AUTH_SECRET`/`CRON_SECRET`), eslint ignores `skills/**`+`infrastructure/**` (lint 0/0), vitest 31 unit tests, e2e 27 tests incl. `assets.spec.ts` regression guards, six missing images added (`public/images/*.jpg` + `public/brand/og-image.jpg`), canonical logo SVG adopted, compare alias redirects, header/home/footer/PageHero/get-started restyled to mirror modfii.com, `.env.example` moved to `home_financing_*:5434`. Source of truth: package.json, tsconfig, next.config.ts, eslint.config.mjs, drizzle.config.ts/json, docker-compose.yml:5434, src/db, src/lib, src/scripts, e2e, vitest.config.ts. Preserve team-specific conventions when updating.*
++*Last generated 2026-09-11 via `claude-md:create`; updated 2026-09-11 (remediation pass 2): markdown H4/OOM fix + regression suites (unit 37, E2E 44), modfii.com visual parity (wordmark logos, testimonial avatars, `Reveal` scroll animations, animated accordions, footer socials + Legal, learn-hub + calculator rebuilds, get-started wizard parity, manufacturers tier bands + A–Z directory); earlier pass: untracked `.env` (real secrets had been committed in `d572d73` — rotate `BETTER_AUTH_SECRET`/`CRON_SECRET`), eslint ignores `skills/**`+`infrastructure/**` (lint 0/0), vitest 31 unit tests, e2e 27 tests incl. `assets.spec.ts` regression guards, six missing images added (`public/images/*.jpg` + `public/brand/og-image.jpg`), canonical logo SVG adopted, compare alias redirects, header/home/footer/PageHero/get-started restyled to mirror modfii.com, `.env.example` moved to `home_financing_*:5434`. Source of truth: package.json, tsconfig, next.config.ts, eslint.config.mjs, drizzle.config.ts/json, docker-compose.yml:5434, src/db, src/lib, src/scripts, e2e, vitest.config.ts. Preserve team-specific conventions when updating.*
+diff --git a/README.md b/README.md
+index 9009bf4..ca6d448 100644
+--- a/README.md
++++ b/README.md
+@@ -4,7 +4,7 @@
+ ![React](https://img.shields.io/badge/React-19.3-149eca?logo=react)
+ ![TypeScript](https://img.shields.io/badge/TypeScript-5.9_strict-3178c6?logo=typescript)
+ ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.3-38bdf8?logo=tailwindcss)
+-![Vitest](https://img.shields.io/badge/Vitest-3.2-6e9f18?logo=vitest)
++![Vitest](https://img.shields.io/badge/Vitest-3.2_37_tests-6e9f18?logo=vitest)
+ ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-0.45-C5F277?logo=drizzle)
+ ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?logo=postgresql)
+ ![License](https://img.shields.io/badge/license-Private-lightgrey)
+@@ -45,8 +45,8 @@
+ | Database | PostgreSQL | 17-alpine | 8 tables, `pgcrypto`/`pg_trgm` extensions |
+ | Fonts | `next/font/google` | — | `Outfit` (display) + `DM Sans` (body), `variable` + `swap` |
+ | Tooling | ESLint + `tsx` | 9.39.5 / 4.23 | Flat config + `eslint-config-next/core-web-vitals` + `tsx` for scripts |
+-| Unit | Vitest | 3.2 | 31 tests over `src/lib/{calculator,matching,rate-limit}` (`npm run test`) |
+-| E2E | Playwright + `@axe-core` | 1.63 + 4.13 | 27 tests (chromium), `playwright.config.ts` prod `next start` on 3002 |
++| Unit | Vitest | 3.2 | 37 tests over `src/lib/{calculator,matching,rate-limit,markdown}` (`npm run test`) |
++| E2E | Playwright + `@axe-core` | 1.63 + 4.13 | 44 tests (chromium), `playwright.config.ts` prod `next start` on 3002 |
+ 
+ ```mermaid
+ flowchart TB
+@@ -114,6 +114,7 @@ sequenceDiagram
+     📄 site-header.tsx            # Fixed header, NAV+MORE, mobile drawer (client)
+     📄 site-footer.tsx / page-shell.tsx / guide-screen.tsx
+     📄 prequal-form.tsx / calculator-app.tsx  # Client islands
++    📄 learn-explorer.tsx / reveal.tsx        # Client islands (learn hub + scroll reveal)
+   📂 data/
+     📄 articles.json / manufacturers.json / states.json / glossary.json  # Source corpora
+   📂 db/
+@@ -129,11 +130,12 @@ sequenceDiagram
+   📂 scripts/                     # DB lifecycle (local-guarded)
+     📄 local-db.ts / migrate.ts / seed.ts / reset.ts
+ 📂 drizzle/                       # Migrations (0000 8 tables + 0001 founded 8→32, meta/_journal.json)
+-📂 e2e/                           # Playwright: smoke / seo / funnel / assets specs (27 tests)
++📂 e2e/                           # Playwright: smoke / seo / funnel / assets / parity specs (44 tests)
+ 📄 playwright.config.ts           # E2E config (prod next start on 3002, reuseExistingServer)
+ 📄 drizzle.config.ts / .json      # TS primary + JSON fallback (keep in sync, url 5434)
+ 📂 infrastructure/postgres/init/  # pgcrypto + pg_trgm extensions
+-📂 public/brand/                  # modfii-logo-icon.svg, og-image.jpg
++📂 public/brand/                  # modfii-logo-icon.svg, og-image.jpg, wordmarks/*.png (5 manufacturer logos)
++📂 public/images/avatars/         # 3 testimonial portraits
+ 📄 next.config.ts                 # images.unoptimized + 11 redirects
+ 📄 docker-compose.yml             # PG17 on host 5434 (home_financing_*)
+ 📄 .env.example                   # Template (scandihaven_* legacy names — real DB is home_financing_*)
+@@ -275,9 +277,9 @@ Tokens live **only** in `src/app/globals.css:@theme` — never add `tailwind.con
+ 
+ ## Testing & Verification
+ 
+-**Unit:** Vitest 3.2 (`vitest.config.ts`, `@` alias), co-located `src/lib/{calculator,matching,rate-limit}.test.ts` — **31 tests** over the pure domains (amortization/PMI, scoring/validation, in-memory limiter). `npm run test` / `test:watch` / `test:coverage`.
++**Unit:** Vitest 3.2 (`vitest.config.ts`, `@` alias), co-located `src/lib/{calculator,matching,rate-limit,markdown}.test.ts` — **37 tests** over the pure domains (amortization/PMI, scoring/validation, in-memory limiter, markdown rendering incl. the 2026-09-11 H4/OOM regression). `npm run test` / `test:watch` / `test:coverage`.
+ 
+-**E2E:** Playwright 1.63 + `@axe-core/playwright` 4.13, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), `e2e/` **27 tests** (chromium) — `smoke` (home/nav/footer, get-started, calculator, health, 404, axe critical) + `seo` (sitemap absolute locs + host-rewrite, robots, title/OG) + `funnel` (POST `/api/applications` 400/200 with `x-forwarded-for` isolation, burst 429) + `assets` (six image assets 200, no broken `<img>` on the image-led pages, `/compare/*` parity aliases resolve). With Postgres: **27/27**; without a DB: 26/27 (funnel happy-path persistence is the only DB-dependent test).
++**E2E:** Playwright 1.63 + `@axe-core/playwright` 4.13, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), `e2e/` **44 tests** (chromium) — `smoke` (home/nav/footer, get-started, calculator, health, 404, axe critical) + `seo` (sitemap absolute locs + host-rewrite, robots, title/OG) + `funnel` (POST `/api/applications` 400/200 with `x-forwarded-for` isolation, burst 429) + `assets` (fourteen image assets 200, no broken `<img>` on the image-led pages, `/compare/*` parity aliases resolve) + `parity` (markdown-OOM regression on the two H4 articles, wordmark logos + testimonial avatars on home, learn-hub search/filter/featured/tools, calculator breakdown bar + PMI alert, footer socials + Legal column, get-started step chip/ZIP helper/privacy note). With Postgres: **44/44**; without a DB: 43/44 (funnel happy-path persistence is the only DB-dependent test).
+ 
+ **Current verification:**
+ ```bash
+@@ -305,6 +307,7 @@ curl http://localhost:3000/api/health   # readiness probe (also triggers ensureS
+ | `EADDRINUSE 3000` for E2E webServer | `scandihaven` also on 3000 | Playwright now defaults to `3002` (`E2E_PORT`) for home-financing |
+ | `pm2` not found | Not used | Ignore |
+ | `react-hooks/set-state-in-effect` lint error | Header menus were reset via a `useEffect` on `pathname` | Fixed 2026-09-11 via React's adjust-state-during-render pattern in `site-header.tsx`; `npm run lint` is now clean |
++| `/learn/*` article OOMs the server (origin 502) | `#### ` (H4) lines hit the markdown paragraph branch, which broke without consuming the line — infinite React-element allocation until the heap died | Fixed 2026-09-11: H4 branch + always-consume-a-line loop guard in `src/lib/markdown.tsx`; pinned by `markdown.test.ts` + `e2e/parity.spec.ts` |
+ | Auth `Invalid origin` | `BETTER_AUTH_URL` still `localhost` in prod | Set `BETTER_AUTH_URL` to canonical public origin + list extras in `BETTER_AUTH_TRUSTED_ORIGINS` |
+ | `sharp` deadlock in sandbox | Image optimizer stress | Set `DISABLE_IMAGE_OPTIMIZER=1` (kept in `turbo.json:globalEnv` when used) |
+ | `.env` committed / secrets leaked | `.env` was tracked before the gitignore rule existed | Untracked 2026-09-11 (`git rm --cached .env`). **Rotate `BETTER_AUTH_SECRET` + `CRON_SECRET`** — they remain in git history |
+@@ -348,4 +351,4 @@ Private — `package.json:private: true`, no `LICENSE` file. Not licensed for pu
+ 
+ ---
+ 
+-*Last verified 2026-09-11 (post-remediation) against `package.json` (Next 16.3 + React 19.3 + Tailwind 4.3 + Vitest 3.2 + Playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills + infrastructure excluded), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (+ 31 unit tests), `public/images/*` + `public/brand/*` (all referenced assets present), `playwright.config.ts` (3002), `e2e/*` 27 tests, `src/app/page.tsx` + `src/components/*` (modfii.com parity design), `.env.example`, `.gitignore`.*
++*Last verified 2026-09-11 (remediation pass 2: markdown H4/OOM fix, modfii.com visual parity — real wordmark logos, testimonial avatars, scroll-reveal animations, animated accordions, footer social icons + Legal section, learn-hub rebuild with search/filters/featured/tools/newsletter, calculator rebuild with breakdown bar/loan summary/PMI alert/how-to/explore/FAQ/related sections, get-started wizard parity, manufacturers tier bands + A–Z directory) against `package.json` (Next 16.3 + React 19.3 + Tailwind 4.3 + Vitest 3.2 + Playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills + infrastructure excluded), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (+ 31 unit tests), `public/images/*` + `public/brand/*` (all referenced assets present), `playwright.config.ts` (3002), `e2e/*` 27 tests, `src/app/page.tsx` + `src/components/*` (modfii.com parity design), `.env.example`, `.gitignore`.*
+diff --git a/home-financing_SKILL.md b/home-financing_SKILL.md
+index a475a7f..0ea2143 100644
+--- a/home-financing_SKILL.md
++++ b/home-financing_SKILL.md
+@@ -49,13 +49,13 @@
+ 
+ ## 1. Project Identity & Design Philosophy
+ 
+-**One-sentence identity:** ModFii (`home-financing`, legacy `nextjs-postgresql-template`) is a **content + transaction hybrid** for prefab homebuyers — SEO-driven editorial (23 articles, 50 state guides, 40 manufacturers) plus a single 12-field pre-qual funnel (`/get-started` → `validateApplication` → `matchLenders` → `applications` + top-4 `application_matches`) that closes the loop on modular/manufactured/ADU/tiny-home financing where traditional lenders fail.
++**One-sentence identity:** ModFii (`home-financing`, legacy `nextjs-postgresql-template`) is a **content + transaction hybrid** for prefab homebuyers — SEO-driven editorial (23 articles, 50 state guides, 40 manufacturers) plus a single 13-field pre-qual funnel (12 required + optional `manufacturerSlug`) (`/get-started` → `validateApplication` → `matchLenders` → `applications` + top-4 `application_matches`) that closes the loop on modular/manufactured/ADU/tiny-home financing where traditional lenders fail.
+ 
+ **Design thesis — Editorial + Brutalist Restraint (Luxury-Dark Cinematic without purple slop):**
+ 
+ | Tenet | Expression in Code |
+ |-------|-------------------|
+-| **Intentional minimalism** — whitespace as structure, not emptiness | `Container max-w-[1400px] mx-auto px-4 md:px-8` + `PageHero` centered `max-w-4xl` + `GuideView grid lg:grid-cols-[1fr_280px]` (280px sticky aside). No undifferentiated card grids. |
++| **Intentional minimalism** — whitespace as structure, not emptiness | `Container max-w-[1400px] mx-auto px-4 md:px-8` + `PageHero` centered `max-w-4xl` + `GuideView grid lg:grid-cols-[1fr_280px]` (280px `h-fit` aside — flows with the page, not sticky). No undifferentiated card grids. |
+ | **Bespoke typography** — one display + one body, tight tracking | `Outfit` (display, `var(--font-outfit)`, `letter-spacing:-0.03em` on `h1–h4/.font-display`) + `DM Sans` (body, `var(--font-dm-sans)`) via `next/font/google` `variable+swap`. Never Inter/Roboto fallback without hierarchy. |
+ | **Deep forest + warm cream + amber accent** — 155-hue greens, not teal | Tokens in `src/app/globals.css:@theme` only (see §4). `bg-forest` (`hsl 155 42% 16%`) for header/hero, `bg-background` (`hsl 40 33% 99%`) warm cream, `accent amber 38 92% 50%` for CTA/highlight/star. |
+ | **Photo as proof** — 5 hero images are load-bearing | `public/images/{hero-prefab,green-home,interior-living,adu-backyard,tiny-home}.jpg` + `brand/og-image.jpg` behind `PageHero` forest overlay (`opacity-35` + `from-forest/80 via-forest/85 to-forest/90` + `radial-gradient(38 92% 50% / 0.16)`). `2026-09-11` incident when they were missing (hero rendered photo-less) is pinned by `assets.spec.ts`. |
+@@ -156,7 +156,7 @@ Runtime: `next`, `react`, `react-dom`, `drizzle-orm`, `pg`, `lucide-react`, `dot
+ | `AUTH_GOOGLE_ID` / `SECRET` | No | OAuth | — |
+ | `AUTH_APPLE_ID` / `SECRET` | No | OAuth | — |
+ | `FEATURE_*` | No | Flags `on/off` (also `true/false`, `1/0`); unknown `FEATURE_*` fails fast at boot (when wired) | `FEATURE_TRADE=off` etc |
+-| `DISABLE_IMAGE_OPTIMIZER` | No | `1` where `sharp` deadlocks; if used must stay in `turbo.json:globalEnv` | `1` |
++| `DISABLE_IMAGE_OPTIMIZER` | No | `1` where `sharp` deadlocks (no `turbo.json` exists in this repo — wire it into CI env instead if Turborepo is ever added) | `1` |
+ 
+ > `.env` is `.gitignore`d (`ec11541` untracked it after `d572d73` leak). Never `git add -f .env`. `docs/bak.env` / `env.tgz` / `ssh-key.txt` also ignored — don't reintroduce.
+ 
+@@ -204,7 +204,7 @@ Alternative PG17 (no Docker): `DATABASE_URL=postgresql://user:pass@localhost:543
+ ### 4.1 The `@theme` Block (Verbatim Evidence)
+ 
+ ```css
+-/* src/app/globals.css — 94K PAD + 1,140-line skill both verified against this block */
++/* src/app/globals.css — verified against the 1,140-line Project_Architecture_Document.md; home-financing_SKILL.md is this file */
+ @import "tailwindcss";
+ @theme {
+   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+@@ -265,8 +265,8 @@ If this block drifts, every `assets.spec.ts` + `PageHero` test conceptually fail
+ | `lg` | `1rem` | — |
+ | `xl` | `1.25rem` | `PageHero` stat chips `rounded-xl` |
+ | `2xl` | `1.5rem` | `GuideView aside rounded-2xl` |
+-| `--shadow-lift` | `0 18px 40px -24px hsl(155 30% 12% / 0.35)` | Header `MORE` dropdown, elevated cards |
+-| `--ease-brand` | `cubic-bezier(0.22,1,0.36,1)` | Header `transition-colors duration-300` |
++| `--shadow-lift` | `0 18px 40px -24px hsl(155 30% 12% / 0.35)` | Defined but currently unused — the header MORE dropdown hardcodes the equivalent arbitrary shadow `shadow-[0_18px_40px_-24px_hsl(155_30%_12%_/_0.35)]` |
++| `--ease-brand` | `cubic-bezier(0.22,1,0.36,1)` | `<details>` accordion `::details-content` expansion (added 2026-09-11) and `Reveal`-adjacent motion |
+ 
+ ### 4.4 Utilities
+ 
+@@ -295,7 +295,7 @@ Layer 5: Edge — Routing. Rule: Redirects live in next.config.ts:redirects(); a
+ ### 5.2 Directory Map (with Counts)
+ 
+ ```
+-src/app/** (31 routed segments → build 43 routes: ○36 static + ƒ7 dynamic)
++src/app/** (43 pages: 39 static + 4 dynamic — authors/[authorSlug], learn/[slug], manufacturers/[slug], states/[state] — plus 3 ƒ API routes and _not-found/robots/sitemap)
+ ├── layout.tsx (fonts + metadataBase + SiteHeader/Footer)
+ ├── globals.css (@theme sole source)
+ ├── page.tsx (~500 lines, editorial homepage)
+@@ -311,7 +311,9 @@ src/components/ (7 files, 3 client islands)
+ ├── site-header.tsx ("use client") ← fixed h-16, transparent over dark hero, NAV 4 + MORE 4
+ ├── site-footer.tsx (LinkedInIcon local SVG)
+ ├── page-shell.tsx (Breadcrumbs + PageHero + GuideView — interior heroes must use this)
+-├── prequal-form.tsx ("use client") ← 12-field funnel
++├── prequal-form.tsx ("use client") ← 13-field funnel
++├── learn-explorer.tsx ("use client") ← learn hub search/filter/featured/tools/newsletter
++├── reveal.tsx ("use client") ← home intro scroll-reveal
+ ├── calculator-app.tsx ("use client")
+ └── guide-screen.tsx (renderer via guides.ts + markdown.tsx)
+ 
+@@ -346,9 +348,10 @@ src/scripts/ (3 lifecycle, all local-guarded)
+ drizzle/ (0000_amusing_thena.sql ~200 lines, 0001_sharp_stick.sql 1 line, meta/_journal.json idx 0,1)
+ e2e/ (308 total lines, 27 tests)
+ ├── smoke.spec.ts (7)
+-├── seo.spec.ts (6)
++├── seo.spec.ts (5)
+ ├── funnel.spec.ts (4)
+-└── assets.spec.ts (9 looped — 6 image × 200 + 3 broken-img + 2 alias)
++├── assets.spec.ts (19 runtime — 14 image × 200 + 3 broken-img + 2 alias)
++└── parity.spec.ts (10 — H4/OOM regression + modfii.com visual-parity pins)
+ ```
+ 
+ **Counts proven:** `grep -r "'use client'" src/components | wc -l` → `3/7` islands. `find src/components -type f | wc -l` → `7`. `find src -type f -name "*.test.ts" | wc -l` → `3`. `wc -l src/data/*` → `2771`.
+@@ -565,7 +568,7 @@ Verified via `globals.css` — every `transition-colors duration-300` (header) c
+ - **Symptom:** `/` renders without photos; green band shows raw alt text. Six images `404`.
+ - **Root:** `public/images/{hero-prefab,green-home,interior-living,adu-backyard,tiny-home}.jpg` + `brand/og-image.jpg` were not committed; `src/app/page.tsx` + `page-shell.tsx:PageHero` referenced them.
+ - **Fix:** `c74dd7e` committed 6 images + `og-image.jpg`; adopted `modfii-logo-icon.svg` canonical.
+-- **Guard:** `e2e/assets.spec.ts` — 6 `request.get(src) → 200` + `no broken <img> (naturalWidth===0)` on `/`, `/adu-financing`, `/tiny-home-financing`; `build` would not catch it (images are static).
++- **Guard:** `e2e/assets.spec.ts` — 14 `request.get(src) → 200` (heroes/OG + 5 `public/brand/wordmarks/*.png` + 3 `public/images/avatars/*.jpg`) + `no broken <img> (naturalWidth===0)` on `/`, `/adu-financing`, `/tiny-home-financing`; `build` would not catch it (images are static).
+ 
+ ### #02 — Source-Parity Compare Aliases 404 [HIGH]
+ 
+@@ -817,6 +820,9 @@ v4 CSS-first — extending via `@theme` only (`—color-forest/accent/cream`), n
+ **LL-16. `prequal-form.tsx` must surface `validateApplication` strings inline.**  
+ Error strings are stable (`Please enter your name.` etc) and rendered as inline alert + disabled submit during async. Never silent-fail.
+ 
++**LL-17. A markdown parser that can break without consuming a line can kill the whole server (2026-09-11 origin 502).**  
++`src/lib/markdown.tsx` had no branch for `#### ` (H4+) headings. Such a line fell through to the paragraph block, whose inner loop breaks on any line starting with `#` — *without consuming it*. The outer loop then re-examined the same line forever, allocating React elements until the Node heap (2 GB) died: one GET to `/learn/construction-loans-vs-traditional-mortgages-prefab` OOM-crashed `next-server` and Cloudflare served 502 for every route. Fix: explicit `#### ` branch + loop-safety guarantee (paragraph branch always consumes ≥1 line). Pinned by `src/lib/markdown.test.ts` (6 tests, incl. full-corpus render) and `e2e/parity.spec.ts` (both affected articles must render with a visible `<h4>`). Lesson: any hand-rolled parser loop must provably advance on every iteration; a content-only change (new `####` line in an article) is a plausible production kill-switch.
++
+ ---
+ 
+ ## 13. Pitfalls to Avoid
+@@ -871,7 +877,7 @@ Error strings are stable (`Please enter your name.` etc) and rendered as inline
+ - TDD: Red → Green → Refactor → Commit (one cycle per commit). Bugs get failing regression test first.
+ - Co-located `*.test.ts` next to source; `vitest.config.ts: include: src/**/*.test.ts`, `environment: node`.
+ - Mock at `db/Pool` boundary; test real `matchLenders` scoring + `calculatePayment` math, not mocks of mocks.
+-- CI runs `lint + typecheck + test + build + e2e` on every PR.
++- No CI is configured yet (no `.github/` directory) — the local pre-push gate is `npm run lint && npm run typecheck && npm run test && npm run build && npm run e2e`. Wiring CI to run the same gate on every PR is planned.
+ 
+ **Database**
+ 
+@@ -1059,12 +1065,12 @@ export function calculatePayment(i: PaymentInput): PaymentBreakdown {
+ ### Pattern 15.6 — Sitemap Derivation from Catalog
+ 
+ ```typescript
+-// src/app/sitemap.ts — Pattern: STATIC_PATHS 40 + catalog arrays → MetadataRoute.Sitemap
++// src/app/sitemap.ts — Pattern: STATIC_PATHS 39 + catalog arrays → MetadataRoute.Sitemap
+ // Why: Sitemap is projection of the same file corpus that seeds PG — keeping it in sync is a one-line article push.
+ 
+ import { articles, manufacturers, states } from "@/lib/catalog";
+ 
+-const STATIC_PATHS = ["/","/get-started","/learn","/calculator","/modular-home-financing", /* ... 40 exact */ /* see file */];
++const STATIC_PATHS = ["/","/get-started","/learn","/calculator","/modular-home-financing", /* ... 39 exact */ /* see file */];
+ 
+ export default function sitemap(): MetadataRoute.Sitemap {
+   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+@@ -1117,9 +1123,9 @@ No canvas
+ **Canonical per-page rhythm:**
+ 
+ - `Container`: `px-4 md:px-8` (always), `max-w-[1400px]`
+-- `Hero` (`page.tsx`): `min-h-[520px]` photo hero, `grid lg:grid-cols-[1.2fr_0.8fr]` (content + glass stats), wordmark strip `grid grid-cols-3 md:grid-cols-5`
++- `Hero` (`page.tsx`): `min-h-[92vh]` photo hero, `grid lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.8fr)]` (content + glass stats), wordmark strip `flex flex-wrap items-center justify-center gap-x-12 gap-y-4` of `h-8 w-auto` logo PNGs (`public/brand/wordmarks/`); intro section scroll-reveals via `Reveal` (opacity 0 + `translateY(30px)`, cards `translateY(40px) scale(0.95)`, 300ms, staggered 75ms)
+ - `PageHero` (`page-shell.tsx`): `pt-32 md:pt-36 pb-16 md:pb-20` (accounts for fixed `h-16` header), centered `max-w-4xl`
+-- `GuideView`: `grid gap-12 lg:grid-cols-[minmax(0,1fr)_280px]` (article + sticky aside)
++- `GuideView`: `grid gap-12 lg:grid-cols-[minmax(0,1fr)_280px]` (article + `h-fit` aside)
+ - Related: `grid gap-4 md:grid-cols-2`
+ - Footer: `grid md:grid-cols-4`
+ 
+@@ -1174,8 +1180,8 @@ No canvas
+ | `--color-cream` | `bg-cream` | `#F7F0E0` | `40 40% 96%` | `247,240,224` | Alt cream wash section |
+ | `--color-forest` | `bg-forest` | `#173329` | `155 42% 16%` | `23,51,41` | Deep forest — `PageHero` + hero CTA over dark |
+ | `--color-moss` | `text-moss` | `#426752` | `150 22% 34%` | `66,103,82` | Muted label (not yet widely used) |
+-| `--shadow-lift` | `shadow-lift` | — | `155 30% 12% / 0.35` | — | `0 18px 40px -24px` |
+-| `--ease-brand` | — | — | `cubic-bezier(0.22,1,0.36,1)` | — | Brand easing |
++| `--shadow-lift` | `shadow-lift` | — | `155 30% 12% / 0.35` | — | `0 18px 40px -24px` (defined; unused — dropdown hardcodes the same value) |
++| `--ease-brand` | — | — | `cubic-bezier(0.22,1,0.36,1)` | — | Accordion `::details-content` easing (2026-09-11) |
+ 
+ **Opacity variants (common patterns):**
+ 
+@@ -1473,6 +1479,8 @@ Do not copy `scandihaven` pipeline cost assumptions into this repo — this is a
+ | 2026-09-11 (lint R-02) | `react-hooks/set-state-in-effect` on header | `useEffect(() => setOpen(false), [pathname])` cascading renders | `4d1e6ad` adjust-during-render `if(prevPathname!==pathname){…}` in `site-header.tsx` | `lint 0/0` |
+ | 2026-09-11 (DB init) | Fresh volume `home_financing_data` empty | `count(lenders)=0` → funnel `500` | `npm run db:setup` (`migrate 0000+0001` + `seed` `8/40/50/23/59/5`) + `GET /api/health` `ok:true,db:true` — all idempotent | `e2e` `27/27` with DB (was `26/27` DB-less) |
+ | 2026-09-11 (deploy) | `home-financing.jesspete.shop` stale host in `sitemap.xml`/OG | `NEXT_PUBLIC_SITE_URL` pointed at old host from `.env` history | `.env` + `.env.example` moved to `home_financing_*` + `https://modfii.jesspete.shop` canonical; `seo.spec.ts` host-rewrites `loc.origin→E2E_BASE_URL` | `sitemap 152` locs absolute, `robots` `Sitemap:` pins canonical |
++| 2026-09-11 (OOM incident) | One GET to `/learn/construction-loans-vs-traditional-mortgages-prefab` OOM-crashed `next-server` (2 GB heap); origin 502 for all routes | `markdown.tsx` had no `#### ` branch; paragraph loop broke on `#`-lines without consuming → infinite allocation | Explicit H4 branch + always-consume-≥1-line guard in `markdown.tsx` | `markdown.test.ts` 6 tests (incl. full-corpus) + `e2e/parity.spec.ts` render both H4 articles |
++| 2026-09-11 (parity pass 2) | Clone diverged from modfii.com: text wordmarks, no testimonial avatars, no scroll reveals, static accordions, 1 social icon, thin `/learn` + `/calculator` | First-pass parity covered layout only | 5 wordmark PNGs + 3 avatars added; `Reveal` component + `::details-content` accordion animation; footer socials (4) + Legal column; `/learn` rebuilt (search/filters/featured/icons/tools/newsletter); `/calculator` rebuilt (breakdown bar/loan summary/PMI alert/how-to/explore/FAQ/related/CTA); get-started wizard parity; manufacturers tier bands + A–Z directory | `e2e/parity.spec.ts` 10 tests; `assets.spec.ts` 14 image pins; visual re-capture vs source |
+ 
+ Cache-pollution `8aacd13` (17 `__pycache__/.mypy_cache/.venv` committed) also covered — `.gitignore` now ignores `**/.venv/__pycache__/.mypy_cache/.ruff_cache`.
+ 

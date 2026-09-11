@@ -1,0 +1,2012 @@
+commit a9eb492eec5c6932ac54817e02dadc1946f5578f
+Author: ModFii Remediation Agent <agent@modfii.local>
+Date:   Fri Sep 11 16:25:49 2026 +0000
+
+    feat: modfii.com visual parity — motion, assets, learn hub, calculator, wizard, footer
+    
+    Browser E2E + full-page comparison against https://modfii.com/ surfaced
+    these gaps; each is now closed and pinned by e2e/parity.spec.ts:
+    
+    - home: real manufacturer wordmark logos (public/brand/wordmarks/),
+      testimonial portrait avatars (public/images/avatars/), scroll-reveal
+      on the intro section via new Reveal client component (opacity 0 +
+      translateY/scale, 300ms, staggered; reduced-motion forces visible),
+      animated <details> accordions via ::details-content (--ease-brand)
+    - footer: Twitter/Facebook/LinkedIn/YouTube icon row + standalone Legal
+      section (Privacy/Terms/NMLS) matching the source layout
+    - /learn: rebuilt as the source's Learning Center — cream hero, search,
+      category filter chips with counts, Featured Guide banner, per-type
+      icon cards with Read more, Interactive Tools affordability calculator
+      (reuses calculatePayment(); green-mortgage rate discount; mailto
+      report), newsletter band (new learn-explorer.tsx client island)
+    - /calculator: grouped input sections (Home Details / Loan Terms /
+      Taxes & Insurance, 10-30yr chips), sage summary card with stacked
+      payment-breakdown bar + legend, Loan Summary rows, PMI alert box,
+      How-To icon band, Explore Financing Options, FAQs, Related Resources,
+      Popular Resources chips, closing CTA band
+    - /get-started: photo-backed hero, numbered step chip + progress bar,
+      trust chips at card top, 'Property ZIP code' label + helper text,
+      privacy-agreement note, avatar testimonial + proof checkmarks row
+    - /modular-home-financing/manufacturers: tier bands with price-range
+      sublabels, homeTypes chips + View Models links, All-Manufacturers
+      A-Z directory, email CTA
+    - assets.spec.ts: 6 -> 14 pinned image assets (wordmarks + avatars)
+
+diff --git a/e2e/assets.spec.ts b/e2e/assets.spec.ts
+index f64c924..36d8abf 100644
+--- a/e2e/assets.spec.ts
++++ b/e2e/assets.spec.ts
+@@ -21,6 +21,14 @@ test.describe("referenced image assets resolve", () => {
+     "/images/adu-backyard.jpg",
+     "/images/tiny-home.jpg",
+     "/brand/og-image.jpg",
++    "/brand/wordmarks/dvele-qHduDYI9.png",
++    "/brand/wordmarks/plant-prefab-BZiOWTM8.png",
++    "/brand/wordmarks/excel-homes-7uiBs08K.png",
++    "/brand/wordmarks/skyline.png",
++    "/brand/wordmarks/dutch-housing-DfGaFGP9.png",
++    "/images/avatars/sarah-chen.jpg",
++    "/images/avatars/marcus-elena-rodriguez.jpg",
++    "/images/avatars/james-thornton.jpg",
+   ];
+ 
+   for (const src of referencedImages) {
+diff --git a/e2e/parity.spec.ts b/e2e/parity.spec.ts
+new file mode 100644
+index 0000000..60c328d
+--- /dev/null
++++ b/e2e/parity.spec.ts
+@@ -0,0 +1,92 @@
++import { expect, test } from "@playwright/test";
++
++/**
++ * Regression guards for the 2026-09-11 remediation pass.
++ *
++ * - The markdown OOM incident: articles containing `#### ` headings used to
++ *   hang the renderer and OOM the whole next-server process (origin 502).
++ * - Visual-parity additions: wordmark logos, testimonial avatars, learn hub
++ *   (search/filter/featured/tools), calculator breakdown bar, footer socials.
++ */
++
++test.describe("markdown OOM regression (2026-09-11)", () => {
++  const h4Articles = [
++    "/learn/construction-loans-vs-traditional-mortgages-prefab",
++    "/learn/inside-prefab-home-closing",
++  ];
++
++  for (const route of h4Articles) {
++    test(`${route} renders without hanging`, async ({ page }) => {
++      const response = await page.goto(route, { timeout: 15_000 });
++      expect(response?.status()).toBe(200);
++      await expect(page.getByRole("heading", { level: 4 }).first()).toBeVisible();
++    });
++  }
++});
++
++test.describe("visual parity additions", () => {
++  test("home shows manufacturer wordmark logos and testimonial avatars", async ({ page }) => {
++    await page.goto("/");
++    await expect(page.locator('img[alt="Dvele"]')).toBeVisible();
++    await expect(page.locator('img[alt="Plant Prefab"]')).toBeVisible();
++    await expect(page.locator('img[alt="Sarah Chen"]')).toHaveCount(0); // avatars are decorative alt=""
++    const avatarCount = await page.locator('figure img[src*="/images/avatars/"]').count();
++    expect(avatarCount).toBe(3);
++  });
++
++  test("learn hub has search, filter chips, featured banner, and interactive tools", async ({ page }) => {
++    await page.goto("/learn");
++    await expect(page.getByRole("heading", { name: /master prefab home financing/i })).toBeVisible();
++    await expect(page.getByLabel(/search articles/i)).toBeVisible();
++    await expect(page.getByRole("button", { name: /^All/ })).toBeVisible();
++    await expect(page.getByRole("button", { name: /^Guide/ })).toBeVisible();
++    await expect(page.getByText("Featured Guide")).toBeVisible();
++    await expect(page.getByRole("heading", { name: /interactive tools/i })).toBeVisible();
++    await expect(page.getByRole("heading", { name: /get weekly prefab insights/i })).toBeVisible();
++  });
++
++  test("learn search narrows results", async ({ page }) => {
++    await page.goto("/learn");
++    await page.getByLabel(/search articles/i).fill("appraisal");
++    const cards = page.locator('a[href^="/learn/"]');
++    await expect(cards.filter({ hasText: /apprais/i }).first()).toBeVisible();
++  });
++
++  test("calculator shows breakdown bar, loan summary, and PMI alert", async ({ page }) => {
++    await page.goto("/calculator");
++    await expect(page.getByText("Your Estimated Payment", { exact: true })).toBeVisible();
++    await expect(page.getByText("Loan Summary")).toBeVisible();
++    // Default 10% down triggers the PMI alert
++    await expect(page.getByText(/PMI Applied\./i)).toBeVisible();
++    await expect(page.getByText(/How to Use the Calculator/i)).toBeVisible();
++    await expect(page.getByText(/Explore Financing Options/i)).toBeVisible();
++  });
++
++  test("calculator PMI alert disappears at 20% down", async ({ page }) => {
++    await page.goto("/calculator");
++    // React-controlled range input: set value via the native setter + input event.
++    await page.locator("#calc-down").evaluate((element) => {
++      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
++      setter?.call(element, "62500");
++      element.dispatchEvent(new Event("input", { bubbles: true }));
++    });
++    await expect(page.getByText(/No PMI\./i)).toBeVisible();
++  });
++
++  test("footer has four social icons and Legal column", async ({ page }) => {
++    await page.goto("/");
++    const footer = page.getByRole("contentinfo");
++    await expect(footer.getByLabel("ModFii on Twitter")).toBeAttached();
++    await expect(footer.getByLabel("ModFii on Facebook")).toBeAttached();
++    await expect(footer.getByLabel("ModFii on LinkedIn")).toBeAttached();
++    await expect(footer.getByLabel("ModFii on YouTube")).toBeAttached();
++    await expect(footer.getByRole("link", { name: "NMLS Consumer Access" })).toBeAttached();
++  });
++
++  test("get-started wizard shows step chip, ZIP helper, and privacy note", async ({ page }) => {
++    await page.goto("/get-started");
++    await expect(page.getByText("Tell us about your project", { exact: true })).toBeVisible();
++    await expect(page.getByText("Where the home will be located")).toBeVisible();
++    await expect(page.getByText(/By continuing, you agree to our/i)).toBeVisible();
++  });
++});
+diff --git a/public/brand/wordmarks/dutch-housing-DfGaFGP9.png b/public/brand/wordmarks/dutch-housing-DfGaFGP9.png
+new file mode 100644
+index 0000000..4371455
+Binary files /dev/null and b/public/brand/wordmarks/dutch-housing-DfGaFGP9.png differ
+diff --git a/public/brand/wordmarks/dvele-qHduDYI9.png b/public/brand/wordmarks/dvele-qHduDYI9.png
+new file mode 100644
+index 0000000..2505443
+Binary files /dev/null and b/public/brand/wordmarks/dvele-qHduDYI9.png differ
+diff --git a/public/brand/wordmarks/excel-homes-7uiBs08K.png b/public/brand/wordmarks/excel-homes-7uiBs08K.png
+new file mode 100644
+index 0000000..0f60396
+Binary files /dev/null and b/public/brand/wordmarks/excel-homes-7uiBs08K.png differ
+diff --git a/public/brand/wordmarks/plant-prefab-BZiOWTM8.png b/public/brand/wordmarks/plant-prefab-BZiOWTM8.png
+new file mode 100644
+index 0000000..34aaddf
+Binary files /dev/null and b/public/brand/wordmarks/plant-prefab-BZiOWTM8.png differ
+diff --git a/public/brand/wordmarks/skyline.png b/public/brand/wordmarks/skyline.png
+new file mode 100644
+index 0000000..2473241
+Binary files /dev/null and b/public/brand/wordmarks/skyline.png differ
+diff --git a/public/images/avatars/james-thornton.jpg b/public/images/avatars/james-thornton.jpg
+new file mode 100644
+index 0000000..2ca9ace
+Binary files /dev/null and b/public/images/avatars/james-thornton.jpg differ
+diff --git a/public/images/avatars/marcus-elena-rodriguez.jpg b/public/images/avatars/marcus-elena-rodriguez.jpg
+new file mode 100644
+index 0000000..e96b679
+Binary files /dev/null and b/public/images/avatars/marcus-elena-rodriguez.jpg differ
+diff --git a/public/images/avatars/sarah-chen.jpg b/public/images/avatars/sarah-chen.jpg
+new file mode 100644
+index 0000000..977660e
+Binary files /dev/null and b/public/images/avatars/sarah-chen.jpg differ
+diff --git a/src/app/calculator/page.tsx b/src/app/calculator/page.tsx
+index 9215322..bd921df 100644
+--- a/src/app/calculator/page.tsx
++++ b/src/app/calculator/page.tsx
+@@ -1,7 +1,9 @@
+ import { CalculatorApp } from "@/components/calculator-app";
+ import { Breadcrumbs } from "@/components/page-shell";
+-import { Container } from "@/components/ui";
++import { BadgeCheck, Banknote, ChevronDown, FileText, Home, Percent, ShieldCheck } from "lucide-react";
+ import type { Metadata } from "next";
++import Link from "next/link";
++import { ButtonLink, Container } from "@/components/ui";
+ 
+ export const metadata: Metadata = {
+   title: "Modular Home Payment Calculator",
+@@ -9,29 +11,205 @@ export const metadata: Metadata = {
+     "Free modular home payment calculator. Estimate monthly payments for prefab and manufactured homes including principal, interest, taxes, insurance, and PMI.",
+ };
+ 
++const TRUST_CHIPS = ["No credit check required", "Instant results", "100% free"];
++
++const HOW_TO_STEPS = [
++  { icon: Home, title: "1. Enter Home Price", body: "Input the total cost of your modular home including delivery and setup." },
++  { icon: Banknote, title: "2. Set Down Payment", body: "Adjust your down payment to see how it affects your monthly costs." },
++  { icon: Percent, title: "3. Choose Loan Terms", body: "Select your interest rate and loan term (10, 15, 20, 25, or 30 years)." },
++  { icon: FileText, title: "4. View Results", body: "See your complete payment breakdown with taxes, insurance, and PMI." },
++];
++
++const LOAN_OPTIONS = [
++  { tag: "3.5% Down", title: "FHA Loans", body: "Government-backed loans with low down payment requirements and flexible credit standards.", href: "/modular-home-financing/loan-options/fha" },
++  { tag: "0% Down", title: "VA Loans", body: "For eligible veterans with no down payment required and no PMI, even at 0% down.", href: "/modular-home-financing/loan-options/va" },
++  { tag: "0% Down", title: "USDA Loans", body: "Rural development loans for eligible suburban and rural properties.", href: "/modular-home-financing/loan-options/usda" },
++  { tag: "Varies", title: "Construction Loans", body: "Construction-to-permanent loans finance your home construction and land purchase.", href: "/modular-home-financing/loan-options/construction-loan" },
++];
++
++const CALCULATOR_FAQS = [
++  {
++    q: "How do I calculate my modular home payment?",
++    a: "Use the calculator above: enter the home price, down payment, interest rate, and loan term. The calculator adds property taxes, homeowners insurance, HOA dues, and PMI (when your down payment is under 20%) to estimate your true monthly cost.",
++  },
++  {
++    q: "What is a typical interest rate for modular home loans?",
++    a: "Real-property modular homes—permanently affixed to land you own or are buying—typically qualify for the same rates as site-built homes. In 2026, well-qualified borrowers are seeing rates in the mid-6s. Rates vary by credit score, down payment, and loan program.",
++  },
++  {
++    q: "How much down payment do I need for a modular home?",
++    a: "It depends on the loan type: FHA loans require 3.5% down, VA and USDA loans require 0% down for eligible borrowers, and conventional loans typically require 5–20%. A 20% down payment eliminates private mortgage insurance (PMI).",
++  },
++  {
++    q: "What is PMI and when is it required?",
++    a: "Private mortgage insurance protects the lender when your down payment is less than 20% of the home price. PMI typically costs 0.5–1% of your loan amount annually and can be removed once you reach 20% equity.",
++  },
++];
++
++const RELATED = [
++  { icon: Percent, title: "Current Rates", body: "See today's rates", href: "/modular-home-financing/rates" },
++  { icon: Banknote, title: "Down Payment Guide", body: "Understand down payment options", href: "/modular-home-financing/down-payment" },
++  { icon: Home, title: "Cost Breakdown", body: "Full modular home costs", href: "/modular-home-financing/cost" },
++  { icon: BadgeCheck, title: "Get Pre-Approved", body: "Start your journey today", href: "/get-started" },
++];
++
++const POPULAR = [
++  { label: "Modular Home Financing", href: "/modular-home-financing" },
++  { label: "FHA Loans", href: "/modular-home-financing/loan-options/fha" },
++  { label: "VA Loans", href: "/modular-home-financing/loan-options/va" },
++  { label: "Construction Loans", href: "/modular-home-financing/loan-options/construction-loan" },
++  { label: "Find Manufacturers", href: "/modular-home-financing/manufacturers" },
++];
++
+ export default function CalculatorPage() {
+   return (
+-    <main className="pt-28 pb-20">
+-      <Container>
+-        <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Calculator" }]} />
+-        <p className="text-sm font-semibold tracking-wider text-primary uppercase">Free tool</p>
+-        <h1 className="mt-3 font-display text-4xl font-bold md:text-5xl">Modular Home Payment Calculator</h1>
+-        <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
+-          Estimate your monthly payment for a modular, prefab, or manufactured home. Includes principal, interest,
+-          taxes, insurance, and PMI. No credit check.
+-        </p>
+-        <div className="mt-10">
+-          <CalculatorApp />
+-        </div>
+-        <section className="mt-16 max-w-3xl">
+-          <h2 className="font-display text-2xl font-bold">How to use the calculator</h2>
+-          <ol className="mt-4 list-decimal space-y-2 pl-5 text-muted-foreground">
+-            <li>Enter the total cost of your modular home including delivery and setup.</li>
+-            <li>Adjust down payment to see when PMI drops off at 20% equity.</li>
+-            <li>Use a rate in the mid-6s for well-qualified real-property modular files in 2026.</li>
+-          </ol>
+-        </section>
++    <main className="pb-20">
++      <section className="pt-28">
++        <Container>
++          <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Payment Calculator" }]} />
++          <h1 className="mt-4 max-w-xl font-display text-4xl font-bold md:text-5xl">
++            Modular Home Payment Calculator
++          </h1>
++          <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
++            Estimate your monthly payment for a modular, prefab, or manufactured home. Our calculator includes
++            principal, interest, taxes, insurance, and PMI.
++          </p>
++          <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2">
++            {TRUST_CHIPS.map((chip) => (
++              <span key={chip} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
++                <ShieldCheck className="h-4 w-4 text-primary" aria-hidden />
++                {chip}
++              </span>
++            ))}
++          </div>
++        </Container>
++      </section>
++
++      <Container className="mt-10">
++        <CalculatorApp />
+       </Container>
++
++      {/* How to use — cream icon band (source parity) */}
++      <section className="mt-20 bg-cream py-16">
++        <Container>
++          <h2 className="text-center font-display text-3xl font-bold md:text-4xl">How to Use the Calculator</h2>
++          <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
++            {HOW_TO_STEPS.map((step) => (
++              <div key={step.title} className="rounded-2xl border border-border bg-card p-6 text-center">
++                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
++                  <step.icon className="h-6 w-6" aria-hidden />
++                </span>
++                <h3 className="mt-4 font-display text-lg font-semibold">{step.title}</h3>
++                <p className="mt-2 text-sm text-muted-foreground">{step.body}</p>
++              </div>
++            ))}
++          </div>
++        </Container>
++      </section>
++
++      {/* Explore financing options */}
++      <section className="py-16">
++        <Container>
++          <div className="mx-auto max-w-2xl text-center">
++            <h2 className="font-display text-3xl font-bold md:text-4xl">Explore Financing Options</h2>
++            <p className="mt-3 text-muted-foreground">
++              Different loan types have different down payment requirements and rates. Explore your options to find the
++              best fit for your situation.
++            </p>
++          </div>
++          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
++            {LOAN_OPTIONS.map((option) => (
++              <div key={option.title} className="flex flex-col rounded-2xl border border-border bg-card p-6">
++                <span className="inline-flex w-fit rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-primary">
++                  {option.tag}
++                </span>
++                <h3 className="mt-3 font-display text-lg font-semibold">{option.title}</h3>
++                <p className="mt-2 flex-1 text-sm text-muted-foreground">{option.body}</p>
++                <Link
++                  href={option.href}
++                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
++                >
++                  Learn More
++                </Link>
++              </div>
++            ))}
++          </div>
++        </Container>
++      </section>
++
++      {/* FAQ */}
++      <section className="bg-cream py-16">
++        <Container>
++          <h2 className="text-center font-display text-3xl font-bold md:text-4xl">Frequently Asked Questions</h2>
++          <div className="mx-auto mt-10 max-w-3xl space-y-4">
++            {CALCULATOR_FAQS.map((faq) => (
++              <details key={faq.q} className="group rounded-xl border border-border bg-card px-6">
++                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-left font-semibold hover:text-primary [&::-webkit-details-marker]:hidden">
++                  {faq.q}
++                  <ChevronDown
++                    className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180"
++                    aria-hidden
++                  />
++                </summary>
++                <p className="pb-5 text-muted-foreground">{faq.a}</p>
++              </details>
++            ))}
++          </div>
++        </Container>
++      </section>
++
++      {/* Related resources */}
++      <section className="py-16">
++        <Container>
++          <h2 className="font-display text-3xl font-bold">Related Resources</h2>
++          <div className="mt-8 grid gap-6 sm:grid-cols-2">
++            {RELATED.map((item) => (
++              <Link
++                key={item.title}
++                href={item.href}
++                className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5 transition hover:border-accent hover:shadow-md"
++              >
++                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
++                  <item.icon className="h-5 w-5" aria-hidden />
++                </span>
++                <span>
++                  <span className="block font-display font-semibold">{item.title}</span>
++                  <span className="block text-sm text-muted-foreground">{item.body}</span>
++                </span>
++              </Link>
++            ))}
++          </div>
++          <div className="mt-10 flex flex-wrap items-center gap-3">
++            <span className="text-sm font-semibold text-muted-foreground">Popular Resources:</span>
++            {POPULAR.map((item) => (
++              <Link
++                key={item.label}
++                href={item.href}
++                className="rounded-full border border-border bg-card px-4 py-1.5 text-sm text-muted-foreground transition hover:border-primary hover:text-foreground"
++              >
++                {item.label}
++              </Link>
++            ))}
++          </div>
++        </Container>
++      </section>
++
++      {/* Closing CTA */}
++      <section className="relative overflow-hidden py-16 md:py-20">
++        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary-600" />
++        <Container className="relative max-w-3xl text-center text-primary-foreground">
++          <h2 className="font-display text-3xl font-bold md:text-4xl">Ready to Get Pre-Qualified?</h2>
++          <p className="mt-4 text-primary-foreground/85">
++            Now that you know your estimated payment, take the next step and get pre-qualified with lenders who
++            specialize in modular home financing.
++          </p>
++          <div className="mt-8 flex justify-center">
++            <ButtonLink href="/get-started" variant="secondary" size="lg">
++              Get Pre-Qualified Now
++            </ButtonLink>
++          </div>
++        </Container>
++      </section>
+     </main>
+   );
+ }
+diff --git a/src/app/get-started/page.tsx b/src/app/get-started/page.tsx
+index df32698..f0d7ffb 100644
+--- a/src/app/get-started/page.tsx
++++ b/src/app/get-started/page.tsx
+@@ -1,7 +1,8 @@
+ import { PrequalForm } from "@/components/prequal-form";
+ import { Container } from "@/components/ui";
+-import { Clock, Leaf, ShieldCheck, Star, Users } from "lucide-react";
++import { BadgeCheck, Clock, Leaf, ShieldCheck, Star, Users } from "lucide-react";
+ import type { Metadata } from "next";
++import Image from "next/image";
+ 
+ export const metadata: Metadata = {
+   title: "Get Pre-Qualified",
+@@ -29,8 +30,18 @@ const BENEFITS = [
+ 
+ export default function GetStartedPage() {
+   return (
+-    <main className="bg-forest pb-20 pt-28 text-primary-foreground">
+-      <Container className="grid items-start gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
++    <main className="relative isolate overflow-hidden bg-forest pb-20 pt-28 text-primary-foreground">
++      {/* Photo-backed hero (source parity: interior shot under a forest overlay) */}
++      <Image
++        src="/images/interior-living.jpg"
++        alt=""
++        fill
++        priority
++        className="object-cover opacity-25"
++        sizes="100vw"
++      />
++      <div className="absolute inset-0 bg-gradient-to-r from-forest/90 via-forest/70 to-forest/40" aria-hidden />
++      <Container className="relative grid items-start gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+         <div>
+           <p className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+             <Leaf className="h-4 w-4 text-accent" aria-hidden />
+@@ -70,8 +81,27 @@ export default function GetStartedPage() {
+               &ldquo;After two banks rejected us, ModFii found a lender who approved our Plant Prefab home in days. The
+               rate was better than we expected.&rdquo;
+             </blockquote>
+-            <figcaption className="mt-3 text-sm text-white/70">Jennifer M. · Austin, TX</figcaption>
++            <figcaption className="mt-4 flex items-center gap-3 border-t border-white/15 pt-4">
++              <span
++                aria-hidden
++                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-accent-foreground"
++              >
++                JM
++              </span>
++              <span>
++                <span className="block text-sm font-semibold text-white">Jennifer M.</span>
++                <span className="block text-xs text-white/70">Colorado · Verified Buyer</span>
++              </span>
++            </figcaption>
+           </figure>
++          <ul className="mt-8 flex flex-wrap gap-x-7 gap-y-3 text-sm text-white/85">
++            {["600+ families helped", "50+ lender network", "All 50 states"].map((item) => (
++              <li key={item} className="flex items-center gap-2">
++                <BadgeCheck className="h-4 w-4 text-accent" aria-hidden />
++                {item}
++              </li>
++            ))}
++          </ul>
+         </div>
+         <PrequalForm />
+       </Container>
+diff --git a/src/app/globals.css b/src/app/globals.css
+index 6ef4115..85d03d5 100644
+--- a/src/app/globals.css
++++ b/src/app/globals.css
+@@ -95,11 +95,38 @@
+   }
+ }
+ 
++/* Animated <details> accordions (modfii.com parity): the summary content
++   expands/collapses smoothly where the browser supports ::details-content.
++   Browsers without support keep the instant native behavior. */
++@supports (interpolate-size: allow-keywords) {
++  :root {
++    interpolate-size: allow-keywords;
++  }
++
++  details::details-content {
++    block-size: 0;
++    overflow: hidden;
++    transition:
++      block-size 0.3s var(--ease-brand),
++      content-visibility 0.3s allow-discrete;
++  }
++
++  details[open]::details-content {
++    block-size: auto;
++  }
++}
++
+ @media (prefers-reduced-motion: reduce) {
+   html {
+     scroll-behavior: auto;
+   }
+ 
++  /* Scroll-reveal content must never stay hidden when motion is reduced. */
++  [data-reveal] {
++    opacity: 1 !important;
++    transform: none !important;
++  }
++
+   *,
+   *::before,
+   *::after {
+diff --git a/src/app/learn/page.tsx b/src/app/learn/page.tsx
+index 97ad49d..cfa78e1 100644
+--- a/src/app/learn/page.tsx
++++ b/src/app/learn/page.tsx
+@@ -1,8 +1,6 @@
+-import { PageHero } from "@/components/page-shell";
+-import { Badge, Container } from "@/components/ui";
+-import { articles, authorSlug } from "@/lib/catalog";
++import { LearnExplorer, type LearnArticle } from "@/components/learn-explorer";
++import { articles } from "@/lib/catalog";
+ import type { Metadata } from "next";
+-import Link from "next/link";
+ 
+ export const metadata: Metadata = {
+   title: "Learn | Modular Home Financing Guides & Resources",
+@@ -10,36 +8,42 @@ export const metadata: Metadata = {
+     "Free guides, calculators, and expert insights to help you navigate modular and prefab home financing with confidence.",
+ };
+ 
++const FEATURED_SLUG = "complete-guide-prefab-home-financing-2026";
++
++function toLearnArticle(article: (typeof articles)[number]): LearnArticle {
++  return {
++    slug: article.slug,
++    title: article.title,
++    description: article.description,
++    category: article.category,
++    readTime: article.readTime,
++    tag: article.tag,
++    authorName: article.authorName,
++    authorRole: article.authorRole,
++  };
++}
++
+ export default function LearnPage() {
++  const featuredArticle = articles.find((article) => article.slug === FEATURED_SLUG) ?? articles[0];
++  const featured = toLearnArticle(featuredArticle);
++  const rest = articles.filter((article) => article.slug !== featured.slug).map(toLearnArticle);
++
+   return (
+     <main className="pb-20">
+-      <PageHero
+-        eyebrow="Specialist guides"
+-        title="Learn"
+-        description="Guides, case studies, and specialist explainers for factory-built home financing."
+-        crumbs={[{ name: "Home", href: "/" }, { name: "Learn" }]}
+-        imageSrc="/images/interior-living.jpg"
+-      />
+-      <Container className="grid gap-6 py-12 md:grid-cols-2 lg:grid-cols-3">
+-        {articles.map((article) => (
+-          <Link
+-            key={article.slug}
+-            href={`/learn/${article.slug}`}
+-            className="flex flex-col rounded-2xl border border-border bg-card p-6 transition hover:border-accent hover:shadow-md"
+-          >
+-            <div className="mb-3 flex items-center gap-2">
+-              <Badge>{article.category}</Badge>
+-              {article.tag ? <span className="text-xs text-muted-foreground">{article.tag}</span> : null}
+-            </div>
+-            <h2 className="font-display text-xl font-semibold">{article.title}</h2>
+-            <p className="mt-3 flex-1 text-sm text-muted-foreground">{article.description}</p>
+-            <p className="mt-4 text-xs text-muted-foreground">
+-              {article.readTime} · {article.authorName}
+-            </p>
+-            <p className="sr-only">Author profile {authorSlug(article.authorName)}</p>
+-          </Link>
+-        ))}
+-      </Container>
++      {/* Cream hero — mirrors modfii.com/learn (Learning Center pill + centered title) */}
++      <section className="bg-gradient-to-b from-background via-muted/30 to-background py-14 md:py-20">
++        <div className="mx-auto max-w-3xl px-4 text-center">
++          <span className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
++            Learning Center
++          </span>
++          <h1 className="mt-6 font-display text-4xl font-bold md:text-5xl">Master Prefab Home Financing</h1>
++          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
++            Free guides, calculators, and expert insights to help you navigate the prefab mortgage landscape with
++            confidence.
++          </p>
++        </div>
++      </section>
++      <LearnExplorer articles={rest} featured={featured} />
+     </main>
+   );
+ }
+diff --git a/src/app/modular-home-financing/manufacturers/page.tsx b/src/app/modular-home-financing/manufacturers/page.tsx
+index 3943f94..bc4c994 100644
+--- a/src/app/modular-home-financing/manufacturers/page.tsx
++++ b/src/app/modular-home-financing/manufacturers/page.tsx
+@@ -1,6 +1,7 @@
+ import { PageHero } from "@/components/page-shell";
+ import { Badge, ButtonLink, Container } from "@/components/ui";
+ import { manufacturers } from "@/lib/catalog";
++import { ArrowRight, Mail } from "lucide-react";
+ import type { Metadata } from "next";
+ import Link from "next/link";
+ 
+@@ -10,7 +11,11 @@ export const metadata: Metadata = {
+     "Connect with approved lenders for America's top modular and manufactured home builders. Find the right financing for your dream prefab home.",
+ };
+ 
+-const TIERS = ["Affordable", "Mid-Range", "Premium"] as const;
++const TIERS = [
++  { key: "Affordable", sub: "Under $150K price", band: "bg-cream" },
++  { key: "Mid-Range", sub: "$150K – $300K price", band: "bg-accent/10" },
++  { key: "Premium", sub: "$300K+ price", band: "bg-secondary/60" },
++] as const;
+ 
+ export default function ManufacturersPage() {
+   return (
+@@ -27,40 +32,98 @@ export default function ManufacturersPage() {
+         imageSrc="/images/hero-prefab.jpg"
+         ctas={[{ label: "Get pre-qualified", href: "/get-started" }]}
+       />
+-      <Container className="py-12">
+-        {TIERS.map((tier) => {
+-          const items = manufacturers.filter((item) => item.category === tier);
+-          return (
+-            <section key={tier} className="mb-14">
+-              <h2 className="mb-6 font-display text-2xl font-bold">{tier} Manufacturers</h2>
++      {TIERS.map((tier) => {
++        const items = manufacturers.filter((item) => item.category === tier.key);
++        return (
++          <section key={tier.key} className={`${tier.band} py-12`}>
++            <Container>
++              <div className="mb-6 flex flex-wrap items-baseline gap-3">
++                <h2 className="font-display text-2xl font-bold">
++                  {tier.key === "Mid-Range" ? "Mid-Range Modern Prefab" : `${tier.key} Manufacturers`}
++                </h2>
++                <span className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
++                  ({tier.sub})
++                </span>
++              </div>
+               <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                 {items.map((item) => (
+                   <Link
+                     key={item.slug}
+                     href={`/modular-home-financing/manufacturers/${item.slug}`}
+-                    className="rounded-2xl border border-border bg-card p-6 transition hover:border-accent"
++                    className="flex flex-col rounded-2xl border border-border bg-card p-6 transition hover:border-accent hover:shadow-md"
+                   >
+-                    <Badge>{tier}</Badge>
++                    <Badge>{tier.key}</Badge>
+                     <h3 className="mt-3 font-display text-xl font-semibold">{item.name}</h3>
+                     <p className="mt-1 text-sm text-muted-foreground">{item.headquarters}</p>
+-                    <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">{item.description}</p>
++                    <p className="mt-3 line-clamp-3 flex-1 text-sm text-muted-foreground">{item.description}</p>
+                     <p className="mt-4 text-sm font-medium text-primary">{item.priceRange}</p>
++                    <p className="mt-3 flex flex-wrap gap-1.5">
++                      {item.homeTypes.slice(0, 3).map((homeType) => (
++                        <span
++                          key={homeType}
++                          className="rounded-full bg-secondary px-2.5 py-0.5 text-xs text-muted-foreground"
++                        >
++                          {homeType}
++                        </span>
++                      ))}
++                    </p>
++                    <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
++                      View Models
++                      <ArrowRight className="h-3.5 w-3.5" aria-hidden />
++                    </p>
+                   </Link>
+                 ))}
+               </div>
+-            </section>
+-          );
+-        })}
+-        <div className="rounded-2xl bg-primary p-8 text-center text-primary-foreground">
+-          <h2 className="font-display text-2xl font-bold">Can&apos;t find your manufacturer?</h2>
+-          <p className="mx-auto mt-3 max-w-xl text-primary-foreground/80">
+-            Our lender network works with hundreds of prefab manufacturers.
++            </Container>
++          </section>
++        );
++      })}
++
++      {/* All-manufacturers chip directory (source parity) */}
++      <section className="bg-accent/10 py-12">
++        <Container>
++          <h2 className="text-center font-display text-2xl font-bold">All Manufacturers</h2>
++          <p className="mt-2 text-center text-sm text-muted-foreground">
++            Complete A–Z directory of every builder in our lending network.
+           </p>
+-          <ButtonLink href="/get-started" variant="secondary" className="mt-6">
+-            Get Pre-Qualified
+-          </ButtonLink>
+-        </div>
+-      </Container>
++          <nav aria-label="All manufacturers" className="mx-auto mt-8 grid max-w-5xl gap-3 sm:grid-cols-2 lg:grid-cols-4">
++            {manufacturers.map((item) => (
++              <Link
++                key={item.slug}
++                href={`/modular-home-financing/manufacturers/${item.slug}`}
++                className="rounded-xl border border-border bg-card px-4 py-3 text-center text-sm font-medium transition hover:border-accent hover:text-primary"
++              >
++                {item.name}
++                <span className="mt-0.5 block text-xs text-muted-foreground">{item.priceRange}</span>
++              </Link>
++            ))}
++          </nav>
++        </Container>
++      </section>
++
++      <section className="py-12">
++        <Container>
++          <div className="rounded-2xl bg-primary p-8 text-center text-primary-foreground md:p-12">
++            <h2 className="font-display text-2xl font-bold md:text-3xl">Can&apos;t Find Your Manufacturer?</h2>
++            <p className="mx-auto mt-3 max-w-xl text-primary-foreground/80">
++              Our lender network works with hundreds of prefab manufacturers. Get matched with the right financing for
++              your build.
++            </p>
++            <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
++              <ButtonLink href="/get-started" variant="secondary">
++                Get Pre-Qualified
++              </ButtonLink>
++              <a
++                href={`mailto:team@modfii.com?subject=${encodeURIComponent("Manufacturer financing question")}`}
++                className="inline-flex items-center gap-2 rounded-md border border-primary-foreground/30 px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary-foreground/10"
++              >
++                <Mail className="h-4 w-4" aria-hidden />
++                Email Our Team
++              </a>
++            </div>
++          </div>
++        </Container>
++      </section>
+     </main>
+   );
+ }
+diff --git a/src/app/page.tsx b/src/app/page.tsx
+index bab660d..ce793d1 100644
+--- a/src/app/page.tsx
++++ b/src/app/page.tsx
+@@ -1,4 +1,5 @@
+ import { Badge, ButtonLink, Container } from "@/components/ui";
++import { Reveal } from "@/components/reveal";
+ import { SITE } from "@/lib/catalog";
+ import {
+   ArrowRight,
+@@ -29,7 +30,13 @@ export const metadata: Metadata = {
+ 
+ const HERO_CHECKS = ["No credit impact", "0.5% closing fee", "Green mortgage options"];
+ 
+-const PARTNER_WORDMARKS = ["DVELE", "plant", "excel", "SKYLINE", "Dutch Housing"];
++const PARTNER_WORDMARKS = [
++  { src: "/brand/wordmarks/dvele-qHduDYI9.png", alt: "Dvele" },
++  { src: "/brand/wordmarks/plant-prefab-BZiOWTM8.png", alt: "Plant Prefab" },
++  { src: "/brand/wordmarks/excel-homes-7uiBs08K.png", alt: "Excel Homes" },
++  { src: "/brand/wordmarks/skyline.png", alt: "Skyline" },
++  { src: "/brand/wordmarks/dutch-housing-DfGaFGP9.png", alt: "Dutch Housing" },
++];
+ 
+ const INTRO_CARDS = [
+   {
+@@ -120,7 +127,7 @@ const STORIES = [
+     title: "First-time Prefab Buyer",
+     location: "Portland, OR",
+     savings: "$14,200",
+-    initials: "SC",
++    avatar: "/images/avatars/sarah-chen.jpg",
+   },
+   {
+     quote:
+@@ -129,7 +136,7 @@ const STORIES = [
+     title: "Eco-conscious Homeowners",
+     location: "Austin, TX",
+     savings: "$21,600",
+-    initials: "MR",
++    avatar: "/images/avatars/marcus-elena-rodriguez.jpg",
+   },
+   {
+     quote:
+@@ -138,7 +145,7 @@ const STORIES = [
+     title: "VP Sales, Method Homes",
+     location: "Seattle, WA",
+     savings: "40% more closes",
+-    initials: "JT",
++    avatar: "/images/avatars/james-thornton.jpg",
+   },
+ ];
+ 
+@@ -278,11 +285,8 @@ export default function HomePage() {
+           <p className="text-center text-sm text-muted-foreground">Trusted by buyers of leading manufacturers</p>
+           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
+             {PARTNER_WORDMARKS.map((mark) => (
+-              <span
+-                key={mark}
+-                className="font-display text-xl font-bold uppercase tracking-[0.18em] text-forest/60"
+-              >
+-                {mark}
++              <span key={mark.alt} className="flex items-center justify-center opacity-80 transition-opacity hover:opacity-100">
++                <Image src={mark.src} alt={mark.alt} width={168} height={32} className="h-8 w-auto object-contain" />
+               </span>
+             ))}
+           </div>
+@@ -292,38 +296,40 @@ export default function HomePage() {
+       {/* Intro — Modular & Prefab Home Loans (lazy-revealed on the source) */}
+       <section className="py-20 md:py-24">
+         <Container>
+-          <div className="mx-auto mb-14 max-w-3xl text-center">
++          <Reveal className="mx-auto mb-14 max-w-3xl text-center">
+             <h2 className="font-display text-3xl font-bold md:text-5xl">Modular &amp; Prefab Home Loans</h2>
+             <p className="mt-6 text-lg text-muted-foreground">
+               ModFii is the leading marketplace connecting prefab, modular, and tiny home buyers with lenders who
+               specialize in factory-built construction financing. We help you get approved faster, with better rates,
+               and without the confusion that comes from working with traditional mortgage lenders.
+             </p>
+-          </div>
++          </Reveal>
+           <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
+-            {INTRO_CARDS.map((card) => (
+-              <div key={card.title} className="rounded-2xl border border-border bg-card p-8">
+-                <div className="flex items-center gap-4">
+-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary">
+-                    <card.icon className="h-5 w-5" aria-hidden />
+-                  </span>
+-                  <h3 className="font-display text-xl font-bold">{card.title}</h3>
+-                </div>
+-                <p className="mt-4 leading-relaxed text-muted-foreground">{card.body}</p>
+-                {card.chips ? (
+-                  <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+-                    {card.chips.map((chip) => (
+-                      <span
+-                        key={chip}
+-                        className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-sm font-medium text-foreground"
+-                      >
+-                        <CheckCircle2 className="h-4 w-4 text-primary" aria-hidden />
+-                        {chip}
+-                      </span>
+-                    ))}
++            {INTRO_CARDS.map((card, index) => (
++              <Reveal key={card.title} variant="card" delay={index * 75}>
++                <div className="h-full rounded-2xl border border-border bg-card p-8">
++                  <div className="flex items-center gap-4">
++                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary">
++                      <card.icon className="h-5 w-5" aria-hidden />
++                    </span>
++                    <h3 className="font-display text-xl font-bold">{card.title}</h3>
+                   </div>
+-                ) : null}
+-              </div>
++                  <p className="mt-4 leading-relaxed text-muted-foreground">{card.body}</p>
++                  {card.chips ? (
++                    <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
++                      {card.chips.map((chip) => (
++                        <span
++                          key={chip}
++                          className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-sm font-medium text-foreground"
++                        >
++                          <CheckCircle2 className="h-4 w-4 text-primary" aria-hidden />
++                          {chip}
++                        </span>
++                      ))}
++                    </div>
++                  ) : null}
++                </div>
++              </Reveal>
+             ))}
+           </div>
+           <div className="mt-12 text-center">
+@@ -477,13 +483,14 @@ export default function HomePage() {
+               <figure key={story.name} className="flex flex-col rounded-2xl border border-border bg-card p-8">
+                 <Stars />
+                 <blockquote className="mt-5 flex-1 text-muted-foreground">&ldquo;{story.quote}&rdquo;</blockquote>
+-                <figcaption className="mt-6 flex items-center gap-3">
+-                  <span
+-                    aria-hidden
+-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary"
+-                  >
+-                    {story.initials}
+-                  </span>
++                <figcaption className="mt-6 flex items-center gap-4">
++                  <Image
++                    src={story.avatar}
++                    alt=""
++                    width={48}
++                    height={48}
++                    className="h-12 w-12 shrink-0 rounded-full object-cover"
++                  />
+                   <div>
+                     <p className="font-semibold">{story.name}</p>
+                     <p className="text-sm text-muted-foreground">
+diff --git a/src/components/calculator-app.tsx b/src/components/calculator-app.tsx
+index 78ec178..0cad5fa 100644
+--- a/src/components/calculator-app.tsx
++++ b/src/components/calculator-app.tsx
+@@ -1,6 +1,6 @@
+ "use client";
+ 
+-import { Button, ButtonLink } from "@/components/ui";
++import { Button, ButtonLink, cn } from "@/components/ui";
+ import {
+   calculatePayment,
+   DEFAULT_CALCULATOR,
+@@ -9,48 +9,59 @@ import {
+   type PaymentBreakdown,
+   type PaymentInput,
+ } from "@/lib/calculator";
+-import { ArrowRight } from "lucide-react";
++import { AlertTriangle, ArrowRight, Leaf } from "lucide-react";
+ import { useMemo, useState } from "react";
+ 
+ function Field({
++  id,
+   label,
+   value,
+   onChange,
+   min,
+   max,
+   step,
+-  prefix,
+-  suffix,
++  format,
++  hint,
+ }: {
++  id: string;
+   label: string;
+   value: number;
+   onChange: (value: number) => void;
+   min: number;
+   max: number;
+   step: number;
+-  prefix?: string;
+-  suffix?: string;
++  format: (value: number) => string;
++  hint?: string;
+ }) {
+   return (
+-    <label className="block">
+-      <span className="mb-2 flex items-center justify-between text-sm font-medium">
+-        {label}
+-        <span className="tabular-nums text-muted-foreground">
+-          {prefix}
+-          {prefix ? formatUsd(value).replace("$", "") : value}
+-          {suffix}
+-        </span>
+-      </span>
++    <div>
++      <div className="flex items-center justify-between text-sm">
++        <label htmlFor={id} className="font-medium">
++          {label}
++        </label>
++        <span className="font-semibold tabular-nums">{format(value)}</span>
++      </div>
+       <input
++        id={id}
+         type="range"
+         min={min}
+         max={max}
+         step={step}
+         value={value}
+         onChange={(event) => onChange(Number(event.target.value))}
+-        className="w-full accent-primary"
++        className="mt-2 w-full accent-primary"
+       />
+-    </label>
++      {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
++    </div>
++  );
++}
++
++function SectionTitle({ children }: { children: string }) {
++  return (
++    <h3 className="flex items-center gap-2 font-display text-lg font-bold">
++      <span className="h-4 w-1 rounded-full bg-accent" aria-hidden />
++      {children}
++    </h3>
+   );
+ }
+ 
+@@ -58,125 +69,202 @@ export function CalculatorApp() {
+   const [input, setInput] = useState<PaymentInput>(DEFAULT_CALCULATOR);
+   const result: PaymentBreakdown = useMemo(() => calculatePayment(input), [input]);
+ 
++  const segments = [
++    { label: "Principal & Interest", value: result.monthlyPi, color: "bg-primary" },
++    { label: "Property Tax", value: result.monthlyTax, color: "bg-accent" },
++    { label: "Insurance", value: result.monthlyInsurance, color: "bg-primary/50" },
++    ...(result.monthlyPmi > 0 ? [{ label: "PMI", value: result.monthlyPmi, color: "bg-destructive/70" }] : []),
++    ...(result.monthlyHoa > 0 ? [{ label: "HOA", value: result.monthlyHoa, color: "bg-muted-foreground/50" }] : []),
++  ];
++  const segmentTotal = segments.reduce((sum, segment) => sum + segment.value, 0) || 1;
++
+   return (
+-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+-      <form className="space-y-6 rounded-2xl border border-border bg-card p-6 md:p-8" onSubmit={(event) => event.preventDefault()}>
+-        <Field
+-          label="Home price"
+-          value={input.homePrice}
+-          min={50000}
+-          max={1500000}
+-          step={5000}
+-          prefix="$"
+-          onChange={(homePrice) =>
+-            setInput((current) => ({
+-              ...current,
+-              homePrice,
+-              downPayment: Math.min(current.downPayment, homePrice),
+-            }))
+-          }
+-        />
+-        <Field
+-          label="Down payment"
+-          value={input.downPayment}
+-          min={0}
+-          max={input.homePrice}
+-          step={1000}
+-          prefix="$"
+-          onChange={(downPayment) => setInput((current) => ({ ...current, downPayment }))}
+-        />
+-        <Field
+-          label="Interest rate"
+-          value={input.annualRate}
+-          min={3}
+-          max={12}
+-          step={0.125}
+-          suffix="%"
+-          onChange={(annualRate) => setInput((current) => ({ ...current, annualRate }))}
+-        />
+-        <div>
+-          <p className="mb-2 text-sm font-medium">Loan term</p>
+-          <div className="flex gap-2">
+-            {[15, 20, 30].map((term) => (
+-              <Button
+-                key={term}
+-                variant={input.termYears === term ? "primary" : "outline"}
+-                onClick={() => setInput((current) => ({ ...current, termYears: term }))}
+-              >
+-                {term} years
+-              </Button>
+-            ))}
++    <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
++      {/* Inputs — grouped like the source: Home Details / Loan Terms / Taxes & Insurance */}
++      <form
++        className="space-y-8 rounded-2xl border border-border bg-card p-6 md:p-8"
++        onSubmit={(event) => event.preventDefault()}
++      >
++        <section className="space-y-6">
++          <SectionTitle>Home Details</SectionTitle>
++          <Field
++            id="calc-price"
++            label="Home Price"
++            value={input.homePrice}
++            min={75_000}
++            max={2_000_000}
++            step={5_000}
++            format={(value) => formatUsd(value)}
++            hint="$75K – $2M — includes delivery and setup"
++            onChange={(homePrice) =>
++              setInput((current) => ({
++                ...current,
++                homePrice,
++                downPayment: Math.min(current.downPayment, homePrice),
++              }))
++            }
++          />
++          <Field
++            id="calc-down"
++            label="Down Payment"
++            value={input.downPayment}
++            min={0}
++            max={input.homePrice}
++            step={1_000}
++            format={(value) => `${formatUsd(value)} · ${Math.round((value / input.homePrice) * 100)}% of price`}
++            hint="20% down eliminates PMI"
++            onChange={(downPayment) => setInput((current) => ({ ...current, downPayment }))}
++          />
++        </section>
++
++        <section className="space-y-6">
++          <SectionTitle>Loan Terms</SectionTitle>
++          <Field
++            id="calc-rate"
++            label="Interest Rate"
++            value={input.annualRate}
++            min={3}
++            max={12}
++            step={0.125}
++            format={(value) => `${value.toFixed(3)}% APR`}
++            onChange={(annualRate) => setInput((current) => ({ ...current, annualRate }))}
++          />
++          <div>
++            <p className="text-sm font-medium">Loan Term</p>
++            <div className="mt-2 flex flex-wrap gap-2">
++              {[10, 15, 20, 25, 30].map((term) => (
++                <Button
++                  key={term}
++                  variant={input.termYears === term ? "primary" : "outline"}
++                  size="sm"
++                  onClick={() => setInput((current) => ({ ...current, termYears: term }))}
++                >
++                  {term} yr
++                </Button>
++              ))}
++            </div>
+           </div>
+-        </div>
+-        <Field
+-          label="Property tax rate"
+-          value={input.annualTaxRate}
+-          min={0.2}
+-          max={3}
+-          step={0.05}
+-          suffix="%"
+-          onChange={(annualTaxRate) => setInput((current) => ({ ...current, annualTaxRate }))}
+-        />
+-        <Field
+-          label="Homeowners insurance / year"
+-          value={input.annualInsurance}
+-          min={400}
+-          max={8000}
+-          step={50}
+-          prefix="$"
+-          onChange={(annualInsurance) => setInput((current) => ({ ...current, annualInsurance }))}
+-        />
+-        <Field
+-          label="HOA / month"
+-          value={input.hoaMonthly}
+-          min={0}
+-          max={800}
+-          step={10}
+-          prefix="$"
+-          onChange={(hoaMonthly) => setInput((current) => ({ ...current, hoaMonthly }))}
+-        />
++        </section>
++
++        <section className="space-y-6">
++          <SectionTitle>Taxes &amp; Insurance</SectionTitle>
++          <Field
++            id="calc-tax"
++            label="Annual Property Tax"
++            value={Math.round((input.homePrice * input.annualTaxRate) / 100)}
++            min={0}
++            max={25_000}
++            step={100}
++            format={(value) => formatUsd(value)}
++            onChange={(annualTax) =>
++              setInput((current) => ({
++                ...current,
++                annualTaxRate: Number((((annualTax / current.homePrice) * 100) || 0).toFixed(3)),
++              }))
++            }
++          />
++          <Field
++            id="calc-insurance"
++            label="Annual Homeowners Insurance"
++            value={input.annualInsurance}
++            min={400}
++            max={8_000}
++            step={50}
++            format={(value) => formatUsd(value)}
++            onChange={(annualInsurance) => setInput((current) => ({ ...current, annualInsurance }))}
++          />
++          <Field
++            id="calc-hoa"
++            label="HOA / month"
++            value={input.hoaMonthly}
++            min={0}
++            max={800}
++            step={10}
++            format={(value) => `${formatUsd(value)}/mo`}
++            onChange={(hoaMonthly) => setInput((current) => ({ ...current, hoaMonthly }))}
++          />
++        </section>
+       </form>
+ 
+-      <div className="rounded-2xl bg-primary p-8 text-primary-foreground">
+-        <p className="text-sm uppercase tracking-wider text-primary-foreground/70">Estimated payment</p>
+-        <p className="mt-2 font-display text-5xl font-bold">{formatUsd(result.monthlyTotal)}/month</p>
+-        <p className="mt-2 text-sm text-primary-foreground/70">
+-          Loan amount {formatUsd(result.loanAmount)} · {(result.downPaymentPct * 100).toFixed(0)}% down
+-        </p>
+-        <dl className="mt-8 space-y-3 text-sm">
+-          {[
+-            ["Principal & interest", result.monthlyPi],
+-            ["Property taxes", result.monthlyTax],
+-            ["Insurance", result.monthlyInsurance],
+-            ["PMI", result.monthlyPmi],
+-            ["HOA", result.monthlyHoa],
+-          ].map(([label, value]) => (
+-            <div key={String(label)} className="flex justify-between border-b border-white/10 pb-2">
+-              <dt className="text-primary-foreground/70">{label}</dt>
+-              <dd className="font-medium">{formatUsdPrecise(Number(value))}</dd>
+-            </div>
+-          ))}
+-        </dl>
+-        {result.monthlyPmi > 0 ? (
+-          <p className="mt-6 text-sm text-primary-foreground/80">
+-            With less than 20% down, you&apos;ll pay private mortgage insurance. Increase your down payment to{" "}
+-            {formatUsd(Math.round(result.principal * 0.2))} to eliminate PMI.
++      {/* Summary — sage card with stacked breakdown bar (source parity) */}
++      <div className="space-y-6">
++        <div className="rounded-2xl border border-primary/15 bg-secondary/70 p-6 md:p-8">
++          <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
++            Your Estimated Payment
++          </span>
++          <p className="mt-3 font-display text-5xl font-bold text-foreground">
++            {formatUsd(Math.round(result.monthlyTotal))}
++            <span className="text-lg font-semibold text-muted-foreground">/month</span>
+           </p>
+-        ) : (
+-          <p className="mt-6 text-sm text-primary-foreground/80">No PMI — you&apos;re at or above 20% down.</p>
+-        )}
+-        <div className="mt-8 rounded-xl bg-white/10 p-4">
+-          <p className="text-sm font-semibold">Modular Home Savings</p>
++
++          <div
++            className="mt-5 flex h-3 overflow-hidden rounded-full bg-border"
++            role="img"
++            aria-label="Monthly payment breakdown"
++          >
++            {segments.map((segment) => (
++              <span
++                key={segment.label}
++                className={segment.color}
++                style={{ width: `${(segment.value / segmentTotal) * 100}%` }}
++              />
++            ))}
++          </div>
++          <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
++            {segments.map((segment) => (
++              <span key={segment.label} className="inline-flex items-center gap-1.5">
++                <span className={cn("h-2 w-2 rounded-full", segment.color)} aria-hidden />
++                {segment.label} <span className="font-semibold text-foreground">{formatUsdPrecise(segment.value)}</span>
++              </span>
++            ))}
++          </div>
++
++          <dl className="mt-6 rounded-xl border border-border bg-card p-5 text-sm">
++            <p className="mb-3 font-display font-bold">Loan Summary</p>
++            {[
++              ["Loan Amount", formatUsd(result.loanAmount)],
++              ["Down Payment", `${formatUsd(input.downPayment)} (${(result.downPaymentPct * 100).toFixed(0)}%)`],
++              ["Interest Rate", `${input.annualRate.toFixed(3)}% APR`],
++              ["Loan Term", `${input.termYears} years (${input.termYears * 12} payments)`],
++            ].map(([label, value]) => (
++              <div key={label} className="flex justify-between border-b border-border/70 py-2 last:border-0 last:pb-0">
++                <dt className="text-muted-foreground">{label}</dt>
++                <dd className="font-semibold">{value}</dd>
++              </div>
++            ))}
++          </dl>
++
++          {result.monthlyPmi > 0 ? (
++            <p className="mt-5 flex gap-2 rounded-xl border border-accent/40 bg-accent/10 p-4 text-sm text-accent-foreground">
++              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
++              <span>
++                <strong>PMI Applied.</strong> Your {(result.downPaymentPct * 100).toFixed(0)}% down payment is below
++                20%, so private mortgage insurance is added to your monthly payment. Increase your down payment to{" "}
++                {formatUsd(Math.round(result.principal * 0.2))} to eliminate PMI.
++              </span>
++            </p>
++          ) : (
++            <p className="mt-5 flex gap-2 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
++              <Leaf className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
++              <span>
++                <strong>No PMI.</strong> You&apos;re at or above 20% down — no private mortgage insurance required.
++              </span>
++            </p>
++          )}
++        </div>
++
++        <div className="rounded-2xl bg-primary p-6 text-primary-foreground md:p-8">
++          <p className="font-display font-bold">Modular Home Savings</p>
+           <p className="mt-2 text-sm text-primary-foreground/80">
+             Modular homes typically cost 10–20% less than site-built homes. A comparable site-built home might cost{" "}
+-            {formatUsd(result.siteBuiltComparePrice)} or more — about {formatUsd(result.monthlySavingsVsSiteBuilt)} extra
+-            per month.
++            {formatUsd(result.siteBuiltComparePrice)} — about {formatUsd(result.monthlySavingsVsSiteBuilt)} more per
++            month ({formatUsdPrecise(result.siteBuiltMonthly)}/mo).
+           </p>
++          <ButtonLink href="/get-started" variant="onPrimary" className="mt-5 w-full" size="lg">
++            Get Pre-Qualified Now
++            <ArrowRight className="h-4 w-4" />
++          </ButtonLink>
+         </div>
+-        <ButtonLink href="/get-started" variant="secondary" className="mt-8 w-full" size="lg">
+-          Get Pre-Qualified Now
+-          <ArrowRight className="h-4 w-4" />
+-        </ButtonLink>
+       </div>
+     </div>
+   );
+diff --git a/src/components/learn-explorer.tsx b/src/components/learn-explorer.tsx
+new file mode 100644
+index 0000000..042b3e8
+--- /dev/null
++++ b/src/components/learn-explorer.tsx
+@@ -0,0 +1,379 @@
++"use client";
++
++import { useMemo, useState } from "react";
++import {
++  ArrowRight,
++  BookOpen,
++  Briefcase,
++  FileText,
++  Leaf,
++  Mail,
++  Play,
++  Search,
++  Zap,
++} from "lucide-react";
++import Link from "next/link";
++import { Button, ButtonLink, Container, cn } from "@/components/ui";
++import { calculatePayment, formatUsd } from "@/lib/calculator";
++
++export interface LearnArticle {
++  slug: string;
++  title: string;
++  description: string;
++  category: string;
++  readTime: string;
++  tag?: string;
++  authorName: string;
++  authorRole: string;
++}
++
++const CATEGORY_ICONS: Record<string, typeof FileText> = {
++  Guide: BookOpen,
++  Article: FileText,
++  Video: Play,
++  "Case Study": Briefcase,
++  Tool: Zap,
++};
++
++const FILTERS = ["All", "Guide", "Article", "Video", "Case Study", "Tool"] as const;
++type Filter = (typeof FILTERS)[number];
++
++function tagPillClass(tag: string): string {
++  if (tag === "New") return "bg-accent/10 text-accent-foreground";
++  if (tag === "Popular") return "bg-primary/10 text-primary";
++  return "bg-muted text-muted-foreground";
++}
++
++function ArticleCard({ article }: { article: LearnArticle }) {
++  const Icon = CATEGORY_ICONS[article.category] ?? FileText;
++  return (
++    <Link
++      href={`/learn/${article.slug}`}
++      className="group flex flex-col rounded-2xl border border-border bg-card p-6 transition hover:border-accent hover:shadow-md"
++    >
++      <div className="flex items-start justify-between gap-3">
++        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
++          <Icon className="h-5 w-5" aria-hidden />
++        </span>
++        {article.tag ? (
++          <span className={cn("rounded-full px-3 py-1 text-xs font-medium", tagPillClass(article.tag))}>
++            {article.tag}
++          </span>
++        ) : null}
++      </div>
++      <p className="mt-4 text-xs font-medium uppercase tracking-wide text-primary">{article.category}</p>
++      <h3 className="mt-2 font-display text-lg font-semibold leading-snug group-hover:text-primary">
++        {article.title}
++      </h3>
++      <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{article.description}</p>
++      <p className="mt-4 text-xs text-muted-foreground">
++        {article.readTime} read · {article.authorName}
++      </p>
++      <p className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
++        Read more
++        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
++      </p>
++    </Link>
++  );
++}
++
++/** Compact affordability calculator embedded in the Learn hub (source parity). */
++function AffordabilityTool() {
++  const [homePrice, setHomePrice] = useState(225_000);
++  const [downPct, setDownPct] = useState(20);
++  const [rate, setRate] = useState(6.5);
++  const [termYears, setTermYears] = useState(30);
++  const [energyEfficient, setEnergyEfficient] = useState(false);
++
++  const downPayment = Math.round((homePrice * downPct) / 100);
++  const effectiveRate = energyEfficient ? Math.max(0, rate - 0.375) : rate;
++  const result = useMemo(
++    () =>
++      calculatePayment({
++        homePrice,
++        downPayment,
++        annualRate: effectiveRate,
++        termYears,
++        annualTaxRate: 1.1,
++        annualInsurance: 1_000,
++        hoaMonthly: 0,
++      }),
++    [homePrice, downPayment, effectiveRate, termYears],
++  );
++  const totalInterest = Math.max(0, result.monthlyPi * termYears * 12 - result.loanAmount);
++
++  const segments = [
++    { label: "P&I", value: result.monthlyPi, color: "bg-primary" },
++    { label: "Tax", value: result.monthlyTax, color: "bg-accent" },
++    { label: "Insurance", value: result.monthlyInsurance, color: "bg-secondary" },
++    ...(result.monthlyPmi > 0 ? [{ label: "PMI", value: result.monthlyPmi, color: "bg-destructive/70" }] : []),
++  ];
++  const total = segments.reduce((sum, s) => sum + s.value, 0) || 1;
++
++  return (
++    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
++      <div className="bg-primary px-6 py-4 text-primary-foreground">
++        <p className="font-display text-lg font-bold">Prefab Home Affordability Calculator</p>
++        <p className="text-sm text-primary-foreground/75">
++          Estimate your monthly payment with green discounts applied.
++        </p>
++      </div>
++      <div className="grid gap-8 p-6 md:grid-cols-2 md:p-8">
++        <div className="space-y-6">
++          <div>
++            <div className="flex items-center justify-between text-sm">
++              <label htmlFor="tool-price" className="font-medium">Home Price</label>
++              <span className="font-semibold">{formatUsd(homePrice)}</span>
++            </div>
++            <input
++              id="tool-price"
++              type="range"
++              min={50_000}
++              max={750_000}
++              step={5_000}
++              value={homePrice}
++              onChange={(event) => setHomePrice(Number(event.target.value))}
++              className="mt-2 w-full accent-primary"
++            />
++          </div>
++          <div>
++            <div className="flex items-center justify-between text-sm">
++              <label htmlFor="tool-down" className="font-medium">% Down Payment</label>
++              <span className="font-semibold">{downPct}% ({formatUsd(downPayment)})</span>
++            </div>
++            <input
++              id="tool-down"
++              type="range"
++              min={0}
++              max={50}
++              step={1}
++              value={downPct}
++              onChange={(event) => setDownPct(Number(event.target.value))}
++              className="mt-2 w-full accent-primary"
++            />
++          </div>
++          <div>
++            <div className="flex items-center justify-between text-sm">
++              <label htmlFor="tool-rate" className="font-medium">Interest Rate</label>
++              <span className="font-semibold">{effectiveRate.toFixed(2)}%</span>
++            </div>
++            <input
++              id="tool-rate"
++              type="range"
++              min={3}
++              max={12}
++              step={0.125}
++              value={rate}
++              onChange={(event) => setRate(Number(event.target.value))}
++              className="mt-2 w-full accent-primary"
++            />
++          </div>
++          <div>
++            <p className="text-sm font-medium">Loan Term</p>
++            <div className="mt-2 flex flex-wrap gap-2">
++              {[10, 15, 20, 25, 30].map((years) => (
++                <Button
++                  key={years}
++                  variant={termYears === years ? "primary" : "outline"}
++                  size="sm"
++                  onClick={() => setTermYears(years)}
++                >
++                  {years} yr
++                </Button>
++              ))}
++            </div>
++          </div>
++          <label className="flex cursor-pointer items-center gap-3 rounded-xl bg-secondary/70 px-4 py-3 text-sm">
++            <input
++              type="checkbox"
++              checked={energyEfficient}
++              onChange={(event) => setEnergyEfficient(event.target.checked)}
++              className="h-4 w-4 accent-primary"
++            />
++            <Leaf className="h-4 w-4 text-primary" aria-hidden />
++            <span>
++              <span className="font-medium">Energy Efficient Home</span>
++              <span className="text-muted-foreground"> — 0.375% rate discount</span>
++            </span>
++          </label>
++        </div>
++        <div className="flex flex-col">
++          <div className="rounded-xl bg-secondary/60 p-5">
++            <p className="text-sm text-muted-foreground">Estimated Monthly Payment</p>
++            <p className="mt-1 font-display text-4xl font-bold text-primary">
++              {formatUsd(Math.round(result.monthlyTotal))}
++              <span className="text-base font-semibold text-muted-foreground">/month</span>
++            </p>
++            <div className="mt-4 flex h-2.5 overflow-hidden rounded-full bg-border" role="img" aria-label="Payment breakdown">
++              {segments.map((segment) => (
++                <span
++                  key={segment.label}
++                  className={segment.color}
++                  style={{ width: `${(segment.value / total) * 100}%` }}
++                />
++              ))}
++            </div>
++            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
++              {segments.map((segment) => (
++                <span key={segment.label} className="inline-flex items-center gap-1.5">
++                  <span className={cn("h-2 w-2 rounded-full", segment.color)} aria-hidden />
++                  {segment.label} {formatUsd(Math.round(segment.value))}
++                </span>
++              ))}
++            </div>
++          </div>
++          <dl className="mt-5 space-y-3 text-sm">
++            <div className="flex justify-between border-b border-border pb-2">
++              <dt className="text-muted-foreground">Loan Amount</dt>
++              <dd className="font-semibold">{formatUsd(result.loanAmount)}</dd>
++            </div>
++            <div className="flex justify-between border-b border-border pb-2">
++              <dt className="text-muted-foreground">Total Interest</dt>
++              <dd className="font-semibold">{formatUsd(Math.round(totalInterest))}</dd>
++            </div>
++            <div className="flex justify-between border-b border-border pb-2">
++              <dt className="text-muted-foreground">Down Payment</dt>
++              <dd className="font-semibold">{formatUsd(downPayment)}</dd>
++            </div>
++            <div className="flex justify-between">
++              <dt className="text-muted-foreground">PMI</dt>
++              <dd className="font-semibold">
++                {result.monthlyPmi > 0 ? `${formatUsd(Math.round(result.monthlyPmi))}/mo` : "$0.00/mo"}
++              </dd>
++            </div>
++          </dl>
++          <a
++            href={`mailto:team@modfii.com?subject=${encodeURIComponent("Full affordability report")}&body=${encodeURIComponent(
++              `Home price: ${formatUsd(homePrice)}\nDown payment: ${formatUsd(downPayment)} (${downPct}%)\nRate: ${effectiveRate.toFixed(3)}%\nTerm: ${termYears} years\nEstimated monthly payment: ${formatUsd(Math.round(result.monthlyTotal))}`,
++            )}`}
++            className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-600"
++          >
++            <Mail className="h-4 w-4" aria-hidden />
++            Get Your Full Report
++          </a>
++        </div>
++      </div>
++    </div>
++  );
++}
++
++export function LearnExplorer({ articles, featured }: { articles: LearnArticle[]; featured: LearnArticle }) {
++  const [query, setQuery] = useState("");
++  const [filter, setFilter] = useState<Filter>("All");
++
++  const counts = useMemo(() => {
++    const map = new Map<string, number>([["All", articles.length + 1]]);
++    for (const article of [featured, ...articles]) {
++      map.set(article.category, (map.get(article.category) ?? 0) + 1);
++    }
++    return map;
++  }, [articles, featured]);
++
++  const normalizedQuery = query.trim().toLowerCase();
++  const visible = articles.filter((article) => {
++    const matchesFilter = filter === "All" || article.category === filter;
++    const matchesQuery =
++      normalizedQuery.length === 0 ||
++      `${article.title} ${article.description} ${article.authorName}`.toLowerCase().includes(normalizedQuery);
++    return matchesFilter && matchesQuery;
++  });
++
++  return (
++    <Container className="py-14 md:py-16">
++      {/* Search + filter chips */}
++      <div className="mx-auto max-w-3xl">
++        <div className="relative">
++          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
++          <label htmlFor="learn-search" className="sr-only">Search articles, guides, and resources</label>
++          <input
++            id="learn-search"
++            type="search"
++            value={query}
++            onChange={(event) => setQuery(event.target.value)}
++            placeholder="Search articles, guides, and resources..."
++            className="h-12 w-full rounded-full border border-border bg-card pl-11 pr-4 text-sm outline-none transition focus:border-primary"
++          />
++        </div>
++        <div className="mt-5 flex flex-wrap justify-center gap-2">
++          {FILTERS.map((option) => (
++            <Button
++              key={option}
++              variant={filter === option ? "primary" : "outline"}
++              size="sm"
++              onClick={() => setFilter(option)}
++            >
++              {option}
++              <span className={cn("ml-1", filter === option ? "text-primary-foreground/70" : "text-muted-foreground")}>
++                ({counts.get(option) ?? 0})
++              </span>
++            </Button>
++          ))}
++        </div>
++      </div>
++
++      {/* Featured guide banner */}
++      <Link
++        href={`/learn/${featured.slug}`}
++        className="group mt-10 flex flex-col gap-5 rounded-2xl border border-accent/40 bg-accent/5 p-6 transition hover:border-accent md:p-8"
++      >
++        <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent-foreground">
++          <BookOpen className="h-3.5 w-3.5" aria-hidden />
++          Featured Guide
++        </span>
++        <div className="flex items-start justify-between gap-6">
++          <div>
++            <h2 className="font-display text-2xl font-bold group-hover:text-primary md:text-3xl">{featured.title}</h2>
++            <p className="mt-2 max-w-3xl text-muted-foreground">{featured.description}</p>
++            <p className="mt-3 text-sm text-muted-foreground">
++              {featured.readTime} read · {featured.authorName}, {featured.authorRole}
++            </p>
++          </div>
++          <span className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary md:flex">
++            <BookOpen className="h-7 w-7" aria-hidden />
++          </span>
++        </div>
++      </Link>
++
++      {/* Grid */}
++      {visible.length > 0 ? (
++        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
++          {visible.map((article) => (
++            <ArticleCard key={article.slug} article={article} />
++          ))}
++        </div>
++      ) : (
++        <p className="mt-10 rounded-2xl border border-dashed border-border p-10 text-center text-muted-foreground">
++          No resources match your search yet. Try a different keyword or filter.
++        </p>
++      )}
++
++      {/* Interactive tools */}
++      <div className="mt-20 text-center">
++        <h2 className="font-display text-3xl font-bold md:text-4xl">Interactive Tools</h2>
++        <p className="mt-3 text-muted-foreground">Calculate your prefab home affordability with our free tools</p>
++      </div>
++      <div className="mt-8">
++        <AffordabilityTool />
++      </div>
++
++      {/* Newsletter */}
++      <div className="mt-20 rounded-3xl bg-cream px-6 py-12 text-center md:py-16">
++        <h2 className="font-display text-3xl font-bold">Get Weekly Prefab Insights</h2>
++        <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
++          Join 5,000+ homeowners and builders receiving our weekly insights on prefab mortgages, market updates, and
++          exclusive guides.
++        </p>
++        <ButtonLink
++          href="mailto:team@modfii.com?subject=Subscribe%20to%20Prefab%20Insights"
++          variant="primary"
++          size="lg"
++          className="mt-6"
++        >
++          Subscribe Free
++          <ArrowRight className="h-4 w-4" />
++        </ButtonLink>
++        <p className="mt-4 text-xs text-muted-foreground">No spam ever. Unsubscribe anytime.</p>
++      </div>
++    </Container>
++  );
++}
+diff --git a/src/components/prequal-form.tsx b/src/components/prequal-form.tsx
+index 140f14f..73f0d84 100644
+--- a/src/components/prequal-form.tsx
++++ b/src/components/prequal-form.tsx
+@@ -142,6 +142,8 @@ export function PrequalForm() {
+ 
+   const progress = useMemo(() => ((step + 1) / 4) * 100, [step]);
+ 
++  const STEP_NAMES = ["Tell us about your project", "About the home", "Quick details", "Contact details"];
++
+   if (result) {
+     return (
+       <div className="rounded-2xl border border-border bg-card p-6 text-foreground shadow-lg md:p-10">
+@@ -200,10 +202,31 @@ export function PrequalForm() {
+ 
+   return (
+     <div className="rounded-2xl border-2 border-border bg-card p-6 text-foreground shadow-2xl md:p-8">
++      {/* Trust chips — top of card (source parity) */}
++      <p className="mb-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
++        <span className="inline-flex items-center gap-1.5">
++          <Shield className="h-3.5 w-3.5 text-primary" /> No credit impact
++        </span>
++        <span className="inline-flex items-center gap-1.5">
++          <Clock className="h-3.5 w-3.5 text-primary" /> 3 min to complete
++        </span>
++        <span className="inline-flex items-center gap-1.5">
++          <Lock className="h-3.5 w-3.5 text-primary" /> 256-bit encryption
++        </span>
++      </p>
++
+       <div className="mb-8">
+-        <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
+-          <span>Step {step + 1} of 4</span>
+-          <span>{Math.round(progress)}% complete</span>
++        <div className="mb-2 flex items-center gap-2.5">
++          <span
++            aria-hidden
++            className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
++          >
++            {step + 1}
++          </span>
++          <p className="text-sm font-semibold">{STEP_NAMES[step]}</p>
++          <span className="sr-only">
++            Step {step + 1} of 4 · {Math.round(progress)}% complete
++          </span>
+         </div>
+         <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+           <div className="h-full rounded-full bg-primary transition-all duration-300" style={{ width: `${progress}%` }} />
+@@ -212,8 +235,8 @@ export function PrequalForm() {
+ 
+       {step === 0 ? (
+         <div className="space-y-8">
+-          <div className="text-center">
+-            <h1 className="font-display text-2xl font-bold md:text-3xl">What brings you to ModFii?</h1>
++          <div>
++            <h1 className="font-display text-2xl font-bold md:text-3xl">What are you looking to do?</h1>
+             <p className="mt-2 text-muted-foreground">Takes about 2 minutes. Estimates are fine.</p>
+           </div>
+           <div className="space-y-3">
+@@ -229,16 +252,17 @@ export function PrequalForm() {
+             ))}
+           </div>
+           <label className="block">
+-            <span className="mb-2 block text-sm font-medium">ZIP code</span>
++            <span className="mb-2 block text-sm font-medium">Property ZIP code</span>
+             <input
+               inputMode="numeric"
+               autoComplete="postal-code"
+               value={data.zipCode}
+               onChange={(event) => update({ zipCode: event.target.value.replace(/\D/g, "").slice(0, 5) })}
+               className="h-12 w-full rounded-lg border border-input bg-background px-4"
+-              placeholder="37203"
++              placeholder="Enter 5-digit ZIP"
+               maxLength={5}
+             />
++            <span className="mt-1.5 block text-xs text-muted-foreground">Where the home will be located</span>
+             {errors.zipCode ? <p className="mt-1 text-sm text-destructive">{errors.zipCode}</p> : null}
+           </label>
+           <Button
+@@ -257,6 +281,17 @@ export function PrequalForm() {
+             Continue
+             <ArrowRight className="h-4 w-4" />
+           </Button>
++          <p className="text-center text-xs text-muted-foreground">
++            By continuing, you agree to our{" "}
++            <a href="/privacy-policy" className="underline underline-offset-2 hover:text-foreground">
++              Privacy Policy
++            </a>{" "}
++            and{" "}
++            <a href="/terms" className="underline underline-offset-2 hover:text-foreground">
++              Terms of Service
++            </a>
++            .
++          </p>
+         </div>
+       ) : null}
+ 
+@@ -466,18 +501,6 @@ export function PrequalForm() {
+           </Button>
+         </div>
+       ) : null}
+-
+-      <p className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-center text-xs text-muted-foreground">
+-        <span className="inline-flex items-center gap-1.5">
+-          <Shield className="h-3.5 w-3.5 text-primary" /> No credit impact
+-        </span>
+-        <span className="inline-flex items-center gap-1.5">
+-          <Clock className="h-3.5 w-3.5 text-primary" /> 3 min to complete
+-        </span>
+-        <span className="inline-flex items-center gap-1.5">
+-          <Lock className="h-3.5 w-3.5 text-primary" /> 256-bit encryption · NMLS #2537136
+-        </span>
+-      </p>
+     </div>
+   );
+ }
+diff --git a/src/components/reveal.tsx b/src/components/reveal.tsx
+new file mode 100644
+index 0000000..23ac04a
+--- /dev/null
++++ b/src/components/reveal.tsx
+@@ -0,0 +1,64 @@
++"use client";
++
++import { useEffect, useRef, useState, type ReactNode } from "react";
++
++/**
++ * Scroll-reveal wrapper mirroring modfii.com: sections start hidden
++ * (opacity 0 + translateY, cards also scale 0.95) and animate in for
++ * 300ms once they intersect the viewport.
++ *
++ * prefers-reduced-motion is handled in globals.css ([data-reveal] is forced
++ * visible there), so no state is set synchronously in the effect body.
++ */
++const HIDDEN_VARIANT = {
++  text: "translate-y-[30px]",
++  card: "translate-y-10 scale-95",
++} as const;
++
++export function Reveal({
++  children,
++  variant = "text",
++  delay = 0,
++  className,
++}: {
++  children: ReactNode;
++  variant?: "text" | "card";
++  delay?: number;
++  className?: string;
++}) {
++  const ref = useRef<HTMLDivElement | null>(null);
++  const [visible, setVisible] = useState(false);
++
++  useEffect(() => {
++    const el = ref.current;
++    if (!el) return;
++    const observer = new IntersectionObserver(
++      (entries) => {
++        for (const entry of entries) {
++          if (entry.isIntersecting) {
++            setVisible(true);
++            observer.disconnect();
++          }
++        }
++      },
++      { rootMargin: "0px 0px -10% 0px" },
++    );
++    observer.observe(el);
++    return () => observer.disconnect();
++  }, []);
++
++  return (
++    <div
++      ref={ref}
++      data-reveal=""
++      className={[
++        "transition-all duration-300",
++        visible ? "translate-y-0 scale-100 opacity-100" : `opacity-0 ${HIDDEN_VARIANT[variant]}`,
++        className ?? "",
++      ].join(" ")}
++      style={delay > 0 ? { transitionDelay: `${delay}ms` } : undefined}
++    >
++      {children}
++    </div>
++  );
++}
+diff --git a/src/components/site-footer.tsx b/src/components/site-footer.tsx
+index 08acc8a..938287b 100644
+--- a/src/components/site-footer.tsx
++++ b/src/components/site-footer.tsx
+@@ -3,7 +3,7 @@ import { Mail, MapPin } from "lucide-react";
+ import Image from "next/image";
+ import Link from "next/link";
+ 
+-/** lucide 1.44 dropped brand icons — minimal LinkedIn glyph wrapper. */
++/** lucide 1.44 dropped brand icons — minimal glyph wrappers (modfii.com footer parity). */
+ function LinkedInIcon({ className }: { className?: string }) {
+   return (
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className={className}>
+@@ -12,6 +12,30 @@ function LinkedInIcon({ className }: { className?: string }) {
+   );
+ }
+ 
++function TwitterIcon({ className }: { className?: string }) {
++  return (
++    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className={className}>
++      <path d="M22 5.9c-.7.3-1.5.6-2.3.7a4 4 0 0 0 1.8-2.2c-.8.5-1.7.8-2.6 1a4 4 0 0 0-6.9 3.7A11.5 11.5 0 0 1 3.7 4.9a4 4 0 0 0 1.3 5.4c-.7 0-1.3-.2-1.8-.5v.1a4 4 0 0 0 3.2 4 4 4 0 0 1-1.8.1 4 4 0 0 0 3.8 2.8A8.1 8.1 0 0 1 2 18.4a11.4 11.4 0 0 0 6.2 1.8c7.5 0 11.6-6.2 11.6-11.6v-.5c.8-.6 1.5-1.3 2.2-2.2Z" />
++    </svg>
++  );
++}
++
++function FacebookIcon({ className }: { className?: string }) {
++  return (
++    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className={className}>
++      <path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z" />
++    </svg>
++  );
++}
++
++function YouTubeIcon({ className }: { className?: string }) {
++  return (
++    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className={className}>
++      <path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12c0 1.6.1 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8c1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.3-1.6.4-3.2.4-4.8s-.1-3.2-.4-4.8ZM10 15.2V8.8l5.2 3.2L10 15.2Z" />
++    </svg>
++  );
++}
++
+ const COLUMNS = [
+   {
+     title: "Loan Options",
+@@ -94,6 +118,20 @@ export function SiteFooter() {
+             </p>
+           </div>
+           <div className="flex items-center gap-3">
++            <a
++              href="#"
++              aria-label="ModFii on Twitter"
++              className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
++            >
++              <TwitterIcon className="h-4 w-4" />
++            </a>
++            <a
++              href="#"
++              aria-label="ModFii on Facebook"
++              className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
++            >
++              <FacebookIcon className="h-4 w-4" />
++            </a>
+             <a
+               href={SITE.linkedin}
+               target="_blank"
+@@ -103,6 +141,13 @@ export function SiteFooter() {
+             >
+               <LinkedInIcon className="h-4 w-4" />
+             </a>
++            <a
++              href="#"
++              aria-label="ModFii on YouTube"
++              className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
++            >
++              <YouTubeIcon className="h-4 w-4" />
++            </a>
+           </div>
+         </div>
+         {COLUMNS.map((column) => (
+@@ -120,6 +165,31 @@ export function SiteFooter() {
+           </div>
+         ))}
+       </div>
++      <div className="mx-auto max-w-[1400px] px-4 pb-10 md:px-8">
++        <p className="mb-3 text-sm font-semibold text-foreground">Legal</p>
++        <ul className="space-y-2">
++          <li>
++            <Link href="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground">
++              Privacy Policy
++            </Link>
++          </li>
++          <li>
++            <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground">
++              Terms of Service
++            </Link>
++          </li>
++          <li>
++            <a
++              href="https://www.nmlsconsumeraccess.org/"
++              target="_blank"
++              rel="noopener noreferrer"
++              className="text-sm text-muted-foreground hover:text-foreground"
++            >
++              NMLS Consumer Access
++            </a>
++          </li>
++        </ul>
++      </div>
+       <div className="border-t border-border">
+         <div className="mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-6 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between md:px-8">
+           <p>© 2026 ModFii. All rights reserved. NMLS #{SITE.nmls}</p>
+@@ -136,14 +206,6 @@ export function SiteFooter() {
+             <Link href="/terms" className="hover:text-foreground">
+               Terms of Service
+             </Link>
+-            <a
+-              href="https://www.nmlsconsumeraccess.org/"
+-              target="_blank"
+-              rel="noopener noreferrer"
+-              className="hover:text-foreground"
+-            >
+-              NMLS Consumer Access
+-            </a>
+           </div>
+         </div>
+         <p className="mx-auto max-w-[1400px] px-4 pb-8 text-xs leading-relaxed text-muted-foreground md:px-8">

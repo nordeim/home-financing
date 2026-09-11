@@ -138,7 +138,7 @@ sequenceDiagram
 📂 public/images/avatars/         # 3 testimonial portraits
 📄 next.config.ts                 # images.unoptimized + 11 redirects
 📄 docker-compose.yml             # PG17 on host 5434 (home_financing_*)
-📄 .env.example                   # Template (scandihaven_* legacy names — real DB is home_financing_*)
+📄 .env.example                   # Template (home_financing_* on :5434 — matches docker-compose.yml)
 ```
 
 ---
@@ -193,9 +193,9 @@ curl -s http://localhost:3000/api/health | jq
 npm run lint        # flat ESLint (0 errors / 0 warnings)
 npm run lint:fix    # auto-fix
 npm run typecheck   # tsc --noEmit (skills excluded via tsconfig)
-npm run test        # vitest unit suite (31 tests)
+npm run test        # vitest unit suite (37 tests: calculator 11 + matching 13 + rate-limit 7 + markdown 6)
 npm run build       # validates next.config.ts:redirects + RSC boundaries + skills excluded
-npm run e2e         # Playwright chromium (27 tests, prod next start on 3002) — needs build; funnel happy-path also needs db:setup
+npm run e2e         # Playwright chromium (44 tests per project — 31 declarations + 14 asset variants, prod next start on 3002) — needs build; funnel happy-path also needs db:setup
 ```
 ```bash
 # Quick E2E without manual build (Playwright starts prod server itself)
@@ -233,7 +233,7 @@ Canonical list — derived from `.env.example` + `docker-compose.yml` + `src/db/
 | `FEATURE_*` | No | Flags `on/off` (also `true/false`, `1/0`); unknown `FEATURE_*` fails fast | `FEATURE_TRADE=off` |
 | `DISABLE_IMAGE_OPTIMIZER` | No | `1` in constrained sandboxes where `sharp` deadlocks | `1` |
 
-> `.env` is gitignored. Never commit secrets. `docs/bak.env`/`**/bak.env`/`*.env.bak`/`docs/env.tgz`/`ssh-key.txt` are also ignored after 2026-09 audits. `.env.example` still contains legacy `scandihaven_*` placeholders — the real Docker DB is `home_financing_*` on `:5434`.
+> `.env` is gitignored. Never commit secrets. `docs/bak.env`/`**/bak.env`/`*.env.bak`/`docs/env.tgz`/`ssh-key.txt` are also ignored after 2026-09 audits. `.env.example` now uses `home_financing_*` on `:5434` (matches `docker-compose.yml`); runtime `DATABASE_URL` wins.
 
 ---
 
@@ -285,7 +285,7 @@ Tokens live **only** in `src/app/globals.css:@theme` — never add `tailwind.con
 ```bash
 npm run lint       # ESLint flat config (0 errors / 0 warnings)
 npm run typecheck  # tsc --noEmit (skills excluded)
-npm run test       # vitest (31 tests)
+npm run test       # vitest (37 tests: calculator 11 + matching 13 + rate-limit 7 + markdown 6)
 npm run build      # Next.js production build (requires skills excluded)
 npm run e2e        # Playwright chromium (prod build)
 curl http://localhost:3000/api/health   # readiness probe (also triggers ensureSeeded)
@@ -340,7 +340,7 @@ curl http://localhost:3000/api/health   # readiness probe (also triggers ensureS
 
 - `CLAUDE.md` — full agent spec (~600 lines): 6-phase workflow, schema tables, env table, DB lifecycle (`src/scripts/*` + `drizzle/`), E2E, design-system, anti-patterns.
 - `AGENTS.md` — compact cheat-sheet (~100 lines): commands (`db:*` + `e2e`), architecture (guarded lifecycle + prod E2E), never-do list.
-- `playwright.config.ts` + `e2e/` — E2E harness (3002, 27 tests) · `vitest.config.ts` + `src/lib/*.test.ts` — unit suite (31 tests).
+- `playwright.config.ts` + `e2e/` — E2E harness (3002, 44 tests per project) · `vitest.config.ts` + `src/lib/*.test.ts` — unit suite (37 tests = 11+13+7+6).
 - `docs/` — prompt archives & `build_error.txt` (not a deployment guide).
 
 ---
@@ -351,4 +351,4 @@ Private — `package.json:private: true`, no `LICENSE` file. Not licensed for pu
 
 ---
 
-*Last verified 2026-09-11 (remediation pass 2: markdown H4/OOM fix, modfii.com visual parity — real wordmark logos, testimonial avatars, scroll-reveal animations, animated accordions, footer social icons + Legal section, learn-hub rebuild with search/filters/featured/tools/newsletter, calculator rebuild with breakdown bar/loan summary/PMI alert/how-to/explore/FAQ/related sections, get-started wizard parity, manufacturers tier bands + A–Z directory) against `package.json` (Next 16.3 + React 19.3 + Tailwind 4.3 + Vitest 3.2 + Playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills + infrastructure excluded), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (+ 31 unit tests), `public/images/*` + `public/brand/*` (all referenced assets present), `playwright.config.ts` (3002), `e2e/*` 27 tests, `src/app/page.tsx` + `src/components/*` (modfii.com parity design), `.env.example`, `.gitignore`.*
+*Last verified 2026-09-12 (remediation pass 2 + docs normalization: markdown H4/OOM fix, modfii.com visual parity — wordmark logos, testimonial avatars, scroll-reveal, animated accordions, footer socials/Legal, learn-hub + calculator rebuilds, wizard parity, manufacturers tier/A–Z; normalized counts: 37 unit = 11+13+7+6, 44 E2E per project = 31 declarations + 14 asset variants) against `package.json` (Next 16.3 + React 19.3 + Tailwind 4.3 + Vitest 3.2 + Playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills + infrastructure excluded), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (37 unit tests), `public/images/*` + `public/brand/*` (all referenced assets present), `playwright.config.ts` (3002), `e2e/*` 44 tests per project, `src/app/page.tsx` + `src/components/*` (modfii.com parity design), `.env.example`, `.gitignore`.*

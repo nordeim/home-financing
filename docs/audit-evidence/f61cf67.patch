@@ -1,0 +1,140 @@
+commit f61cf6713bc9b85d9be23693d54870c2d3e52f3e
+Author: ModFii Remediation Agent <agent@modfii.local>
+Date:   Fri Sep 11 16:25:36 2026 +0000
+
+    fix(markdown): render H4+ headings and guarantee parser progress
+    
+    Root cause of the 2026-09-11 production outage: a line starting with
+    '#### ' fell through to the paragraph block, whose inner loop breaks on
+    any '#' line WITHOUT consuming it. The outer loop re-examined the same
+    line forever, allocating React elements until the Node heap (2GB) died —
+    one GET to an affected /learn/* article OOM-crashed next-server and the
+    origin served 502 for every route.
+    
+    - add explicit '#### ' branch rendering an h4
+    - paragraph branch now always consumes >= 1 line (loop-safety guard)
+    - regression: src/lib/markdown.test.ts (heading levels, loop safety,
+      full-corpus render, both affected articles)
+
+diff --git a/src/lib/markdown.test.ts b/src/lib/markdown.test.ts
+new file mode 100644
+index 0000000..10972fb
+--- /dev/null
++++ b/src/lib/markdown.test.ts
+@@ -0,0 +1,73 @@
++import { describe, expect, it } from "vitest";
++import { articles } from "@/lib/catalog";
++import { Markdown } from "@/lib/markdown";
++import { renderToString } from "react-dom/server";
++
++/**
++ * Regression tests for the 2026-09-11 production OOM incident.
++ *
++ * `Markdown` had no branch for `#### ` (H4+) headings, so such a line fell
++ * through to the paragraph block, whose inner loop breaks on any line
++ * starting with "#" — without consuming it. The outer loop then re-examined
++ * the same line forever, allocating React elements until the Node heap
++ * (2 GB) was exhausted and the whole next-server process died
++ * (Cloudflare 502 on the live deployment).
++ */
++
++function render(content: string): string {
++  return renderToString(Markdown({ content }));
++}
++
++describe("Markdown heading levels", () => {
++  it("renders #### as an h4 and terminates", () => {
++    const html = render("#### Construction-Only Loans");
++    expect(html).toContain("<h4");
++    expect(html).toContain("Construction-Only Loans");
++  });
++
++  it("renders ##### and deeper hashes without hanging", () => {
++    const html = render("##### Deep Heading");
++    expect(html).toContain("Deep Heading");
++  });
++
++  it("renders every heading level h1-h4", () => {
++    const html = render("# A\n\n## B\n\n### C\n\n#### D");
++    expect(html).toContain("<h1");
++    expect(html).toContain("<h2");
++    expect(html).toContain("<h3");
++    expect(html).toContain("<h4");
++  });
++});
++
++describe("Markdown loop safety", () => {
++  it("always consumes the line: any single-line input terminates", () => {
++    // Inputs that previously triggered the non-consuming break in the
++    // paragraph branch must terminate and emit at least one block.
++    for (const line of ["#### X", "##### X", "###### X", "#no-space", "####hashtag"]) {
++      const html = render(line);
++      expect(html.length).toBeGreaterThan(0);
++    }
++  });
++});
++
++describe("Markdown full corpus", () => {
++  it("renders every seeded article without hanging", () => {
++    expect(articles.length).toBeGreaterThan(0);
++    for (const article of articles) {
++      const html = render(article.content);
++      expect(html.length).toBeGreaterThan(0);
++    }
++  });
++
++  it("renders the two articles that killed production", () => {
++    const slugs = [
++      "construction-loans-vs-traditional-mortgages-prefab",
++      "inside-prefab-home-closing",
++    ];
++    for (const slug of slugs) {
++      const article = articles.find((a) => a.slug === slug);
++      expect(article, `article ${slug} must exist in the corpus`).toBeTruthy();
++      expect(render(article!.content)).toContain("h4");
++    }
++  });
++});
+diff --git a/src/lib/markdown.tsx b/src/lib/markdown.tsx
+index ae41a94..2cc6429 100644
+--- a/src/lib/markdown.tsx
++++ b/src/lib/markdown.tsx
+@@ -53,6 +53,15 @@ export function Markdown({ content }: { content: string }) {
+       i += 1;
+       continue;
+     }
++    if (line.startsWith("#### ")) {
++      blocks.push(
++        <h4 key={key++} className="mt-6 font-display text-lg font-semibold text-foreground">
++          {inline(line.slice(5))}
++        </h4>,
++      );
++      i += 1;
++      continue;
++    }
+     if (line.startsWith("### ")) {
+       blocks.push(
+         <h3 key={key++} className="mt-8 font-display text-xl font-semibold text-foreground">
+@@ -111,6 +120,7 @@ export function Markdown({ content }: { content: string }) {
+       continue;
+     }
+     const para: string[] = [];
++    const start = i;
+     while (i < lines.length) {
+       const current = lines[i] ?? "";
+       if (
+@@ -124,6 +134,14 @@ export function Markdown({ content }: { content: string }) {
+       para.push(current);
+       i += 1;
+     }
++    if (i === start) {
++      // Loop safety (2026-09-11 OOM incident): the break conditions above all
++      // match lines the outer loop did not consume (e.g. "####" and deeper
++      // hashes once fell through here). Never let the outer loop re-examine
++      // the same line — consume it and keep the parser terminating.
++      para.push(lines[start] ?? "");
++      i += 1;
++    }
+     blocks.push(
+       <p key={key++} className="mt-4 text-lg leading-relaxed text-muted-foreground">
+         {inline(para.join(" "))}
