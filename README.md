@@ -1,9 +1,10 @@
 # ModFii — Home Financing
 
-![Next.js](https://img.shields.io/badge/Next.js-16.2.6-black?logo=next.js)
-![React](https://img.shields.io/badge/React-19.2-149eca?logo=react)
+![Next.js](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)
+![React](https://img.shields.io/badge/React-19.3-149eca?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9_strict-3178c6?logo=typescript)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1-38bdf8?logo=tailwindcss)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.3-38bdf8?logo=tailwindcss)
+![Vitest](https://img.shields.io/badge/Vitest-3.2-6e9f18?logo=vitest)
 ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-0.45-C5F277?logo=drizzle)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?logo=postgresql)
 ![License](https://img.shields.io/badge/license-Private-lightgrey)
@@ -34,17 +35,18 @@
 
 | Layer | Technology | Version | Purpose |
 |-------|------------|---------|---------|
-| Framework | Next.js (App Router) | 16.2.6 | SSR + RSC + Route Handlers + `next/font` + `next/image` |
-| UI | React | 19.2.6 | Server Components by default; `"use client"` only for header/forms/calculator |
+| Framework | Next.js (App Router) | 16.3.x | SSR + RSC + Route Handlers + `next/font` + `next/image` |
+| UI | React | 19.3.x | Server Components by default; `"use client"` only for header/forms/calculator |
 | Language | TypeScript | 5.9.3 | `strict: true`, `isolatedModules`, alias `@/*→./src/*` |
-| Styling | Tailwind CSS | 4.1.17 | CSS-first `@theme` in `src/app/globals.css` — no `tailwind.config.*` |
+| Styling | Tailwind CSS | 4.3.x | CSS-first `@theme` in `src/app/globals.css` — no `tailwind.config.*` |
 | Icons | lucide-react | 1.44.0 | All product icons |
 | ORM | Drizzle ORM | 0.45.2 | `pgTable` + `drizzle-kit` migrations (`drizzle/` 0000+0001) |
-| Driver | `pg` + `Pool` | 8.20.0 | Singleton via `globalThis.__arenaNextJsPostgresqlPool` |
+| Driver | `pg` + `Pool` | 8.23.x | Singleton via `globalThis.__arenaNextJsPostgresqlPool` |
 | Database | PostgreSQL | 17-alpine | 8 tables, `pgcrypto`/`pg_trgm` extensions |
 | Fonts | `next/font/google` | — | `Outfit` (display) + `DM Sans` (body), `variable` + `swap` |
-| Tooling | ESLint + `tsx` | 9.39.4 / 4.23 | Flat config + `eslint-config-next/core-web-vitals` + `tsx` for scripts |
-| E2E | Playwright + `@axe-core` | 1.63 + 4.13 | 16 tests (chromium), `playwright.config.ts` prod `next start` on 3002 |
+| Tooling | ESLint + `tsx` | 9.39.5 / 4.23 | Flat config + `eslint-config-next/core-web-vitals` + `tsx` for scripts |
+| Unit | Vitest | 3.2 | 31 tests over `src/lib/{calculator,matching,rate-limit}` (`npm run test`) |
+| E2E | Playwright + `@axe-core` | 1.63 + 4.13 | 27 tests (chromium), `playwright.config.ts` prod `next start` on 3002 |
 
 ```mermaid
 flowchart TB
@@ -127,12 +129,12 @@ sequenceDiagram
   📂 scripts/                     # DB lifecycle (local-guarded)
     📄 local-db.ts / migrate.ts / seed.ts / reset.ts
 📂 drizzle/                       # Migrations (0000 8 tables + 0001 founded 8→32, meta/_journal.json)
-📂 e2e/                           # Playwright: smoke.spec.ts / seo.spec.ts / funnel.spec.ts (16 tests)
+📂 e2e/                           # Playwright: smoke / seo / funnel / assets specs (27 tests)
 📄 playwright.config.ts           # E2E config (prod next start on 3002, reuseExistingServer)
 📄 drizzle.config.ts / .json      # TS primary + JSON fallback (keep in sync, url 5434)
 📂 infrastructure/postgres/init/  # pgcrypto + pg_trgm extensions
 📂 public/brand/                  # modfii-logo-icon.svg, og-image.jpg
-📄 next.config.ts                 # images.unoptimized + 9 redirects
+📄 next.config.ts                 # images.unoptimized + 11 redirects
 📄 docker-compose.yml             # PG17 on host 5434 (home_financing_*)
 📄 .env.example                   # Template (scandihaven_* legacy names — real DB is home_financing_*)
 ```
@@ -185,12 +187,13 @@ npm run dev
 curl -s http://localhost:3000/api/health | jq
 # Expected: { "ok": true, "status": "ok", "db": true }
 
-# Lint / typecheck / build / E2E (pre-push gate — must all pass)
-npm run lint        # flat ESLint (core-web-vitals)
+# Lint / typecheck / unit / build / E2E (pre-push gate — must all pass)
+npm run lint        # flat ESLint (0 errors / 0 warnings)
 npm run lint:fix    # auto-fix
 npm run typecheck   # tsc --noEmit (skills excluded via tsconfig)
+npm run test        # vitest unit suite (31 tests)
 npm run build       # validates next.config.ts:redirects + RSC boundaries + skills excluded
-npm run e2e         # Playwright chromium (16 tests, prod next start on 3002) — needs db:setup + build first
+npm run e2e         # Playwright chromium (27 tests, prod next start on 3002) — needs build; funnel happy-path also needs db:setup
 ```
 ```bash
 # Quick E2E without manual build (Playwright starts prod server itself)
@@ -214,9 +217,9 @@ Canonical list — derived from `.env.example` + `docker-compose.yml` + `src/db/
 |----------|----------|---------|---------|
 | `DATABASE_URL` | **Yes** | Postgres connection — app **throws** if missing | `postgresql://home_financing_user:home_financing_secret@localhost:5434/home_financing_dev` |
 | `BETTER_AUTH_SECRET` | **Yes** | Auth signing (`openssl rand -base64 32`) | `…` |
-| `BETTER_AUTH_URL` | **Yes** | Canonical public origin — must be real origin in prod or auth fails `Invalid origin` | `http://localhost:3000` (dev) / `https://home-financing.jesspete.shop` (prod) |
+| `BETTER_AUTH_URL` | **Yes** | Canonical public origin — must be real origin in prod or auth fails `Invalid origin` | `http://localhost:3000` (dev) / `https://modfii.jesspete.shop` (prod) |
 | `BETTER_AUTH_TRUSTED_ORIGINS` | No | Extra trusted origins (comma-separated) | `https://admin.example` |
-| `NEXT_PUBLIC_SITE_URL` | **Yes** | `metadataBase` + OG URLs | `http://localhost:3000` / `https://home-financing.jesspete.shop` |
+| `NEXT_PUBLIC_SITE_URL` | **Yes** | `metadataBase` + OG + sitemap host | `http://localhost:3000` / `https://modfii.jesspete.shop` |
 | `CRON_SECRET` | **Yes** | Jobs runner (`openssl rand -hex 16`) | `…` |
 | `STRIPE_SECRET_KEY` | No | Stripe secret (test `sk_test_…`) | `sk_test_set-me` |
 | `STRIPE_WEBHOOK_SECRET` | No | Webhook signing | `whsec_set-me` |
@@ -238,7 +241,7 @@ Canonical list — derived from `.env.example` + `docker-compose.yml` + `src/db/
 |--------|----------|------|------------|-------------|
 | `GET` | `/api/health` | none | none | DB ping `select 1` + `ensureSeeded()` → `{ ok, status, db }` (500 on DB failure) |
 | `POST` | `/api/applications` | none | `8 / 10 min` per IP (`x-forwarded-for` → `x-real-ip` → `local`) | Body: `ApplicationInput` → `400` validate/JSON, `429` rate-limit, `500` on no-row → inserts `applications` + up to 4 `application_matches` → returns matches with `estimatedRate`/`estimatedPayment`/`matchScore` |
-| `*` | `/api/calculator` | none | none | Payment calculator (see `src/app/api/calculator/route.ts`) |
+| `POST` | `/api/calculator` | none | `60 / min` per IP | Payment calculator (see `src/app/api/calculator/route.ts`) |
 
 **`ApplicationInput` shape** (`src/lib/matching.ts`):
 ```ts
@@ -272,18 +275,21 @@ Tokens live **only** in `src/app/globals.css:@theme` — never add `tailwind.con
 
 ## Testing & Verification
 
-**E2E:** Playwright 1.63 + `@axe-core/playwright` 4.13, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), `e2e/` 16 tests (chromium) — `smoke` (home/nav/footer, get-started, calculator, health, 404, axe critical) + `seo` (sitemap absolute locs + host-rewrite 30×200, robots, title/OG) + `funnel` (POST `/api/applications` 400/200 with `x-forwarded-for` isolation, burst 429). **16/16 passing.** No `vitest`/`jest` unit files yet.
+**Unit:** Vitest 3.2 (`vitest.config.ts`, `@` alias), co-located `src/lib/{calculator,matching,rate-limit}.test.ts` — **31 tests** over the pure domains (amortization/PMI, scoring/validation, in-memory limiter). `npm run test` / `test:watch` / `test:coverage`.
+
+**E2E:** Playwright 1.63 + `@axe-core/playwright` 4.13, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), `e2e/` **27 tests** (chromium) — `smoke` (home/nav/footer, get-started, calculator, health, 404, axe critical) + `seo` (sitemap absolute locs + host-rewrite, robots, title/OG) + `funnel` (POST `/api/applications` 400/200 with `x-forwarded-for` isolation, burst 429) + `assets` (six image assets 200, no broken `<img>` on the image-led pages, `/compare/*` parity aliases resolve). With Postgres: **27/27**; without a DB: 26/27 (funnel happy-path persistence is the only DB-dependent test).
 
 **Current verification:**
 ```bash
-npm run lint       # ESLint flat config (1 pre-existing setState-in-effect)
+npm run lint       # ESLint flat config (0 errors / 0 warnings)
 npm run typecheck  # tsc --noEmit (skills excluded)
+npm run test       # vitest (31 tests)
 npm run build      # Next.js production build (requires skills excluded)
-npm run e2e        # Playwright chromium (prod build, needs db:setup)
+npm run e2e        # Playwright chromium (prod build)
 curl http://localhost:3000/api/health   # readiness probe (also triggers ensureSeeded)
 ```
 
-**To add:** `vitest` for `src/lib/calculator.ts`/`matching.ts`/`rate-limit.ts` (pure, deterministic), integration tests for `POST /api/applications` with a test Postgres.
+**To add:** integration tests for `POST /api/applications` with a test Postgres (pg-mem/testcontainers); refinance-path funnel E2E.
 
 ---
 
@@ -293,19 +299,22 @@ curl http://localhost:3000/api/health   # readiness probe (also triggers ensureS
 |-------|-------|-----|
 | `Error: DATABASE_URL is required` | Missing env | `cp .env.example .env` and set `DATABASE_URL` (see Quick Start) |
 | `ECONNREFUSED :5432` on `drizzle-kit` | Old `drizzle.config.json` dummy `5432` (pre-fix) | Now both configs default to `:5434/home_financing_dev` — keep `drizzle.config.ts/.json` in sync; runtime `DATABASE_URL` still wins |
-| `skills/` `TS2307 z-ai-web-dev-sdk` | `skills/` is operator-managed, now `exclude: [skills]` in `tsconfig.json` | No longer blocks `typecheck`/`build` — don't install `z-ai-web-dev-sdk`; don't re-include `skills` |
+| `skills/` `TS2307 z-ai-web-dev-sdk` | `skills/` is operator-managed, excluded via `tsconfig.json` + `eslint.config.mjs` | No longer blocks `typecheck`/`build`/`lint` — don't install `z-ai-web-dev-sdk`; don't re-include `skills` |
 | `ENOTFOUND home-financing.jesspete.shop` in E2E sitemap 30×200 | `sitemap.xml` uses `NEXT_PUBLIC_SITE_URL` (prod host) | `seo.spec.ts` host-rewrites loc origin → local `E2E_BASE_URL` (3002) before `request.get` |
 | `429` in funnel API tests | In-memory limiter `8/10 min` per IP persists across tests (reuseExistingServer) | Tests use isolated `x-forwarded-for: test-*` per request; burst test uses dedicated `burst-*` IP |
 | `EADDRINUSE 3000` for E2E webServer | `scandihaven` also on 3000 | Playwright now defaults to `3002` (`E2E_PORT`) for home-financing |
 | `pm2` not found | Not used | Ignore |
-| `setState-in-effect` lint error on `site-header.tsx` | `useEffect` resetting `open` on `pathname` change | Pre-existing; safe to ignore until header refactor (matches `react-hooks/set-state-in-effect` rule) |
+| `react-hooks/set-state-in-effect` lint error | Header menus were reset via a `useEffect` on `pathname` | Fixed 2026-09-11 via React's adjust-state-during-render pattern in `site-header.tsx`; `npm run lint` is now clean |
 | Auth `Invalid origin` | `BETTER_AUTH_URL` still `localhost` in prod | Set `BETTER_AUTH_URL` to canonical public origin + list extras in `BETTER_AUTH_TRUSTED_ORIGINS` |
 | `sharp` deadlock in sandbox | Image optimizer stress | Set `DISABLE_IMAGE_OPTIMIZER=1` (kept in `turbo.json:globalEnv` when used) |
+| `.env` committed / secrets leaked | `.env` was tracked before the gitignore rule existed | Untracked 2026-09-11 (`git rm --cached .env`). **Rotate `BETTER_AUTH_SECRET` + `CRON_SECRET`** — they remain in git history |
+| Sitemap/OG point at `home-financing.jesspete.shop` | `NEXT_PUBLIC_SITE_URL` env on the deploy predates the `modfii.jesspete.shop` host | Set `NEXT_PUBLIC_SITE_URL=https://modfii.jesspete.shop` in the deployment env and redeploy |
 
 ---
 
 ## Deployment
 
+- **Live:** `https://modfii.jesspete.shop/` — set `NEXT_PUBLIC_SITE_URL=https://modfii.jesspete.shop` (and `BETTER_AUTH_URL` to the same origin) in the deployment env, or sitemap.xml / OG tags keep emitting the stale `home-financing.jesspete.shop` host.
 - **Build:** `npm run build` → `.next` (no `output: "standalone"` — add in `next.config.ts` if containerizing; no static export — SSR required for API routes).
 - **DB is optional for content pages** (can render from `catalog` JSON), required for `/api/*` + `ensureSeeded()`.
 - **Redirects validated at build** — renaming a content slug without adding a `next.config.ts:redirects()` entry will produce 404.
@@ -328,7 +337,7 @@ curl http://localhost:3000/api/health   # readiness probe (also triggers ensureS
 
 - `CLAUDE.md` — full agent spec (~600 lines): 6-phase workflow, schema tables, env table, DB lifecycle (`src/scripts/*` + `drizzle/`), E2E, design-system, anti-patterns.
 - `AGENTS.md` — compact cheat-sheet (~100 lines): commands (`db:*` + `e2e`), architecture (guarded lifecycle + prod E2E), never-do list.
-- `playwright.config.ts` + `e2e/` — E2E harness (3002, 16 tests).
+- `playwright.config.ts` + `e2e/` — E2E harness (3002, 27 tests) · `vitest.config.ts` + `src/lib/*.test.ts` — unit suite (31 tests).
 - `docs/` — prompt archives & `build_error.txt` (not a deployment guide).
 
 ---
@@ -339,4 +348,4 @@ Private — `package.json:private: true`, no `LICENSE` file. Not licensed for pu
 
 ---
 
-*Last verified 2026-09-11 against `package.json` (Next 16.2.6 + tsx + playwright 1.63), `tsconfig.json` (excludes skills), `next.config.ts`, `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (founded 32), `src/scripts/*` (local-db/migrate/seed/reset), `playwright.config.ts` (3002), `e2e/*` 16 tests, `src/lib/*.ts`, `src/app/layout.tsx`, `src/app/globals.css`, `.env.example`, `.gitignore`.*
+*Last verified 2026-09-11 (post-remediation) against `package.json` (Next 16.3 + React 19.3 + Tailwind 4.3 + Vitest 3.2 + Playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills + infrastructure excluded), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (+ 31 unit tests), `public/images/*` + `public/brand/*` (all referenced assets present), `playwright.config.ts` (3002), `e2e/*` 27 tests, `src/app/page.tsx` + `src/components/*` (modfii.com parity design), `.env.example`, `.gitignore`.*

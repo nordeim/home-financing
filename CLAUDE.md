@@ -5,7 +5,7 @@ IMPORTANT: File is read fresh for every conversation. Be brief and practical.
 # ModFii — Home Financing (Prefab Mortgage Marketplace)
 
 > **Brand:** ModFii — "The #1 Prefab Home Mortgage Platform" — prefab/modular/ADU/tiny-home financing marketplace matching borrowers to prefab-specialist lenders.
-> **Stack:** Next.js 16.2.6 (App Router) + React 19.2 + TypeScript 5.9 strict + Tailwind CSS v4.1 CSS-first `@theme` + Drizzle ORM 0.45.2 + PostgreSQL 17 + `pg` + `next/font` (DM Sans + Outfit) + lucide-react + Drizzle Kit 0.31 / `tsx` 4.23 + Playwright 1.63 + `@axe-core/playwright` 4.13 (E2E, 16 tests). Package manager: npm (package-lock.json).
+> **Stack:** Next.js 16.3 (App Router) + React 19.3 + TypeScript 5.9 strict + Tailwind CSS v4.3 CSS-first `@theme` + Drizzle ORM 0.45 + PostgreSQL 17 + `pg` + `next/font` (DM Sans + Outfit) + lucide-react + Drizzle Kit 0.31 / `tsx` 4.23 + Vitest 3.2 (unit, 31 tests) + Playwright 1.63 + `@axe-core/playwright` 4.13 (E2E, 27 tests). Package manager: npm (package-lock.json).
 > **Repo:** `home-financing` (package.json name `nextjs-postgresql-template` — legacy; brand is **ModFii**). Single app, no monorepo/turborepo.
 
 ---
@@ -281,28 +281,27 @@ public/
 
 ## Testing Strategy
 
-### Current State (audit 2026-09-11, updated 2026-09-11)
+### Current State (post-remediation 2026-09-11)
 
-- **Playwright E2E installed** — `@playwright/test 1.63.0` + `@axe-core/playwright 4.13.0`, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), `e2e/` with 16 tests (chromium): `smoke.spec.ts` (home/nav/footer, get-started, calculator, health, 404, axe critical), `seo.spec.ts` (sitemap absolute locs + 30×200 via host-rewrite, robots, title, OG), `funnel.spec.ts` (POST `/api/applications` 400/200 + `x-forwarded-for` isolated, burst 429, UI no-500). **16/16 passing.**
-- **No unit runner yet** — no `vitest`/`jest`, no `*.test.*` files (`e2e/*.spec.ts` are the only specs). `npm run e2e` (`--project=chromium`) and `npm run e2e:all` (chromium+webkit) are the test scripts.
-- **Manual verification still:** `npm run lint` + `npm run typecheck` + `npm run build` + `curl /api/health`.
+- **Vitest unit runner installed** — `vitest.config.ts` (node env, `@` alias), `src/lib/{calculator,matching,rate-limit}.test.ts` — **31 tests, all passing** (`npm run test` / `test:watch` / `test:coverage`). Pure/deterministic domains only; DB-touching code stays under Playwright.
+- **Playwright E2E** — `@playwright/test 1.63.0` + `@axe-core/playwright 4.13.0`, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), **27 tests** (chromium): `smoke.spec.ts` (home/nav/footer, get-started via the "Get Started" CTA, calculator, health, 404, axe critical), `seo.spec.ts` (sitemap absolute locs + host-rewrite, robots, title, OG), `funnel.spec.ts` (POST `/api/applications` 400/200 + `x-forwarded-for` isolated, burst 429, UI no-500), `assets.spec.ts` (six referenced image assets return 200, no broken `<img>` on `/`, `/adu-financing`, `/tiny-home-financing`, and the two `/compare/*` alias redirects resolve). With Postgres: 27/27; without DB: 26/27 (funnel valid-payload is the only DB-dependent test).
+- **Manual verification still:** `npm run lint` (now 0 errors / 0 warnings) + `npm run typecheck` + `npm run build` + `curl /api/health`.
 
 ### Target Pyramid (next)
 
-- **Unit (to add)** — `src/lib/calculator.ts`, `src/lib/matching.ts`, `src/lib/rate-limit.ts` in isolation (pure functions, deterministic). Use `vitest` + factory helpers `getMockApplicationInput(overrides)`.
 - **Integration (to add)** — `POST /api/applications` with a test Postgres (or `pg-mem`/testcontainers), `ensureSeeded()` idempotency, rate-limit 429.
-- **E2E (done, expand)** — add journeys: `/calculator` compute assertions, `/modular-home-financing/*` content, more funnel permutations. Use Playwright (already present).
+- **E2E (expand)** — refinance funnel permutation, `/calculator` API compute assertions, state/manufacturer content spot-checks.
 
 ### Test Commands
 
 ```bash
-npm run lint          # eslint . (1 pre-existing setState-in-effect error)
-npm run typecheck     # tsc --noEmit (skills excluded)
-npm run build         # next build (requires skills excluded)
-npm run e2e           # playwright --project=chromium (needs db:setup + build, 16 tests)
-npm run e2e:all       # playwright chromium+webkit
-# To add:
-npm test              # vitest run (not yet installed)
+npm run test         # vitest run (31 unit tests)
+npm run test:watch   # vitest watch mode
+npm run lint         # eslint . (0 errors / 0 warnings)
+npm run typecheck    # tsc --noEmit (skills excluded)
+npm run build        # next build (requires skills excluded)
+npm run e2e          # playwright --project=chromium (needs build; funnel valid-payload also needs db:setup)
+npm run e2e:all      # playwright chromium+webkit
 ```
 
 ### Standards (when tests exist)
@@ -319,13 +318,14 @@ npm test              # vitest run (not yet installed)
 ### Linting & Formatting
 
 ```bash
-npm run lint        # eslint .  (flat config, core-web-vitals, ignores .next/out/build/next-env.d.ts)
+npm run lint        # eslint .  (flat config, core-web-vitals; 0 errors / 0 warnings)
 npm run lint:fix    # eslint . --fix
 npm run typecheck   # tsc --noEmit (skills excluded via tsconfig)
-npm run e2e         # playwright (chromium, 16 tests)
+npm run test        # vitest run (31 unit tests)
+npm run e2e         # playwright (chromium, 27 tests)
 ```
 
-- Config: `eslint.config.mjs` — `defineConfig([...nextCoreWebVitals, globalIgnores([".next/**","out/**","build/**","next-env.d.ts"])])`. Keep flat config; do not revert to `.eslintrc`.
+- Config: `eslint.config.mjs` — `defineConfig([...nextCoreWebVitals, globalIgnores([".next/**","out/**","build/**","next-env.d.ts","skills/**","infrastructure/**"])])`. Keep flat config; do not revert to `.eslintrc`. `skills/` + `infrastructure/` are operator-managed and excluded from all checks/tests/compilation.
 - No Prettier installed — formatting is via ESLint + editor. If adding Prettier, wire `eslint-config-prettier` and a `format` script; don't run two formatters that fight.
 - Before pushing: `npm run lint && npm run typecheck && npm run build` must pass.
 
@@ -458,7 +458,8 @@ App Router Server Components + Route Handlers
 - `/manufacturers` + `/manufacturers/:slug` → `/modular-home-financing/manufacturers*` (permanent).
 - `/states/:state` → `/modular-home-financing/states/:state` (permanent).
 - `/playbook` → `/learn` (temporary).
-- Add new aliases only in `next.config.ts:redirects()` — keep them tested via `npm run build` (Next validates redirects at build).
+- Source-parity aliases (permanent): `/compare/fha-vs-conventional` → `/compare/fha-vs-conventional-prefab`, `/compare/prefab-vs-site-built` → `/compare/prefab-vs-site-built-costs` — modfii.com's footer links the short slugs.
+- Add new aliases only in `next.config.ts:redirects()` — keep them tested via `npm run build` (Next validates redirects at build); the parity aliases are pinned by `e2e/assets.spec.ts`.
 
 ### Environment Variables
 
@@ -466,9 +467,9 @@ App Router Server Components + Route Handlers
 |----------|----------|---------|---------|
 | `DATABASE_URL` | Yes | Postgres 17 connection | `postgresql://home_financing_user:home_financing_secret@localhost:5434/home_financing_dev` |
 | `BETTER_AUTH_SECRET` | Yes | Auth signing secret (`openssl rand -base64 32`) | `…` (do not commit) |
-| `BETTER_AUTH_URL` | Yes | Canonical public origin — must be real origin in prod or auth breaks (`Invalid origin`) | `http://localhost:3000` (dev) / `https://home-financing.jesspete.shop` (prod) |
+| `BETTER_AUTH_URL` | Yes | Canonical public origin — must be real origin in prod or auth breaks (`Invalid origin`) | `http://localhost:3000` (dev) / `https://modfii.jesspete.shop` (prod) |
 | `BETTER_AUTH_TRUSTED_ORIGINS` | No | Extra trusted origins (comma-separated) | `https://admin.example` |
-| `NEXT_PUBLIC_SITE_URL` | Yes | `metadataBase` + OG URLs | `http://localhost:3000` / `https://home-financing.jesspete.shop` |
+| `NEXT_PUBLIC_SITE_URL` | Yes | `metadataBase` + OG + sitemap host — set to the canonical public origin (current deployment: `https://modfii.jesspete.shop/`) | `http://localhost:3000` (dev) / `https://modfii.jesspete.shop` (prod) |
 | `STRIPE_SECRET_KEY` | No (feature) | Stripe test/live secret | `sk_test_…` |
 | `STRIPE_WEBHOOK_SECRET` | No (feature) | Stripe webhook signing | `whsec_…` |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | No (feature) | Stripe publishable | `pk_test_…` |
@@ -482,13 +483,17 @@ App Router Server Components + Route Handlers
 
 > Real `.env` is gitignored. Never commit secrets. `docs/bak.env`/`**/bak.env`/`*.env.bak`/`docs/env.tgz` are also ignored after audit incidents — do not re-introduce.
 
-### Design System — ModFii Editorial
+### Design System — ModFii Editorial (mirrors modfii.com)
 
 - **Tokens:** `src/app/globals.css:@theme` — `background` (cream 40 33% 99), `foreground`/`forest`/`moss` greens (155–150 hue), `primary`/`primary-600` forest, `accent` amber 38 92% 50, `border`/`input`/`ring` muted greens, radii `sm→2xl`, shadow `lift`, ease `brand`. Extend only inside `@theme`.
 - **Typography:** `Outfit` (display/headings, `--font-outfit`) + `DM Sans` (body, `--font-dm-sans`) via `next/font/google` with `variable` + `display: swap`. Apply via `font-sans` / `font-display`.
+- **Header:** fixed `h-16`; on `/` it sits transparent with light text over the dark hero until ~12px of scroll, then transitions to `bg-background/90` + border; interior pages render light from first paint. CTA is a forest "Get Started" pill (never amber).
+- **PageHero (`src/components/page-shell.tsx`):** centered interior hero — photo background (one of the five `/images/*.jpg`) under a forest overlay, star eyebrow pill, optional amber `highlight` title line, CTA pair, glass stat chips; `Breadcrumbs` centered inside. All `GuideScreen` pages + learn/glossary/manufacturers flow through it.
+- **Homepage (`src/app/page.tsx`)** mirrors modfii.com section-for-section: photo hero + glass stats card, manufacturer wordmark strip, "Modular & Prefab Home Loans" intro (4 cards + loan chips), problem/solution (red vs green tinted cards with icons), green-mortgage photo band, 3-step icons + ghost numerals, 5-star testimonials with savings ledger, "Our Standards" trio, FAQ accordions, dotted-pattern closing CTA.
+- **Logo:** `public/brand/modfii-logo-icon.svg` is the canonical rotated-square mark used by modfii.com — don't revert to the legacy MD monogram.
 - **Layout rhythm:** `Container` max `1400px`, `px-4 md:px-8`, header `h-16` fixed + `backdrop-blur-md` + `border-b`.
-- **Iconography:** `lucide-react` only. No emoji-as-icon.
-- **Anti-generic guard:** no purple gradients, no Inter/Roboto fallback without hierarchy, no undifferentiated card grids — editorial intent on every section (see `src/app/page.tsx` PROBLEMS/FIXES/STEPS for the current voice model).
+- **Iconography:** `lucide-react` only (v1.44 has no brand icons — wrap inline SVGs in a local component, see `LinkedInIcon` in `site-footer.tsx`).
+- **Anti-generic guard:** no purple gradients, no Inter/Roboto fallback without hierarchy, no undifferentiated card grids — editorial intent on every section.
 
 ---
 
@@ -534,7 +539,7 @@ This project is intentionally static-site-hostable with an optional Postgres bac
 
 ## Continuous Improvement
 
-- **When you add unit tests:** install `vitest`, add `test`/`test:watch`/`test:coverage` scripts (Playwright E2E already present — 16 tests). Add `sitemap`/health smoke first (done).
+- **Unit tests:** vitest is installed — `src/lib/*.test.ts` co-located, `npm run test` (31 tests). Keep unit tests on pure domains; DB paths belong to Playwright E2E.
 - **When content grows:** consider moving `src/data/*.json` to Content Collections or a headless CMS — but keep the file-backed seed pattern until the migration is ADR'd and redirect-tested.
 - **When DB load grows:** add `pgBouncer` or Drizzle `migrate` workflow (`drizzle-kit generate` + `drizzle-kit migrate`) instead of ad-hoc `push`.
 - **After each task:** run `npm run lint && npm run typecheck`, reflect on what broke, and update this file if the workflow changed.
@@ -561,9 +566,9 @@ This project is intentionally static-site-hostable with an optional Postgres bac
 | 14 | Continuous Improvement | No | ✓ |
 | 15 | Frontmatter | No | ✓ (`IMPORTANT` banner) |
 
-*Framework checks:* Next.js App Router ✓, `next/font` ✓, Tailwind v4 `@theme` ✓, Drizzle + `pg` Pool singleton ✓, `next.config.ts:redirects` ✓, `images.unoptimized` documented ✓, `force-dynamic` API routes ✓, Playwright E2E (prod build, 3002) ✓, Drizzle migrate/seed guarded ✓.
-*Commands verified against `package.json:scripts`* (`dev`, `build`, `start`, `lint`, `lint:fix`, `typecheck`, `e2e`, `e2e:all`, `db:generate/migrate/seed/setup/reset`) + `drizzle.config.ts`/`.json` + `docker-compose.yml:5434`. Missing `test`/`format` intentionally flagged (vitest not yet).
+*Framework checks:* Next.js App Router ✓, `next/font` ✓, Tailwind v4 `@theme` ✓, Drizzle + `pg` Pool singleton ✓, `next.config.ts:redirects` ✓, `images.unoptimized` documented ✓, `force-dynamic` API routes ✓, Playwright E2E (prod build, 3002) ✓, Drizzle migrate/seed guarded ✓, Vitest unit suite ✓.
+*Commands verified against `package.json:scripts`* (`dev`, `build`, `start`, `lint`, `lint:fix`, `typecheck`, `test`, `test:watch`, `test:coverage`, `e2e`, `e2e:all`, `db:generate/migrate/seed/setup/reset`) + `drizzle.config.ts`/`.json` + `docker-compose.yml:5434`.
 
 ---
 
-*Last generated 2026-09-11 via `claude-md:create` (Steps 1→2→4→5) + `framework-templates:get` (Next.js); updated 2026-09-11 with DB lifecycle (tsx + drizzle.config.ts/json + src/scripts/* + drizzle/ 0000-0001, schema founded 32) and Playwright E2E (1.63 + @axe-core, playwright.config.ts, e2e/* 16 tests, tsconfig excludes skills). Source of truth: package.json, tsconfig, next.config.ts, eslint.config.mjs, drizzle.config.ts/json, docker-compose.yml:5434, src/db, src/lib, src/scripts, e2e. Preserve team-specific conventions when updating.*
+*Last generated 2026-09-11 via `claude-md:create`; updated 2026-09-11 (remediation pass): untracked `.env` (real secrets had been committed in `d572d73` — rotate `BETTER_AUTH_SECRET`/`CRON_SECRET`), eslint ignores `skills/**`+`infrastructure/**` (lint 0/0), vitest 31 unit tests, e2e 27 tests incl. `assets.spec.ts` regression guards, six missing images added (`public/images/*.jpg` + `public/brand/og-image.jpg`), canonical logo SVG adopted, compare alias redirects, header/home/footer/PageHero/get-started restyled to mirror modfii.com, `.env.example` moved to `home_financing_*:5434`. Source of truth: package.json, tsconfig, next.config.ts, eslint.config.mjs, drizzle.config.ts/json, docker-compose.yml:5434, src/db, src/lib, src/scripts, e2e, vitest.config.ts. Preserve team-specific conventions when updating.*

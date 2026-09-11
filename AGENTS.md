@@ -28,16 +28,18 @@
 | `npm run lint` | ESLint flat config (`eslint.config.mjs` + `core-web-vitals`) |
 | `npm run lint:fix` | ESLint auto-fix |
 | `npm run typecheck` | `tsc --noEmit` (`skills` excluded via `tsconfig`) |
-| `npm run e2e` | Playwright E2E chromium (prod `next start` on 3002, 16 tests) |
+| `npm run e2e` | Playwright E2E chromium (prod `next start` on 3002, 27 tests) |
+| `npm run test` | Vitest unit suite (31 tests — calculator / matching / rate-limit) |
 | `npm run e2e:all` | Playwright both projects (chromium+webkit) |
 | `curl http://localhost:3000/api/health` | Readiness — pings DB + triggers `ensureSeeded()` |
 | `docker compose down -v` | **Destructive** — wipes `home_financing_data` volume |
 
-**Order that matters:** `db:setup` → `lint` → `typecheck` → `build` → `e2e` before PR. No `test`/`format` scripts yet (vitest not installed).
+**Order that matters:** `db:setup` → `lint` → `typecheck` → `test` → `build` → `e2e` before PR.
 
 ## Architecture — what an agent will miss
 
 - **File-backed seeds are the write path.** Edit `src/data/*.json` + `src/lib/lenders.ts`, not Postgres rows. `ensureSeeded()` is idempotent via `globalThis.__modfiiSeedPromise` + `count(lenders) > 0` guard + `onConflictDoNothing`. Called in `/api/health` and `/api/applications` and via `npm run db:seed` (`src/scripts/seed.ts`) — reuse, don't duplicate.
+- **Visual parity with modfii.com is a design contract.** The header sits transparent (light text) over the homepage hero until scroll; interior heroes flow through `PageHero` (`src/components/page-shell.tsx`) — centered, photo-backed, star eyebrow pill, optional amber `highlight` title line, CTA pair, glass stat chips. Don't reintroduce left-aligned gradient heroes or an amber header CTA (it is a forest "Get Started" pill).
 - **Pool singleton.** Import `{ db, pool }` only from `@/db` (`src/db/index.ts`). `globalThis.__arenaNextJsPostgresqlPool` prevents HMR pool leaks. Never `new Pool()` inline.
 - **Server Components by default.** `"use client"` only for `site-header`, `prequal-form`, `calculator-app`. Never import a Server Component into a Client Component.
 - **`force-dynamic` only where DB is touched.** API routes (`src/app/api/*/route.ts`) have `export const dynamic = "force-dynamic"`. Content pages can render from `catalog` without DB.
@@ -50,17 +52,17 @@
 
 - **Tailwind v4 CSS-first — no `tailwind.config.*`.** All tokens in `src/app/globals.css:@theme` (`--color-forest`, `--color-accent`, `--color-cream`, radii, shadows). Extend only there; no arbitrary `text-[13px]`.
 - **`next.config.ts:images.unoptimized: true`** is intentional (no `sharp` in deploy). Don't re-enable without infra.
-- **Redirects live in `next.config.ts:redirects()`:** `/loans/*` → `/modular-home-financing/loan-options/*`, `/manufacturers` → `/modular-home-financing/manufacturers`, `/states/:state` → `/modular-home-financing/states/:state`, `/get-started-v2` → `/get-started` (temp), `/playbook` → `/learn`. Add new aliases there only.
+- **Redirects live in `next.config.ts:redirects()`:** `/loans/*` → `/modular-home-financing/loan-options/*`, `/manufacturers` → `/modular-home-financing/manufacturers`, `/states/:state` → `/modular-home-financing/states/:state`, `/get-started-v2` → `/get-started` (temp), `/playbook` → `/learn`, plus source-parity aliases `/compare/fha-vs-conventional` → `…-prefab` and `/compare/prefab-vs-site-built` → `…-costs`. Add new aliases there only.
 - **`drizzle.config.ts` (primary) + `.json` fallback** — both `out: ./drizzle`, `strict/verbose`, `url: home_financing_user:secret@localhost:5434/home_financing_dev` (runtime `DATABASE_URL` wins). Keep them in sync after schema edits (`npm run db:generate` writes to `drizzle/`).
-- **`tsconfig.json:strict:true`, `skipLibCheck:true`, `isolatedModules:true`, `exclude: [node_modules,skills]`.** `skills/` is operator-managed and now excluded from `typecheck`/`build` — don't add `z-ai-web-dev-sdk`; don't re-include `skills`.
+- **`tsconfig.json:strict:true`, `skipLibCheck:true`, `isolatedModules:true`, `exclude: [node_modules,skills]`.** `eslint.config.mjs` also ignores `skills/**` + `infrastructure/**` — operator-managed folders stay out of checks/tests/compilation. Don't add `z-ai-web-dev-sdk`; don't re-include `skills`.
 - **Rate limiter is in-memory `Map`.** `8 / 10 min` per IP on `POST /api/applications` (`clientKey` via `x-forwarded-for`/`x-real-ip`). Under-limits on multi-instance — migrate to Redis if scaling.
-- **Playwright E2E (no unit yet).** 16 tests in `e2e/` (`smoke`/`seo`/`funnel`, chromium via `npm run e2e`). No `*.test.*` unit files, no `vitest`/`jest` yet. Verify via `lint + typecheck + build + e2e + curl /api/health`.
+- **Tests: Vitest unit + Playwright E2E.** 31 unit tests in `src/lib/*.test.ts` (`npm run test`) + 27 E2E tests in `e2e/` (`smoke`/`seo`/`funnel`/`assets`, chromium via `npm run e2e`). `assets.spec.ts` guards the six image assets + two `/compare/*` aliases (2026-09-11 incidents). The funnel valid-payload E2E needs Postgres; the rest run DB-less.
 - **Kebab route folders** (`modular-home-financing`, `construction-loans`), `kebab-case.json` data, `kebab-case.tsx` components (grandfathered; new components prefer `PascalCase.tsx` — don't mass-rename).
 
 ## Environment & Services
 
-- **Required env:** `DATABASE_URL` (`home_financing_*` on `:5434` — see `docker-compose.yml`; `.env.example` still has legacy `scandihaven_*` placeholders), `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (must be canonical public origin in prod — `localhost` breaks with `Invalid origin`), `NEXT_PUBLIC_SITE_URL` (for `metadataBase`, sitemap uses this — hence host-rewrite in `seo.spec.ts`), `CRON_SECRET`.
-- **Never commit:** `.env`, `.env.*.local`, `docs/bak.env`, `**/bak.env`, `*.env.bak`, `docs/env.tgz`, `ssh-key.txt` — all `.gitignore`d after 2026-09 audits.
+- **Required env:** `DATABASE_URL` (`home_financing_*` on `:5434` — matches `docker-compose.yml` **and** `.env.example` now), `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (must be canonical public origin in prod — `localhost` breaks with `Invalid origin`), `NEXT_PUBLIC_SITE_URL` (for `metadataBase` + sitemap — **current deployment is `https://modfii.jesspete.shop/`**; a wrong value makes sitemap/OG emit the wrong host), `CRON_SECRET`.
+- **Never commit:** `.env`, `.env.*.local`, `docs/bak.env`, `**/bak.env`, `*.env.bak`, `docs/env.tgz`, `ssh-key.txt` — all `.gitignore`d. `.env` was untracked on 2026-09-11 after being found committed with real secrets (`d572d73`) — **rotate `BETTER_AUTH_SECRET` + `CRON_SECRET`**: they remain in git history.
 
 ## Never Do
 
@@ -78,4 +80,4 @@
 - Validation: `src/lib/matching.ts:validateApplication()` (ZIP `^\d{5}$`, phone digits ≥10, `EMAIL_RE`).
 - Math: `src/lib/calculator.ts:PMI_ANNUAL_RATE = 0.0065`, site-built `1.15×`.
 
-*Last verified 2026-09-11 against `package.json` (tsx + playwright), `tsconfig.json` (excludes skills), `next.config.ts`, `drizzle.config.ts/json` (5434), `docker-compose.yml` (home_financing_*), `src/db` (founded 32), `src/scripts/*`, `playwright.config.ts` (3002), `e2e/*` 16 tests, `src/lib`, `src/app`, `.gitignore`.*
+*Last verified 2026-09-11 (post-remediation) against `package.json` (next ^16.3.4, react ^19.3.0, tailwind ^4.3.3, vitest ^3.2), `eslint.config.mjs` (skills + infrastructure ignored), `tsconfig.json`, `next.config.ts` (11 redirects), `drizzle.config.ts/json` (5434), `docker-compose.yml`, `src/db` (8 tables), `src/lib` (+ `*.test.ts`), `public/images/*` + `public/brand/og-image.jpg` (every referenced asset exists), `playwright.config.ts` (3002), `e2e/*` 27 tests, `vitest.config.ts`.*
