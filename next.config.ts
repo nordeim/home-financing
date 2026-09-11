@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
       { source: "/states/:state", destination: "/modular-home-financing/states/:state", permanent: true },
       { source: "/get-started-v2", destination: "/get-started", permanent: false },
       { source: "/playbook", destination: "/learn", permanent: false },
+      // modfii.com footer links these short compare slugs; the canonical pages
+      // here use the -prefab / -costs variants (parity aliases, permanent).
+      { source: "/compare/fha-vs-conventional", destination: "/compare/fha-vs-conventional-prefab", permanent: true },
+      { source: "/compare/prefab-vs-site-built", destination: "/compare/prefab-vs-site-built-costs", permanent: true },
     ];
   },
 };
