@@ -3,7 +3,7 @@
 **Classification:** Internal Engineering Reference
 **Status:** DEFINITIVE, PRODUCTION-LOCKED BLUEPRINT
 **Companion Documents:** `CLAUDE.md` (agent spec) · `AGENTS.md` (compact cheat-sheet) · `README.md` (operator guide)
-**Last Updated:** 2026-09-13 (v1.3 — remediation pass 4: source-exact hero + guide-hero system + counts 37 unit / 61 E2E per project; `turbo.json` doc drift resolved)
+**Last Updated:** 2026-09-12 (v1.4 — remediation pass 5: security headers app-emitted, funnel JSON-500 contract, source-exact header/logo/buttons/radius, heading hierarchy + intro eyebrow restored, guide content depth, counts 37 unit / 81 E2E per project)
 **Audience:** Senior Engineers, Tech Leads, DevOps, Onboarding Engineers, and AI Coding Agents
 **Rule:** Every architectural decision in this document traces to a specific rationale. Nothing is here "because it's popular."
 
@@ -75,7 +75,7 @@ Every version is pinned from `package.json` / `docker-compose.yml` / `drizzle.co
 | Build Scripting | `tsx` | `^4.23.13` | Runs `src/scripts/migrate.ts/seed.ts/reset.ts` as ESM without compile step. |
 | Linting | ESLint + `eslint-config-next` | `^9.39.5` + `^16.3.4` (`core-web-vitals`) | Flat config (`eslint.config.mjs` + `defineConfig`), `globalIgnores([.next,out,build,next-env,skills,infrastructure])` — operator-managed folders excluded. |
 | Unit Testing | Vitest | `^3.2.7` (`vitest/config`, `environment: node`) | Co-located `src/lib/*.test.ts` on pure domains only (calculator 11 + matching 13 + rate-limit 7 + markdown 6 = 37); DB paths stay under Playwright. `include: src/**/*.test.ts`. |
-| E2E Testing | Playwright + `@axe-core/playwright` | `^1.63.0` + `^4.13.0` | Prod `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `timeout: 30000/5000`, projects `chromium + webkit`, `x-forwarded-for` isolation for rate-limit tests. 61 per project — 47 declarations + data-driven loops (122 with webkit, 61/61 with DB, 60/61 DB-less). |
+| E2E Testing | Playwright + `@axe-core/playwright` | `^1.63.0` + `^4.13.0` | Prod `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `timeout: 30000/5000`, projects `chromium + webkit`, `x-forwarded-for` isolation for rate-limit tests. 81 per project — 52 declarations + data-driven loops (162 with webkit, 81/81 with DB, 80/81 DB-less). |
 | Package Manager | npm | `package-lock.json` (not pnpm) | Single-app, no monorepo/turborepo. `npm install` path; `db:setup → lint → typecheck → test → build → e2e` is the pre-PR gate. |
 
 ### 1.3 Architecture Decision Records (ADRs)
@@ -123,8 +123,8 @@ Every version is pinned from `package.json` / `docker-compose.yml` / `drizzle.co
 #### ADR-006: Vitest Unit (37) + Playwright Prod-Build E2E (55) — Pure vs. DB Boundary
 
 - **Context:** Logic (PMI, amortization, scoring, validation, limiter) is deterministic and pure; persistence and sitemap + alias routing are DB/deployment-shaped and need prod-build parity (dev HMR diverged from prod in prior `scandihaven` audit).
-- **Decision:** Vitest `3.2.7` (node env, `@` alias, `include: src/**/*.test.ts`) for `src/lib/{calculator,matching,rate-limit,markdown}.test.ts` — **37 tests** (calculator 11 + matching 13 + rate-limit 7 + markdown 6) on pure domains only — markdown pins the 2026-09-11 H4/OOM regression (both killing articles). Playwright `1.63.0` + `@axe-core/playwright 4.13.0` for `e2e/{smoke,seo,funnel,assets,parity}.spec.ts` — **61 per project** (47 declarations + data-driven loops: +14 asset URLs, +2 H4 articles; 122 with webkit) running `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `expect:5000`. `assets.spec.ts` pins the two `2026-09-11` incidents: 14 image assets `200` (6 heroes/OG + 5 wordmarks + 3 avatars) + 3 broken-img checks + 2 `/compare/*` parity aliases resolve. `parity.spec.ts` pins H4 OOM + wordmarks/avatars/learn-hub/calculator/footer/wizard + the pass-3 live-source pins + the pass-4 source-exact pins (hero overlay recipe/bottom fade/no hero-grid, hub Last-Updated + truth callout + dual CTA + 4 chips, FHA/VA highlight + dual CTA + author strip, learn no-"read read", calculator pill + middle crumb). Funnel valid-payload E2E needs Postgres (migrated+seeded); the other 60 run DB-less.
-- **Rationale:** `lint (0/0)` + `typecheck` + `test (37/37)` is the fast local gate; `build (43/43)` validates redirects + RSC boundaries + `skills` exclusion; `e2e 61/61` on the shipped artifact catches what `dev` HMR hides (assets 19 runtime + parity 26 runtime incl. the pass-3 + pass-4 live-source pins).
+- **Decision:** Vitest `3.2.7` (node env, `@` alias, `include: src/**/*.test.ts`) for `src/lib/{calculator,matching,rate-limit,markdown}.test.ts` — **37 tests** (calculator 11 + matching 13 + rate-limit 7 + markdown 6) on pure domains only — markdown pins the 2026-09-11 H4/OOM regression (both killing articles). Playwright `1.63.0` + `@axe-core/playwright 4.13.0` for `e2e/{smoke,seo,funnel,assets,parity}.spec.ts` — **81 per project** (52 declarations + data-driven loops: +14 asset URLs, +2 H4 articles; 162 with webkit) running `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `expect:5000`. `assets.spec.ts` pins the two `2026-09-11` incidents: 14 image assets `200` (6 heroes/OG + 5 wordmarks + 3 avatars) + 3 broken-img checks + 2 `/compare/*` parity aliases resolve. `parity.spec.ts` pins H4 OOM + wordmarks/avatars/learn-hub/calculator/footer/wizard + the pass-3 live-source pins + the pass-4 source-exact pins (hero overlay recipe/bottom fade/no hero-grid, hub Last-Updated + truth callout + dual CTA + 4 chips, FHA/VA highlight + dual CTA + author strip, learn no-"read read", calculator pill + middle crumb). Funnel valid-payload E2E needs Postgres (migrated+seeded); the other 80 run DB-less.
+- **Rationale:** `lint (0/0)` + `typecheck` + `test (37/37)` is the fast local gate; `build (43/43)` validates redirects + RSC boundaries + `skills` exclusion; `e2e 81/81` on the shipped artifact catches what `dev` HMR hides (assets 19 runtime + parity 44 runtime incl. the pass-3 + pass-4 live-source pins).
 - **Consequences:** Positive — `build` + `e2e` catch alias 404s and broken `<img>` before deploy. Negative — `reuseExistingServer:true` requires `x-forwarded-for` isolation for rate-limit tests; E2E needs `E2E_PORT=3002` because `3000` is occupied by the sibling `scandihaven` repo in this dev host.
 - **Alternatives Rejected:** Unit-only (would miss alias/image regressions), E2E on `dev` (HMR drift), `pg-mem`/testcontainers for API integration (not yet — documented as next).
 
@@ -752,7 +752,7 @@ Single source: `src/app/globals.css:@theme`. Extend only there — no `text-[13p
 | S-10 | Public funnel returns JSON errors, never HTML error pages | `Response.json({ error }, { status })` with `400/429/500`; success `200 { id, matches }` | Error-page HTML would break `prequal-form.tsx` inline alert |
 | S-11 | Prod `images.unoptimized:true` is intentional | `next.config.ts` documented; `DISABLE_IMAGE_OPTIMIZER` sandbox guard in `ENV` | Re-enabling without infra causes `sharp` deadlock |
 
-Live header evidence (from `curl -v http://localhost:3002/api/health`):
+**Header contract — emitted by the app since pass 5 (2026-09-12):** `next.config.ts:headers()` now ships the full set on every route; verified live on the local prod server and pinned by `e2e/smoke.spec.ts` (CSP incl. `frame-ancestors 'none'`, XFO DENY, nosniff, referrer-policy, permissions-policy; HSTS also set for HTTPS deployments):
 
 ```
 content-security-policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://static.cloudflareinsights.com;
@@ -818,13 +818,13 @@ No queue, worker, or async pipeline is running in this iteration. `CRON_SECRET` 
 |----------|-----------|-------|-------|----------|----|---------|
 | Unit — pure domains | Vitest `3.2.7` (`node`) | 4 | 37 | `src/lib/calculator.test.ts` (11), `matching.test.ts` (13), `rate-limit.test.ts` (7), `markdown.test.ts` (6) | None | `npm run test` / `test:watch` / `test:coverage` |
 | E2E — smoke | Playwright `1.63.0` + `@axe-core/playwright 4.13.0` | 1 | 7 | `e2e/smoke.spec.ts` | Optional (`health` tolerates `200|500`) | `npm run e2e` |
-| E2E — SEO | Playwright | 1 | 6 | `e2e/seo.spec.ts` | Optional | (same) |
+| E2E — SEO | Playwright | 1 | 5 | `e2e/seo.spec.ts` | Optional | (same) |
 | E2E — funnel | Playwright | 1 | 4 | `e2e/funnel.spec.ts` | **Required** for valid-payload 200 path (other 3 run DB-less) | (same) |
 | E2E — assets | Playwright | 1 | 19 (14 looped) | `e2e/assets.spec.ts` | None | (same) |
-| E2E — parity | Playwright | 1 | 19 | `e2e/parity.spec.ts` | **Required** for H4 OOM / wordmarks+avatars/learn-hub/calculator/footer/wizard (other 54 DB-less) | (same) |
-| **Total** | Vitest + Playwright | 8 | **92 (37+55)** | `src/lib/*.test.ts` + `e2e/*.spec.ts` | See notes | `npm run db:setup → lint → typecheck → test → build → e2e` |
+| E2E — parity | Playwright | 1 | 26 (25 declarations + 2 H4-article loop) | `e2e/parity.spec.ts` | **Required** for H4 OOM / wordmarks+avatars/learn-hub/calculator/footer/wizard (other 60 DB-less) | (same) |
+| **Total** | Vitest + Playwright | 8 | **98 (37+81)** | `src/lib/*.test.ts` + `e2e/*.spec.ts` | See notes | `npm run db:setup → lint → typecheck → test → build → e2e` |
 
-With Postgres: **61/61** E2E (chromium, 47 declarations + data-driven loops). Without DB: **60/61** (funnel valid-payload is the only DB-dependent test — expects `200` with `application_matches` persistence; other 60 verify static/SEO/assets/parity). `e2e:all` runs `chromium + webkit` (122 total).
+With Postgres: **81/81** E2E (chromium, 52 declarations + data-driven loops). Without DB: **80/81** (funnel valid-payload is the only DB-dependent test — expects `200` with `application_matches` persistence; other 60 verify static/SEO/assets/parity). `e2e:all` runs `chromium + webkit` (162 total).
 
 ### 8.2 Test Patterns
 
@@ -857,7 +857,7 @@ npm run lint          # ESLint flat (0 errors / 0 warnings) — skills/infrastru
 npm run typecheck     # tsc --noEmit (skills excluded)
 npm run test          # vitest 37/37 (11+13+7+6, incl. markdown H4/OOM regression)
 npm run build         # next build — validates redirects + RSC boundaries + skills excluded
-npm run e2e           # playwright chromium 61/61 per project (47 declarations + data-driven loops; valid-payload needs DB)
+npm run e2e           # playwright chromium 81/81 per project (52 declarations + data-driven loops; valid-payload needs DB)
 curl -s http://localhost:3002/api/health | jq  # { ok:true, status:ok, db:true }
 curl -s http://localhost:3002/sitemap.xml | grep -c "<loc>"  # 152
 ```
@@ -875,26 +875,27 @@ npm run build         # next build → .next (no output: "standalone" — add in
 npm start             # next start (default 3000; prod E2E uses 3002 via E2E_PORT)
 ```
 
-**Build artifact verified 2026-09-11:**
+**Build artifact verified 2026-09-12 (pass-5 clean-clone re-run):**
 
 ```
 Route (app)
-┌ ○ /  (+ 35 static: /about, /adu-financing, /calculator, /compare/*, /construction-loans/*, /modular-home-financing/**, /glossary, /resources, /robots.txt, /sitemap.xml, /terms, /tiny-home-financing)
+┌ ○ /  (+ 41 static: /about, /adu-financing, /calculator, /compare/*, /construction-loans/*, /modular-home-financing/**, /editorial-policy, /corrections, /glossary, /resources, /robots.txt, /sitemap.xml, /terms, /tiny-home-financing)
 ├ ƒ /api/applications
 ├ ƒ /api/calculator
 ├ ƒ /api/health
 ├ ƒ /authors/[authorSlug]
+├ ƒ /debug-error-probe        # deliberate error-boundary probe (error.tsx catches → recovery UI; live deploy returns 200)
 ├ ƒ /learn/[slug]
 ├ ƒ /modular-home-financing/manufacturers/[slug]
 ├ ƒ /modular-home-financing/states/[state]
 └ ○ /_not-found
 
-○ (Static)  prerendered as static content
-ƒ (Dynamic) server-rendered on demand
+○ (Static)  prerendered as static content — 42 routes
+ƒ (Dynamic) server-rendered on demand — 8 routes
 
-✓ Running next.config.ts took 83ms (redirects validated)
-✓ Compiled successfully in 538ms
-✓ Generating static pages using 3 workers (43/43) in 957ms
+✓ Running next.config.ts took 27ms (redirects validated)
+✓ Compiled successfully
+✓ Generating static pages (43/43)
 ```
 
 ### 9.2 Environment Variables
@@ -945,7 +946,7 @@ Canonical from `.env.example` + `docker-compose.yml` + `src/db/index.ts` + `src/
 | DB provision | `docker compose up -d` + `npm run db:setup` (CI) | `migrate` + `seed` idempotent; `docker compose logs -f postgres` shows `pgcrypto: t` |
 | Quality | `npm run lint` (flat + `core-web-vitals`) + `npm run typecheck` + `npm run test` | `lint 0/0`, `typecheck` pass (`skills` excluded), `test 37/37 (11+13+7+6)` |
 | Build | `npm run build` | `43/43` pages, redirects validated, RSC boundaries proven |
-| E2E | `npm run e2e` (prod `next start` on `3002`) + `npm run e2e:all` (chromium+webkit) | `61/61` (with DB, per project) / `60/61` (without DB, funnel valid-payload blocked) |
+| E2E | `npm run e2e` (prod `next start` on `3002`) + `npm run e2e:all` (chromium+webkit) | `81/81` (with DB, per project) / `80/81` (without DB, funnel valid-payload blocked) |
 | Readiness | `curl http://localhost:3002/api/health` | `{ ok:true, status:ok, db:true }` |
 | Deploy | Vercel / Node SSR (no `standalone` yet — add `output:"standalone"` in `next.config.ts` if containerizing) | `NEXT_PUBLIC_SITE_URL` + `BETTER_AUTH_URL` must be `https://modfii.jesspete.shop` or sitemap/OG/auth break |
 
@@ -1062,15 +1063,17 @@ DATABASE_URL=postgresql://user:pass@localhost:5432/home_financing_dev npm run de
 | Priority | Issue | Impact | Status |
 |----------|-------|--------|--------|
 | **HIGH** | `.env` with real `BETTER_AUTH_SECRET`/`CRON_SECRET` committed in `d572d73` remains in git history | Secrets retrievable via `git show d572d73:.env`; `BETTER_AUTH_SECRET=8KxGM…` / `CRON_SECRET=ec16d8…` must be considered compromised | **Mitigated in workspace** — current `.env` has fresh `ec16d809a08c91d24dbfdab7e7be4a99` for `CRON_SECRET` and prod `https://modfii.jesspete.shop`; **Open** — run `filter-repo`/BFG and rotate on deploy if history-exposed values were ever valid prod secrets |
+| **HIGH** | ~~No security headers emitted by the app itself~~ | Clickjacking, MIME-sniffing, protocol-downgrade exposure | **Resolved 2026-09-12 (pass 5)** — `next.config.ts:headers()` emits CSP/XFO/nosniff/referrer-policy/permissions-policy + HSTS on every route; pinned by `e2e/smoke.spec.ts`. NOTE: the live deploy still needs a redeploy to pick this up |
+| **MEDIUM** | ~~`POST /api/applications` empty non-JSON 500 on DB outage~~ | API consumers couldn't distinguish DB outage | **Resolved 2026-09-12 (pass 5)** — persistence block wrapped in try/catch → `Response.json({ error }, { status: 500 })`; pinned by `funnel.spec.ts` + verified via `scripts/verify-db-outage.sh` (500 + `application/json` + error body) |
 | **MEDIUM** | In-memory `Map` rate limiter resets on restart, under-limits on multi-instance | Burst burst-locked assumption breaks past single deploy | **Accepted** — documented; migrate to Redis/Upstash before scaling |
-| **MEDIUM** | `README.md` troubleshooting row says "`.env.example` still contains legacy `scandihaven_*` placeholders" — now actually `home_financing_*` | Doc stale sentence could mislead onboarding | **Open** — update that row to canonical `home_financing_*` |
+| **MEDIUM** | `README.md` troubleshooting row said "`.env.example` still contains legacy `scandihaven_*` placeholders" — now actually `home_financing_*` | Doc stale sentence could mislead onboarding | **Resolved** — README row documents the canonical `home_financing_*` `:5434` values; `.env.example` matches `docker-compose.yml` |
 | **MEDIUM** | `CLAUDE.md` references `turbo.json:globalEnv` for `DISABLE_IMAGE_OPTIMIZER` but no `turbo.json` exists | Minor contract drift | **Resolved 2026-09-13 (pass 4)** — claims reworded across CLAUDE.md/README.md/PAD/.env.example/SKILL to state no `turbo.json` exists; revisit only if Turborepo is introduced |
 | **LOW** | `skills/` is operator-managed, `tsconfig` + `eslint` already exclude it, but `**/.pytest_cache/__pycache__/.mypy_cache` under `skills/` re-added in PR can inflate repo | History shows `8aacd13` committed 17 cache files | **Mitigated** — `*.pyc`, `**/.venv`, `__pycache__`, `.mypy_cache` now ignored; PR review must reject cache files |
 | **LOW** | Many route segments that call `ensureSeeded()`/`db` lack `loading.tsx`/`error.tsx` | Missing boundary degrades graceful degradation | **Open** — add incrementally per `CLAUDE.md` file → serve the material or edit a separate technical section |
 | **LOW** | `CRON_SECRET` and `STRIPE_*` / `RESEND_API_KEY` not yet consumed in code (log transport only) | Env is over-specified relative to implemented features | **Open** — wire when jobs/checkout/email ships; until then they are reserved keys |
 | **LOW** | `pm run dev` on `:3000` collides with sibling `scandihaven` on same dev host | Requires `E2E_PORT=3002` / `next dev --port 3002` | **Accepted** — `playwright.config.ts` defaults to `3002`; document in `AGENTS.md` |
 
-No `CRITICAL` open issues. `lint 0/0`, `typecheck` pass, `37/37` unit (11+13+7+6), `61/61` E2E per project (60/61 DB-less), `build 43/43`, live probes green as of `2026-09-13` (pass 4: source-exact home hero, hub truth callout + Last-Updated, loan-page source heroes + author strips, learn read-duplication fix, calculator pill + blue tax segment, intro-eyebrow removal — see `docs/REMEDIATION_PLAN_pass4.md`).
+No `CRITICAL` open issues. `lint 0/0`, `typecheck` pass, `37/37` unit (11+13+7+6), `81/81` E2E per project (80/81 DB-less), `build 43/43`, live probes green as of `2026-09-13` (pass 4: source-exact home hero, hub truth callout + Last-Updated, loan-page source heroes + author strips, learn read-duplication fix, calculator pill + blue tax segment, intro-eyebrow removal — see `docs/REMEDIATION_PLAN_pass4.md`).
 
 ---
 
@@ -1107,7 +1110,7 @@ No `CRITICAL` open issues. `lint 0/0`, `typecheck` pass, `37/37` unit (11+13+7+6
 | `src/components/learn-explorer.tsx` | 379 | Learn hub client island (search/filter/Featured/Interactive Tools/newsletter, reuses `calculatePayment()`) |
 | `src/app/loading.tsx` + `error.tsx` | ~20+30 | Global RSC loading skeleton + error boundary (`"use client"` reset) — fallback for 7 dynamic routes |
 | `playwright.config.ts` | ~40 | Prod `next start` 3002, `reuseExistingServer:true`, chromium+webkit |
-| `e2e/{smoke,seo,funnel,assets,parity}.spec.ts` | 63/77/99/74/147 | 55 E2E tests per project (smoke 7, seo 6, funnel 4, assets 19, parity 19) incl. H4-OOM + alias/image regression + pass-3 live-source parity guards |
+| `e2e/{smoke,seo,funnel,assets,parity}.spec.ts` | 63/77/99/74/147 | 81 E2E tests per project (smoke 8, seo 5, funnel 5, assets 19 runtime, parity 44 runtime) incl. H4-OOM + alias/image regression + pass-3/pass-4 live-source parity guards |
 | `src/lib/*.test.ts` | 81/110/57 | 37 Vitest unit tests co-located on pure domains |
 | `public/images/*.jpg` + `brand/*` | 6+3 assets | Hero/site imagery + `modfii-logo-icon.svg` + `og-image.jpg` |
 | `tsconfig.json` | ~35 | `strict`, `skipLibCheck`, `isolatedModules`, `@/*→./src/*`, `exclude: [node_modules,skills]`, `incremental` |
@@ -1142,4 +1145,4 @@ No `CRITICAL` open issues. `lint 0/0`, `typecheck` pass, `37/37` unit (11+13+7+6
 
 ---
 
-*Last verified 2026-09-13 (PAD v1.3 — remediation pass 4: source-exact home hero (daylight photo + `from-primary/95 via-primary/90 to-primary/80` + bottom fade + content-driven height + text-4xl→6xl headline, no hero-grid), intro eyebrow REMOVED (live source renders none — pass-3 pin flipped), hub hero Last-Updated line + "Here's the truth" glass callout + dual CTA + 4th chip + crumbsOutside breadcrumbs, FHA/VA/USDA/construction loan pages source copy + amber-first CTA + contextual eyebrow icons + author/reviewer strips + FHA chip removal, learn "read read" fix, calculator Free-Calculator pill + middle crumb + `--color-chart-tax` blue tax segment, header blur 12→16px, hero photo + skyline wordmark swapped to source assets; pass 3 (2026-09-12): circle brand mark + two-tone wordmark, always-light header, closing trust line, green band removed, get-started 3-step band, calculator amber band, footer legal line + 2-item More dropdown, PMI-flake root cause; counts `37/37` vitest = 11+13+7+6 + `61/61` per project playwright = smoke 7+seo 5+funnel 4+assets 19+parity 26 (60/61 DB-less) + `next build` 43/43 + `lint 0/0` + live probes (`/api/health` ok:true, funnel 4 matches, sitemap 152, robots host correct) against `package.json` (next ^16.3.4, react ^19.3.0, tailwind ^4.3.3, vitest ^3.2, playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills+infrastructure ignored), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (37 tests), `public/brand/wordmarks 5` + `public/images/avatars 3` + `public/images 5` + `brand/og-image.jpg`, `playwright.config.ts` (3002), `e2e/*` 55 per project, `vitest` 37/37. Source of truth: `package.json`, `tsconfig.json`, `next.config.ts`, `eslint.config.mjs`, `drizzle.config.ts/.json`, `docker-compose.yml:5434`, `src/db`, `src/lib`, `src/scripts`, `e2e`, `vitest.config.ts`, `.env.example`, live modfii.com + modfii.jesspete.shop probes. Evidence: `docs/REMEDIATION_PLAN_pass4.md` (pass 3: `docs/REMEDIATION_PLAN_pass3.md`).*
+*Last verified 2026-09-13 (PAD v1.3 — remediation pass 4: source-exact home hero (daylight photo + `from-primary/95 via-primary/90 to-primary/80` + bottom fade + content-driven height + text-4xl→6xl headline, no hero-grid), intro eyebrow REMOVED (live source renders none — pass-3 pin flipped), hub hero Last-Updated line + "Here's the truth" glass callout + dual CTA + 4th chip + crumbsOutside breadcrumbs, FHA/VA/USDA/construction loan pages source copy + amber-first CTA + contextual eyebrow icons + author/reviewer strips + FHA chip removal, learn "read read" fix, calculator Free-Calculator pill + middle crumb + `--color-chart-tax` blue tax segment, header blur 12→16px, hero photo + skyline wordmark swapped to source assets; pass 3 (2026-09-12): circle brand mark + two-tone wordmark, always-light header, closing trust line, green band removed, get-started 3-step band, calculator amber band, footer legal line + 2-item More dropdown, PMI-flake root cause; counts `37/37` vitest = 11+13+7+6 + `81/81` per project playwright = smoke 8+seo 5+funnel 5+assets 19+parity 44 (80/81 DB-less) + `next build` 43/43 + `lint 0/0` + live probes (`/api/health` ok:true, funnel 5 matches, sitemap 152, robots host correct) against `package.json` (next ^16.3.4, react ^19.3.0, tailwind ^4.3.3, vitest ^3.2, playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills+infrastructure ignored), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (37 tests), `public/brand/wordmarks 5` + `public/images/avatars 3` + `public/images 5` + `brand/og-image.jpg`, `playwright.config.ts` (3002), `e2e/*` 55 per project, `vitest` 37/37. Source of truth: `package.json`, `tsconfig.json`, `next.config.ts`, `eslint.config.mjs`, `drizzle.config.ts/.json`, `docker-compose.yml:5434`, `src/db`, `src/lib`, `src/scripts`, `e2e`, `vitest.config.ts`, `.env.example`, live modfii.com + modfii.jesspete.shop probes. Evidence: `docs/REMEDIATION_PLAN_pass4.md` (pass 3: `docs/REMEDIATION_PLAN_pass3.md`).*

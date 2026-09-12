@@ -36,7 +36,7 @@ export default function LearnPage() {
           <span className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
             Learning Center
           </span>
-          <h1 className="mt-6 font-display text-4xl font-bold md:text-5xl">Master Prefab Home Financing</h1>
+          <h1 className="mt-6 font-display text-4xl font-bold md:text-6xl">Master Prefab Home Financing</h1>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
             Free guides, calculators, and expert insights to help you navigate the prefab mortgage landscape with
             confidence.

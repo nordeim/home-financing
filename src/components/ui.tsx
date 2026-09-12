@@ -2,7 +2,9 @@ import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type ButtonVariant = "primary" | "secondary" | "accent" | "outline" | "ghost" | "onPrimary";
-type ButtonSize = "md" | "lg" | "sm";
+// lgSm/xl mirror the live source's mixed CTA scale (pass-5 probes): most
+// section CTAs render text-sm at lg padding; the closing CTA renders text-lg.
+type ButtonSize = "md" | "lg" | "lgSm" | "xl" | "sm";
 
 const variants: Record<ButtonVariant, string> = {
   primary:
@@ -18,7 +20,9 @@ const variants: Record<ButtonVariant, string> = {
 const sizes: Record<ButtonSize, string> = {
   sm: "h-9 px-3 text-sm",
   md: "h-11 px-5 text-sm",
-  lg: "h-12 px-7 text-base",
+  lg: "h-12 px-8 text-base",
+  lgSm: "h-12 px-8 text-sm",
+  xl: "h-14 px-8 text-lg",
 };
 
 export function cn(...parts: Array<string | false | null | undefined>): string {
@@ -35,7 +39,7 @@ export function Button({ className, variant = "primary", size = "md", type = "bu
     <button
       type={type}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:pointer-events-none disabled:opacity-50",
         variants[variant],
         sizes[size],
         className,
@@ -65,7 +69,7 @@ export function ButtonLink({
       href={href}
       onClick={onClick}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-colors",
+        "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors",
         variants[variant],
         sizes[size],
         className,

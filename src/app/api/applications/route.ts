@@ -48,45 +48,53 @@ export async function POST(request: Request) {
     return Response.json({ error: errors[0] }, { status: 400 });
   }
 
-  await ensureSeeded();
   const matches = matchLenders(input);
 
-  const [row] = await db
-    .insert(applications)
-    .values({
-      fullName: input.fullName,
-      email: input.email,
-      phone: input.phone,
-      zipCode: input.zipCode,
-      propertyIntent: input.propertyIntent,
-      homeType: input.homeType,
-      landStatus: input.landStatus,
-      manufacturerKnown: input.manufacturerKnown,
-      manufacturerSlug: input.manufacturerSlug,
-      creditRange: input.creditRange,
-      incomeRange: input.incomeRange,
-      budget: input.budget,
-      timeline: input.timeline,
-      status: "matched",
-    })
-    .returning({ id: applications.id });
+  // S-10 contract: every funnel response is JSON, including persistence
+  // failures — an unhandled throw here previously produced an empty,
+  // content-type-less 500 (pass-5 finding F-13).
+  try {
+    await ensureSeeded();
+    const [row] = await db
+      .insert(applications)
+      .values({
+        fullName: input.fullName,
+        email: input.email,
+        phone: input.phone,
+        zipCode: input.zipCode,
+        propertyIntent: input.propertyIntent,
+        homeType: input.homeType,
+        landStatus: input.landStatus,
+        manufacturerKnown: input.manufacturerKnown,
+        manufacturerSlug: input.manufacturerSlug,
+        creditRange: input.creditRange,
+        incomeRange: input.incomeRange,
+        budget: input.budget,
+        timeline: input.timeline,
+        status: "matched",
+      })
+      .returning({ id: applications.id });
 
-  if (!row) {
-    return Response.json({ error: "Could not save application." }, { status: 500 });
+    if (!row) {
+      return Response.json({ error: "Could not save application." }, { status: 500 });
+    }
+
+    for (const match of matches) {
+      const [lender] = await db.select({ id: lenders.id }).from(lenders).where(eq(lenders.slug, match.lender.slug)).limit(1);
+      if (!lender) continue;
+      await db.insert(applicationMatches).values({
+        applicationId: row.id,
+        lenderId: lender.id,
+        estimatedRate: match.estimatedRate.toFixed(3),
+        estimatedPayment: match.estimatedPayment,
+        matchScore: match.matchScore,
+        rationale: match.rationale,
+      });
+    }
+
+    return Response.json({ id: row.id, matches });
+  } catch (error) {
+    console.error("[api/applications] persistence failed:", error instanceof Error ? error.message : error);
+    return Response.json({ error: "We couldn't save your application right now. Please try again in a moment." }, { status: 500 });
   }
-
-  for (const match of matches) {
-    const [lender] = await db.select({ id: lenders.id }).from(lenders).where(eq(lenders.slug, match.lender.slug)).limit(1);
-    if (!lender) continue;
-    await db.insert(applicationMatches).values({
-      applicationId: row.id,
-      lenderId: lender.id,
-      estimatedRate: match.estimatedRate.toFixed(3),
-      estimatedPayment: match.estimatedPayment,
-      matchScore: match.matchScore,
-      rationale: match.rationale,
-    });
-  }
-
-  return Response.json({ id: row.id, matches });
 }

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ButtonLink, Container } from "@/components/ui";
 
 export const metadata: Metadata = {
-  title: "Modular Home Payment Calculator",
+  title: "Modular Home Payment Calculator | Estimate Your Monthly Mortgage",
   description:
     "Free modular home payment calculator. Estimate monthly payments for prefab and manufactured homes including principal, interest, taxes, insurance, and PMI.",
 };

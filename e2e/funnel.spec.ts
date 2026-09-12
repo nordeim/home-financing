@@ -18,6 +18,32 @@ test.describe("funnel API", () => {
     expect(typeof body.error).toBe("string");
   });
 
+  test("funnel API responses are always JSON (S-10 contract, incl. rate-limit 429)", async ({ request }) => {
+    // Pass-5 (F-13): every response from the public funnel must be JSON —
+    // 400 (validation) and 429 (rate limit) here; the DB-outage 500 path is
+    // pinned by scripts/verify-db-outage.sh (cannot run inside the shared
+    // Playwright webServer which has a healthy DB).
+    const bad = await request.post("/api/applications", {
+      data: { fullName: "x" },
+      headers: { "x-forwarded-for": `test-json-400-${Date.now()}` },
+    });
+    expect(bad.status()).toBe(400);
+    expect(bad.headers()["content-type"]).toContain("application/json");
+
+    const burstIp = `json-429-${Date.now()}`;
+    let limited;
+    for (let i = 0; i < 10; i++) {
+      limited = await request.post("/api/applications", {
+        data: { fullName: "" },
+        headers: { "x-forwarded-for": burstIp },
+      });
+    }
+    expect(limited?.status()).toBe(429);
+    expect(limited?.headers()["content-type"]).toContain("application/json");
+    const errBody = await limited?.json();
+    expect(errBody).toHaveProperty("error");
+  });
+
   test("POST /api/applications returns matches for a valid payload", async ({ request }) => {
     const payload = {
       fullName: "Alex Rivera",

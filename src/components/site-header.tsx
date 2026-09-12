@@ -2,7 +2,6 @@
 
 import { ButtonLink, cn } from "@/components/ui";
 import { ChevronDown, Menu, X } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useState } from "react";
@@ -22,9 +21,11 @@ const MORE = [
 
 /**
  * Live modfii.com renders a light frosted header in every state — over the
- * homepage hero, after scroll, and on mobile (computed-style probe
- * 2026-09-12: rgba(253,253,252,0.8) + blur). The earlier
- * transparent-over-dark treatment does not match the source and is gone.
+ * homepage hero, after scroll, and on mobile. Pass-5 metrics (2026-09-12):
+ * bg-background/80 + backdrop-blur-lg (16px) + border-border/50 + h-20 inner
+ * bar (81px rendered). Brand mark: source renders a CSS rotated-square
+ * gradient badge (32×32 rotate-3 rounded-lg, inner bg-background square,
+ * 16×16 gradient center) — the circle-ring SVG is only the favicon.
  */
 export function SiteHeader() {
   const pathname = usePathname();
@@ -50,11 +51,17 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 md:px-8">
-        <Link href="/" className="flex items-center gap-2.5" aria-label="ModFii home">
-          <Image src="/brand/modfii-logo-icon.svg" alt="" width={36} height={36} priority />
-          <span className="font-display text-xl font-bold tracking-tight text-foreground">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-lg">
+      <div className="mx-auto flex h-20 max-w-[1400px] items-center justify-between px-4 md:px-8">
+        <Link href="/" className="flex items-center gap-2" aria-label="ModFii home">
+          {/* Source badge: rotated gradient square + inner bg square + gradient core */}
+          <div className="relative h-8 w-8" aria-hidden>
+            <div className="absolute inset-0 rotate-3 rounded-lg bg-gradient-to-br from-primary to-primary-600" />
+            <div className="absolute inset-0.5 flex items-center justify-center rounded-lg bg-background">
+              <div className="h-4 w-4 rounded-sm bg-gradient-to-br from-primary to-primary-600" />
+            </div>
+          </div>
+          <span className="font-display text-xl font-bold text-foreground">
             Mod<span className="text-primary">Fii</span>
           </span>
         </Link>

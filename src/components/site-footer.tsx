@@ -1,6 +1,5 @@
 import { SITE } from "@/lib/catalog";
 import { Mail, MapPin } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 /** lucide 1.44 dropped brand icons — minimal glyph wrappers (modfii.com footer parity). */
@@ -101,7 +100,13 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-[1400px] gap-10 px-4 py-16 md:grid-cols-2 md:px-8 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] xl:grid-cols-[minmax(0,1.4fr)_repeat(6,minmax(0,1fr))]">
         <div>
           <Link href="/" className="mb-4 inline-flex items-center gap-2">
-            <Image src="/brand/modfii-logo-icon.svg" alt="" width={36} height={36} />
+            {/* Source badge (pass-5): rotated gradient square + inner bg square + gradient core */}
+            <span className="relative block h-8 w-8" aria-hidden>
+              <span className="absolute inset-0 block rotate-3 rounded-lg bg-gradient-to-br from-primary to-primary-600" />
+              <span className="absolute inset-0.5 flex items-center justify-center rounded-lg bg-background">
+                <span className="block h-4 w-4 rounded-sm bg-gradient-to-br from-primary to-primary-600" />
+              </span>
+            </span>
             <span className="font-display text-xl font-bold text-foreground">
               Mod<span className="text-primary">Fii</span>
             </span>

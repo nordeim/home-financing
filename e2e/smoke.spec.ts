@@ -61,4 +61,22 @@ test.describe("home smoke", () => {
     const critical = results.violations.filter((v) => v.impact === "critical");
     expect(critical, `critical a11y violations: ${JSON.stringify(critical, null, 2)}`).toEqual([]);
   });
+
+  test("app emits security headers (CSP, XFO, nosniff, referrer-policy, permissions-policy)", async ({ request }) => {
+    // Pass-5 (F-02): the app itself must emit the documented header contract —
+    // previously these only existed on a dev reverse-proxy, never in the repo.
+    const response = await request.get("/api/health");
+    const h = (name: string) => response.headers()[name] ?? "";
+    expect(h("x-frame-options")).toBe("DENY");
+    expect(h("x-content-type-options")).toBe("nosniff");
+    expect(h("referrer-policy")).toBe("strict-origin-when-cross-origin");
+    expect(h("permissions-policy")).toContain("camera=()");
+    expect(h("permissions-policy")).toContain("microphone=()");
+    expect(h("permissions-policy")).toContain("geolocation=()");
+    const csp = h("content-security-policy");
+    expect(csp).toContain("default-src 'self'");
+    expect(csp).toContain("object-src 'none'");
+    expect(csp).toContain("base-uri 'self'");
+    expect(csp).toContain("frame-ancestors");
+  });
 });

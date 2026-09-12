@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Modular Home Financing Glossary",
+  title: "Modular Home Financing Glossary | Terms & Definitions",
   description: "Clear definitions for construction loans, mortgage terms, and prefab home terminology.",
 };
 
@@ -19,11 +19,12 @@ export default function GlossaryPage() {
     <main>
       <PageHero
         title="Modular Home Financing Glossary"
+        titleSize="md"
         description="Clear definitions for construction loans, mortgage terms, and prefab home terminology."
         crumbs={[{ name: "Home", href: "/" }, { name: "Glossary" }]}
         imageSrc="/images/green-home.jpg"
       />
-      <nav className="sticky top-16 z-40 border-b border-border bg-background/95 py-3 backdrop-blur-sm" aria-label="Letters">
+      <nav className="sticky top-20 z-40 border-b border-border bg-background/95 py-3 backdrop-blur-sm" aria-label="Letters">
         <Container>
           <div className="flex flex-wrap justify-center gap-1">
             {LETTERS.map((letter) =>

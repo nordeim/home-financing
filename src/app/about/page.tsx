@@ -4,7 +4,7 @@ import { SITE } from "@/lib/catalog";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About ModFii",
+  title: "About ModFii | Prefab Home Mortgage Marketplace",
   description: "The first mortgage marketplace built exclusively for prefab and modular homes. Headquartered in Nashville, TN.",
 };
 

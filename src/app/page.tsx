@@ -209,8 +209,9 @@ export default function HomePage() {
     <main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      {/* Hero — source recipe: daylight photo, horizontal forest wash + bottom fade, glass stats card */}
-      <section className="relative isolate overflow-hidden bg-forest pb-16 pt-28 text-primary-foreground md:pb-20 md:pt-32">
+      {/* Hero — source recipe: daylight photo, horizontal forest wash + bottom fade, glass stats card.
+          Pass-5: section paddings match the source (pt-24/md:pt-28, pb-16/md:pb-20) — no container py. */}
+      <section className="relative isolate overflow-hidden bg-forest pb-16 pt-24 text-primary-foreground md:pb-20 md:pt-28">
         <Image
           src="/images/hero-prefab.jpg"
           alt="Modern prefab home"
@@ -221,15 +222,15 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/90 to-primary/80" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-primary/95" />
-        <Container className="relative grid items-center gap-10 py-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.8fr)] lg:gap-16 md:py-20">
-          <div>
-            <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+        <Container className="relative grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <div className="max-w-xl text-white">
+            <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
               <Star className="h-4 w-4 fill-accent text-accent" aria-hidden />
               The #1 Prefab Home Mortgage Platform
             </p>
-            <h1 className="font-display text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
+            <h2 className="font-display text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
               Stop Losing Your Dream Home to <span className="text-accent">Financing Nightmares</span>
-            </h1>
+            </h2>
             <p className="mt-6 max-w-xl text-lg text-white/90 md:text-xl">
               Most lenders don&apos;t understand prefab homes—killing deals even when you&apos;re pre-approved. ModFii
               connects you with specialized lenders who get it, cutting approval times by 50%.
@@ -253,11 +254,11 @@ export default function HomePage() {
           </div>
 
           <div className="relative">
-            <div className="absolute -top-4 -right-2 z-10 rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground shadow-lg">
+            <div className="absolute -top-4 -right-4 z-10 rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground shadow-lg">
               🏆 Rated #1 by Prefab Buyers
             </div>
             <div className="rounded-2xl border border-white/20 bg-white/10 p-8 backdrop-blur-md">
-              <h2 className="text-center font-display text-xl font-bold">Why Homeowners Choose ModFii</h2>
+              <h3 className="text-center font-display text-xl font-bold">Why Homeowners Choose ModFii</h3>
               <p className="mt-1 text-center text-sm text-white/70">Specialized lenders, better outcomes</p>
               <div className="mt-6 grid grid-cols-3 gap-4">
                 {[
@@ -271,7 +272,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <ButtonLink href="/get-started" variant="accent" size="lg" className="mt-6 w-full">
+              <ButtonLink href="/get-started" variant="accent" size="lgSm" className="mt-6 w-full">
                 Start Free Pre-Qualification
                 <ArrowRight className="h-4 w-4" />
               </ButtonLink>
@@ -280,8 +281,8 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* Trusted-by wordmark strip */}
-      <section className="border-b border-border bg-card py-10">
+      {/* Trusted-by wordmark strip — source chrome: py-8 bg-muted/30 border-y border-border/50 */}
+      <section className="border-y border-border/50 bg-muted/30 py-8">
         <Container>
           <p className="text-center text-sm text-muted-foreground">Trusted by buyers of leading manufacturers</p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
@@ -294,11 +295,16 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* Intro — Modular & Prefab Home Loans (lazy-revealed on the source) */}
-      <section className="py-20 md:py-24">
+      {/* Intro — Modular & Prefab Home Loans (lazy-revealed on the source).
+          Pass-5: source renders the "Your Prefab Financing Partner" pill above the
+          document H1 and washes the section with a muted gradient. */}
+      <section className="overflow-hidden bg-gradient-to-b from-background via-muted/20 to-background py-12 md:py-16">
         <Container>
           <Reveal className="mx-auto mb-14 max-w-3xl text-center">
-            <h2 className="font-display text-3xl font-bold md:text-5xl">Modular &amp; Prefab Home Loans</h2>
+            <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+              Your Prefab Financing Partner
+            </span>
+            <h1 className="font-display text-3xl font-bold md:text-5xl">Modular &amp; Prefab Home Loans</h1>
             <p className="mt-6 text-lg text-muted-foreground">
               ModFii is the leading marketplace connecting prefab, modular, and tiny home buyers with lenders who
               specialize in factory-built construction financing. We help you get approved faster, with better rates,
@@ -313,7 +319,7 @@ export default function HomePage() {
                     <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary">
                       <card.icon className="h-5 w-5" aria-hidden />
                     </span>
-                    <h3 className="font-display text-xl font-bold">{card.title}</h3>
+                    <h2 className="font-display text-xl font-semibold">{card.title}</h2>
                   </div>
                   <p className="mt-4 leading-relaxed text-muted-foreground">{card.body}</p>
                   {card.chips ? (
@@ -334,7 +340,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="mt-12 text-center">
-            <ButtonLink href="/modular-home-financing/loan-options" size="lg">
+            <ButtonLink href="/modular-home-financing/loan-options" size="lgSm">
               Explore All Loan Options
               <ArrowRight className="h-4 w-4" />
             </ButtonLink>
@@ -364,7 +370,7 @@ export default function HomePage() {
                       <item.icon className="h-5 w-5" aria-hidden />
                     </span>
                     <div>
-                      <h3 className="font-display text-lg font-semibold">{item.title}</h3>
+                      <h3 className="font-display text-base font-semibold">{item.title}</h3>
                       <p className="mt-1 text-muted-foreground">{item.description}</p>
                     </div>
                   </div>
@@ -383,7 +389,7 @@ export default function HomePage() {
                       <item.icon className="h-5 w-5" aria-hidden />
                     </span>
                     <div>
-                      <h3 className="font-display text-lg font-semibold">{item.title}</h3>
+                      <h3 className="font-display text-base font-semibold">{item.title}</h3>
                       <p className="mt-1 text-muted-foreground">{item.description}</p>
                     </div>
                   </div>
@@ -392,7 +398,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="mt-12 text-center">
-            <ButtonLink href="/modular-home-financing/loan-options" size="lg">
+            <ButtonLink href="/modular-home-financing/loan-options" size="lgSm">
               See Your Options
               <ArrowRight className="h-4 w-4" />
             </ButtonLink>
@@ -424,7 +430,7 @@ export default function HomePage() {
                 <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   <step.icon className="h-6 w-6" aria-hidden />
                 </span>
-                <h3 className="mt-6 font-display text-2xl font-semibold">{step.title}</h3>
+                <h3 className="mt-6 font-display text-xl font-semibold">{step.title}</h3>
                 <p className="mt-3 text-muted-foreground">{step.description}</p>
                 {index < STEPS.length - 1 ? (
                   <span
@@ -450,7 +456,7 @@ export default function HomePage() {
           </div>
           <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">
             {STORIES.map((story) => (
-              <figure key={story.name} className="flex flex-col rounded-2xl border border-border bg-card p-8">
+              <figure key={story.name} className="flex flex-col rounded-2xl border border-border bg-background p-8 transition-shadow hover:shadow-lg">
                 <Stars />
                 <blockquote className="mt-5 flex-1 text-muted-foreground">&ldquo;{story.quote}&rdquo;</blockquote>
                 <figcaption className="mt-6 flex items-center gap-4">
@@ -481,7 +487,7 @@ export default function HomePage() {
       <section className="bg-muted/50 py-16">
         <Container>
           <div className="mx-auto mb-12 max-w-2xl text-center">
-            <h2 className="font-display text-3xl font-bold md:text-4xl">Our Standards</h2>
+            <h2 className="font-display text-3xl font-bold">Our Standards</h2>
             <p className="mt-4 text-lg text-muted-foreground">
               ModFii is committed to providing accurate, unbiased information to help you make informed decisions about
               prefab home financing.
@@ -497,7 +503,7 @@ export default function HomePage() {
                 <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
                   <item.icon className="h-6 w-6" aria-hidden />
                 </span>
-                <h3 className="mt-5 font-display text-lg font-semibold">{item.title}</h3>
+                <h3 className="mt-5 font-display text-base font-semibold">{item.title}</h3>
                 <p className="mt-3 text-sm text-muted-foreground">{item.body}</p>
               </div>
             ))}
@@ -529,8 +535,8 @@ export default function HomePage() {
           <div className="mx-auto max-w-3xl space-y-4">
             {FAQS.map((item) => (
               <details key={item.q} className="group rounded-xl border border-border bg-card px-6">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-6 text-left font-semibold hover:text-primary [&::-webkit-details-marker]:hidden">
-                  {item.q}
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-6 text-left hover:text-primary [&::-webkit-details-marker]:hidden">
+                  <h3 className="text-base font-normal">{item.q}</h3>
                   <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden />
                 </summary>
                 <p className="pb-6 text-muted-foreground">{item.a}</p>
@@ -558,7 +564,7 @@ export default function HomePage() {
             months—at rates that reward sustainability.
           </p>
           <div className="mt-10 flex justify-center">
-            <ButtonLink href="/get-started" variant="secondary" size="lg">
+            <ButtonLink href="/get-started" variant="secondary" size="xl">
               Get Pre-Approved Free
               <ArrowRight className="h-4 w-4" />
             </ButtonLink>

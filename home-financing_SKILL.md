@@ -3,8 +3,8 @@
 **Classification:** Internal Engineering Reference — Reusable Skill Document
 **Status:** DEFINITIVE, PRODUCTION-LOCKED
 **Companion Documents:** `Project_Architecture_Document.md` v1.0 (blueprint) · `CLAUDE.md` (agent spec, ~600 lines) · `AGENTS.md` (cheat-sheet) · `README.md` (operator guide) · `docs/REMEDIATION_PLAN_pass4.md` (pass-4 evidence)
-**Last Updated:** 2026-09-13 (v1.3 — remediation pass 4: source-exact hero + guide-hero system + counts 37 unit / 61 E2E per project)
-**Project State:** 37 Vitest (11+13+7+6, incl. H4/OOM regression) + 61 Playwright per project (61/61 with DB, 60/61 DB-less — 47 declarations + data-driven loops) · 43/43 Next build · PG 17 `8/40/50/23/59/5` seeded · `lint 0/0` · `typecheck` pass
+**Last Updated:** 2026-09-12 (v1.4 — remediation pass 5: security headers, funnel JSON-500, source-exact header/logo/buttons, heading hierarchy, guide content depth, counts 37 unit / 81 E2E per project)
+**Project State:** 37 Vitest (11+13+7+6, incl. H4/OOM regression) + 61 Playwright per project (81/81 with DB, 80/81 DB-less — 52 declarations + data-driven loops) · 43/43 Next build · PG 17 `8/40/50/23/59/5` seeded · `lint 0/0` · `typecheck` pass
 **Audience:** AI Coding Agents, Senior Engineers, Tech Leads, DevOps, Onboarding Engineers
 **Rule:** Every rule in this document traces to a specific file, test, or live probe. Nothing is here "because it's popular."
 
@@ -96,7 +96,7 @@ Pinned from `package.json` (`package-lock.json` is the lockfile, not pnpm) + `do
 | Scripting | `tsx` | `^4.23.13` | Runs `src/scripts/migrate|seed|reset` as ESM. |
 | Lint | ESLint + `eslint-config-next` | `^9.39.5` + `^16.3.4` | Flat config `eslint.config.mjs` + `defineConfig` + `globalIgnores(.next,out,build,next-env,skills,infrastructure)`. |
 | Unit | Vitest | `^3.2.7` (`vitest/config`, `node` env, `include: src/**/*.test.ts`) | Co-located `src/lib/*.test.ts` pure only (calculator 11 + matching 13 + rate-limit 7 + markdown 6 = 37). `37/37` green. |
-| E2E | Playwright + `@axe-core/playwright` | `^1.63.0` + `^4.13.0` | Prod `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `chromium+webkit`, `x-forwarded-for` isolation. `61 per project` — 47 declarations + data-driven loops (122 with webkit, `61/61` with DB, `60/61` DB-less). `assets 19 runtime` + `parity 26 runtime` + `smoke 7` + `seo 5` + `funnel 4`. |
+| E2E | Playwright + `@axe-core/playwright` | `^1.63.0` + `^4.13.0` | Prod `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `chromium+webkit`, `x-forwarded-for` isolation. `61 per project` — 52 declarations + data-driven loops (122 with webkit, `81/81` with DB, `80/81` DB-less). `assets 19 runtime` + `parity 44 runtime` + `smoke 8` + `seo 5` + `funnel 5`. |
 | Package Manager | npm | `package-lock.json` | Single app, no monorepo/turborepo. Gate: `db:setup → lint → typecheck → test → build → e2e`. |
 
 ---
@@ -346,7 +346,7 @@ src/scripts/ (3 lifecycle, all local-guarded)
 └── reset.ts (DROP SCHEMA public,drizzle CASCADE + extensions)
 
 drizzle/ (0000_amusing_thena.sql ~200 lines, 0001_sharp_stick.sql 1 line, meta/_journal.json idx 0,1)
-e2e/ (61 per project — 47 declarations + data-driven loops, `parity.spec.ts` pins H4/OOM + parity + pass-3 live-source pins + pass-4 source-exact hero/guide-hero pins)
+e2e/ (61 per project — 52 declarations + data-driven loops, `parity.spec.ts` pins H4/OOM + parity + pass-3 live-source pins + pass-4 source-exact hero/guide-hero pins)
 ├── smoke.spec.ts (7)
 ├── seo.spec.ts (6)
 ├── funnel.spec.ts (4)
@@ -731,7 +731,7 @@ npm run build
 # → Routes: ○ 36 static + ƒ 7 dynamic
 
 # 6 — E2E (prod next start on 3002, reuseExistingServer, chromium; valid-payload needs DB)
-npm run e2e             # chromium 61/61 per project (47 declarations + data-driven loops; 60/61 DB-less)
+npm run e2e             # chromium 81/81 per project (52 declarations + data-driven loops; 80/81 DB-less)
 npm run e2e:all         # chromium + webkit
 
 # 7 — Readiness + content surfaces
@@ -1446,7 +1446,7 @@ interface Env {
 | ADR-003 | Drizzle ORM `0.45.2` + `pg` Pool singleton `globalThis` | `src/db/schema.ts`, `src/db/index.ts`, `drizzle.config.*` (`5434`) | Single Pool prevents HMR `EMFILE`; `drizzle-kit generate` diff→SQL | Prisma / inline `new Pool()` |
 | ADR-004 | Tailwind v4 CSS-first `@theme` (sole source) | `src/app/globals.css`, `src/components/ui.tsx` | Token authority without config drift; `build` proves parity | `tailwind.config.*` (v3) / arbitrary escapes |
 | ADR-005 | In-memory `Map` limiter `8/10min` via `x-forwarded-for` | `src/lib/rate-limit.ts`, `src/app/api/applications/route.ts` | Single-instance zero-infra; probed `400×8→429×2` | Redis from day-0 / no limiter |
-| ADR-006 | Vitest `37` (11+13+7+6) + Playwright prod `55` per project (pure vs DB boundary) | `vitest.config.ts`, `playwright.config.ts` (`3002`, `reuseExistingServer`), `e2e/*` (`smoke 7 + seo 6 + funnel 4 + assets 19 + parity 19`) | Dev HMR ≠ prod; `assets` guards 14 images + alias incidents + `parity` guards H4/OOM + wordmarks/avatars/learn-hub/calculator/footer/wizard + pass-3 live-source pins | Unit-only / E2E on `dev` |
+| ADR-006 | Vitest `37` (11+13+7+6) + Playwright prod `55` per project (pure vs DB boundary) | `vitest.config.ts`, `playwright.config.ts` (`3002`, `reuseExistingServer`), `e2e/*` (`smoke 8 + seo 6 + funnel 5 + assets 19 + parity 19`) | Dev HMR ≠ prod; `assets` guards 14 images + alias incidents + `parity` guards H4/OOM + wordmarks/avatars/learn-hub/calculator/footer/wizard + pass-3 live-source pins | Unit-only / E2E on `dev` |
 | ADR-007 | `images.unoptimized:true` (no `sharp`) | `next.config.ts`, `postcss.config.mjs` | No optimizer in deploy/sandbox would deadlock | Optimizer-on by default |
 
 ---
@@ -1546,7 +1546,7 @@ What live-site catches that CI cannot: `modfii.com` parity aliases (308), host-r
 | Images | `public/images/*` | `5` + `brand/og-image.jpg` | `assets.spec.ts` `6×200` + broken-img |
 | Sitemap | `src/app/sitemap.ts` | `STATIC_PATHS 40` → `152` locs (23+50+40) | `seo.spec.ts` `30×200` |
 | Env | `.env.example` | 12 + `FEATURE_*` | `src/db/index.ts` throw on missing |
-| Pre-ship gate | `AGENTS.md` | `db:setup → lint (0/0) → typecheck → test 37/37 → build 43/43 → e2e 61/61` | `drizzle` journal `idx 0,1` |
+| Pre-ship gate | `AGENTS.md` | `db:setup → lint (0/0) → typecheck → test 37/37 → build 43/43 → e2e 81/81` | `drizzle` journal `idx 0,1` |
 
 **Copy-paste env generation:**
 
@@ -1583,12 +1583,12 @@ DELIVER  → Complete handoff: usage, runbooks, challenges/solutions, next steps
 
 - [ ] Every version in §2 matches `npm list --depth=0` exactly
 - [ ] `grep -A50 "@theme" src/app/globals.css | head` hex values match §4/§19
-- [ ] `grep -r "'use client'" src/components | wc -l` → `3/7` islands still `site-header, prequal-form, calculator-app`
-- [ ] `npm run test 2>&1 | grep Tests` → `37` (11+13+7+6) still; `npm run e2e 2>&1 | grep "passed"` → `44` per project
-- [ ] `find src/components -name "*.tsx" | wc -l` → 7; `ls public/images/*.jpg | wc -l` → 5 + `brand/og-image.jpg`
+- [ ] `grep -r "'use client'" src/components | wc -l` → `5` client islands of `9` components (`site-header, prequal-form, calculator-app, learn-explorer, reveal`) + the required `src/app/error.tsx` boundary (6 `'use client'` files total under `src/`)
+- [ ] `npm run test 2>&1 | grep Tests` → `37` (11+13+7+6) still; `npm run e2e 2>&1 | grep "passed"` → `81` per project (80/81 DB-less — funnel valid-payload needs Postgres)
+- [ ] `find src/components -name "*.tsx" | wc -l` → 9; `ls public/images/*.jpg | wc -l` → 5 + `brand/og-image.jpg`
 - [ ] Every env var count matches `.env.example` (12 tracked + `FEATURE_*`)
 - [ ] `grep -n "TODO\|FIXME\|placeholder\|example.com" home-financing_SKILL.md | wc -l` → `0` (allow `orders@modfii.example` + `team@modfii.com` only)
 - [ ] TOC matches all `^## ` / `^### ` headings; appendices A–E referenced from body
 - [ ] `wc -l home-financing_SKILL.md` → `1,800–2,800` for this mid-size project (PAD `1,140` + SKILL `~1,000–1,400` = combined `~2,100–2,500`)
 
-*Last verified 2026-09-13 (SKILL v1.3 — remediation pass 4: source-exact home hero (daylight photo + dual-overlay recipe + content-driven height + text-4xl→6xl headline + no hero-grid), intro eyebrow REMOVED (live source renders none — pass-3 pin flipped to absence), hub hero Last-Updated line + "Here's the truth" glass callout + dual CTA + 4th chip + crumbsOutside breadcrumbs, FHA/VA/USDA/construction loan pages source copy + amber-first CTA + contextual eyebrow icons + author/reviewer strips, learn "read read" fix, calculator Free-Calculator pill + middle crumb + `--color-chart-tax` blue tax segment, header blur 12→16px, hero photo + skyline wordmark swapped to source assets; earlier pass 3: circle brand mark + two-tone wordmark, always-light header, closing trust line, green band removed, get-started 3-step band, calculator amber band, footer legal line + 2-item dropdown; calculator-PMI E2E flake root-caused to pre-hydration value-tracker poisoning, pinned with fresh-navigation retry ×10 stable; `37/37` vitest = 11+13+7+6 incl. H4/OOM + `61/61` per project playwright = smoke 7+seo 5+funnel 4+assets 19+parity 26 (60/61 DB-less) + build `43/43` + `lint 0/0` + `typecheck` + DB init `8/40/50/23/59/5` + live `health/funnel/sitemap/images/aliases`) against `package.json` (next ^16.3.4), `tsconfig.json` (strict, skills excluded), `next.config.ts` (11 redirects), `drizzle.config.*` (`5434`), `docker-compose.yml` (`home_financing_*` + `pgcrypto/pg_trgm`), `src/db/schema.ts` (8 tables), `src/lib/*` (37 tests), `public/brand/wordmarks 5` + `public/images/avatars 3`, `playwright.config.ts` (`3002`), `e2e/*` 55 per project, `.env.example`. Evidence: `docs/REMEDIATION_PLAN_pass3.md`.*
+*Last verified 2026-09-12 (SKILL v1.3.1 — pass-5 pre-remediation alignment audit in a clean clone: `lint 0/0`, `typecheck` clean, `37/37` unit, `build 43/43` (routes `○ 42 static + ƒ 8 dynamic` — includes `/debug-error-probe` probe route + `/editorial-policy` + `/corrections`), `81/81` E2E chromium with Postgres + `80/81` DB-less; validation-checklist drift fixed — `5/9` client islands (not `3/7`), e2e count `61` (not `44`/`55`); live-audit https://modfii.jesspete.shop → 39 PASS / 0 FAIL / 2 WARN; source-parity drift catalogued for remediation pass 5 (header bar metrics, intro-eyebrow re-add — pass-4 removal was based on a wrong pin, guide-page content depth, button chrome, heading levels). Earlier: 2026-09-13 pass 4 — source-exact home hero, hub Last-Updated + truth callout, loan-page heroes, calculator pill + blue tax segment; `37/37` vitest = 11+13+7+6 incl. H4/OOM + `81/81` per project playwright = smoke 8+seo 5+funnel 5+assets 19+parity 44 (80/81 DB-less) + DB init `8/40/50/23/59/5`.) against `package.json` (next ^16.3.4), `tsconfig.json` (strict, skills excluded), `next.config.ts` (11 redirects), `drizzle.config.*` (`5434`), `docker-compose.yml` (`home_financing_*` + `pgcrypto/pg_trgm`), `src/db/schema.ts` (8 tables), `src/lib/*` (37 tests), `public/brand/wordmarks 5` + `public/images/avatars 3`, `playwright.config.ts` (`3002`), `e2e/*` 61 per project, `.env.example`. Evidence: `docs/REMEDIATION_PLAN_pass3.md` + `docs/REMEDIATION_PLAN_pass4.md` + `docs/REMEDIATION_PLAN_pass5.md`.*

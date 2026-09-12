@@ -27,11 +27,14 @@
   /* Calculator breakdown bar — source renders the Property Tax segment blue. */
   --color-chart-tax: hsl(217 91% 60%);
 
+  /* Radius scale aligned to the live source (pass-5 probes 2026-09-12):
+     source buttons (rounded-md) compute to 10px, cards (rounded-2xl) to 16px,
+     logo decoration (rounded-lg) to 12px. */
   --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.5rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1rem;
 
   --shadow-lift: 0 18px 40px -24px hsl(155 30% 12% / 0.35);
   --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);

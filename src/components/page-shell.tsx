@@ -63,6 +63,7 @@ export function PageHero({
   eyebrow,
   eyebrowIcon: EyebrowIcon = Star,
   title,
+  titleSize = "lg",
   highlight,
   description,
   crumbs,
@@ -76,6 +77,8 @@ export function PageHero({
   eyebrow?: string;
   eyebrowIcon?: ComponentType<{ className?: string }>;
   title: string;
+  /** Source hero H1 scale (pass-5 probes): guide/loan pages 60px, glossary 48px. */
+  titleSize?: "lg" | "md";
   highlight?: string;
   description: string;
   crumbs: Array<{ name: string; href?: string }>;
@@ -115,7 +118,12 @@ export function PageHero({
               {eyebrow}
             </p>
           ) : null}
-          <h1 className="font-display text-4xl font-bold leading-[1.08] md:text-6xl">
+          <h1
+            className={cn(
+              "font-display font-bold leading-[1.08]",
+              titleSize === "md" ? "text-4xl md:text-5xl" : "text-4xl md:text-6xl",
+            )}
+          >
             {title}
             {highlight ? (
               <>
@@ -259,6 +267,7 @@ export function GuideView({
                   {paragraph}
                 </p>
               ))}
+              {section.lead ? <p className="mt-4 font-medium text-foreground">{section.lead}</p> : null}
               {section.bullets ? (
                 <ul className="mt-4 list-disc space-y-2 pl-6 text-muted-foreground">
                   {section.bullets.map((bullet) => (
@@ -266,6 +275,24 @@ export function GuideView({
                   ))}
                 </ul>
               ) : null}
+              {section.subsections?.map((sub) => (
+                <div key={sub.heading} className="mt-6">
+                  <h3 className="font-display text-xl font-semibold text-foreground">{sub.heading}</h3>
+                  {sub.lead ? <p className="mt-2 font-medium text-foreground">{sub.lead}</p> : null}
+                  {sub.body?.map((paragraph) => (
+                    <p key={paragraph} className="mt-3 leading-relaxed text-muted-foreground">
+                      {paragraph}
+                    </p>
+                  ))}
+                  {sub.bullets ? (
+                    <ul className="mt-3 list-disc space-y-2 pl-6 text-muted-foreground">
+                      {sub.bullets.map((bullet) => (
+                        <li key={bullet}>{bullet}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              ))}
             </section>
           ))}
           {guide.faqs ? (

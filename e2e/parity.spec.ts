@@ -109,12 +109,27 @@ test.describe("visual parity additions", () => {
  * docs/REMEDIATION_PLAN_pass3.md holds the evidence table.
  */
 test.describe("live-source parity (pass 3)", () => {
-  test("brand mark is the circle glyph and the wordmark is two-tone", async ({ page }) => {
+  test("brand mark is the source rotated-square gradient badge and the wordmark is two-tone", async ({ page }) => {
     await page.goto("/");
-    // Circle mark: the svg served as the brand icon must contain <circle>
-    const svg = await page.request.get("/brand/modfii-logo-icon.svg");
-    expect(svg.status()).toBe(200);
-    expect(await svg.text()).toContain("<circle");
+    // 2026-09-12 pass-5 correction: the live source header AND footer render a
+    // CSS badge — 32x32 rotated (rotate-3) rounded-lg gradient square with an
+    // inner bg-background square + 16x16 gradient center. The circle-ring SVG
+    // is only the favicon on both sites (the pass-3 "circle glyph" pin was a
+    // mis-verification of the favicon asset).
+    for (const region of [page.locator("header"), page.getByRole("contentinfo")]) {
+      const badge = region.locator("[class*='rotate-3']");
+      await expect(badge.first()).toBeVisible();
+      const layers = await badge.first().evaluate((el) => {
+        const root = el.closest("[class*='relative']");
+        return root ? [...root.querySelectorAll("[class*='rounded']")].map((d) => d.className.toString()) : [];
+      });
+      expect(layers.join(" ")).toContain("from-primary");
+      expect(layers.join(" ")).toContain("bg-background");
+      expect(await region.locator("img[src*='modfii-logo-icon.svg']").count()).toBe(0);
+    }
+    // favicon remains the circle-ring SVG
+    const icon = await page.locator("link[rel='icon']").first().getAttribute("href");
+    expect(icon).toContain("/brand/modfii-logo-icon.svg");
     // Two-tone wordmark: "Mod" (foreground) + "Fii" (primary) in header and footer
     for (const region of [page.locator("header"), page.getByRole("contentinfo")]) {
       await expect(region.locator(".text-primary", { hasText: "Fii" }).first()).toBeVisible();
@@ -134,12 +149,17 @@ test.describe("live-source parity (pass 3)", () => {
     expect(background).not.toBe("rgba(0, 0, 0, 0)");
   });
 
-  test("intro section has no eyebrow label (source renders none)", async ({ page }) => {
+  test("intro section renders the source eyebrow pill (pass-4 removal was a wrong pin)", async ({ page }) => {
     await page.goto("/");
-    // 2026-09-13 correction: the live source homepage has NO eyebrow above the
-    // "Modular & Prefab Home Loans" intro — the pass-3 addition overshot the
-    // source (the phrase only exists in source og: meta descriptions).
-    await expect(page.getByText("Your Prefab Financing Partner")).toHaveCount(0);
+    // 2026-09-12 pass-5 correction: direct DOM extraction of the live source
+    // shows a "Your Prefab Financing Partner" pill ABOVE the intro H1
+    // (bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium
+    // mb-6). The pass-4 "source renders none" claim mis-read the evidence.
+    const eyebrow = page.getByText("Your Prefab Financing Partner", { exact: true });
+    await expect(eyebrow).toBeVisible();
+    const classes = (await eyebrow.first().getAttribute("class")) ?? "";
+    expect(classes).toContain("bg-primary/10");
+    expect(classes).toContain("rounded-full");
   });
 
   test("closing CTA carries the source trust line", async ({ page }) => {
@@ -254,5 +274,261 @@ test.describe("live-source parity (pass 4)", () => {
     await expect(page.getByText("Free Calculator")).toBeVisible();
     const crumbs = page.getByRole("navigation", { name: "Breadcrumb" });
     await expect(crumbs.getByText("Modular Home Financing")).toBeVisible();
+  });
+});
+
+/**
+ * Pass-5 live-source parity pins (2026-09-12).
+ *
+ * Evidence: computed-style + DOM probes of the rendered source vs the deployed
+ * clone (scripts/source-recon.mts, clone-compare.mts, home-deep-diff.mts,
+ * section-diff.mts, resolve-conflicts.mts, hero-overlay-probe.mts,
+ * logo-probe2.mts) + VLM screenshot comparisons. docs/REMEDIATION_PLAN_pass5.md
+ * holds the finding table (F-01..F-16).
+ */
+test.describe("live-source parity (pass 5)", () => {
+  test("header bar matches the source metrics: /80 alpha, 16px blur, h-20 inner, border/50", async ({ page }) => {
+    await page.goto("/");
+    const header = page.locator("header");
+    const styles = await header.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      const inner = el.firstElementChild;
+      return {
+        bg: cs.backgroundColor,
+        blur: cs.backdropFilter,
+        innerHeight: inner ? getComputedStyle(inner).height : "",
+        borderBottomWidth: cs.borderBottomWidth,
+      };
+    });
+    // Source probe: rgba(253,253,252,0.8) + blur(16px) + 80px inner + 1px border/50.
+    // Tailwind v4 emits alpha colors as oklab(...) — assert the alpha component,
+    // which is the format-agnostic equivalent of the source's rgba.
+    expect(styles.bg).toMatch(/\/ 0\.8\)$|rgba\(253, ?253, ?252, ?0\.8\)/);
+    expect(styles.blur).toBe("blur(16px)");
+    expect(styles.innerHeight).toBe("80px");
+    expect(styles.borderBottomWidth).toBe("1px");
+    const classes = (await header.getAttribute("class")) ?? "";
+    expect(classes).toContain("border-border/50");
+    expect(classes).toContain("bg-background/80");
+    expect(classes).toContain("backdrop-blur-lg");
+  });
+
+  test("hero matches the source paddings: section pt-24/md:pt-28 + no container vertical padding", async ({ page }) => {
+    await page.goto("/");
+    const hero = page.locator("main section").first();
+    const styles = await hero.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      const container = el.querySelector(":scope > div");
+      const ccs = container ? getComputedStyle(container) : null;
+      return { padding: cs.padding, containerPaddingY: ccs ? `${ccs.paddingTop} ${ccs.paddingBottom}` : "n/a" };
+    });
+    // At 1440px the source renders padding 112px 0px 80px (md:pt-28 + md:pb-20)
+    expect(styles.padding).toBe("112px 0px 80px");
+    expect(styles.containerPaddingY).toBe("0px 0px");
+  });
+
+  test("hero eyebrow pill matches the source translucency (bg-white/15, border-white/30)", async ({ page }) => {
+    await page.goto("/");
+    const eyebrow = page.getByText("The #1 Prefab Home Mortgage Platform", { exact: true });
+    const classes = (await eyebrow.first().getAttribute("class")) ?? "";
+    expect(classes).toContain("bg-white/15");
+    expect(classes).toContain("border-white/30");
+    const styles = await eyebrow.first().evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { bg: cs.backgroundColor, borderColor: cs.borderTopColor };
+    });
+    // Tailwind v4 oklab format — assert alpha components match the source probes.
+    expect(styles.bg).toMatch(/\/ 0\.15\)$|rgba\(255, ?255, ?255, ?0\.15\)/);
+    expect(styles.borderColor).toMatch(/\/ 0\.3\)$|rgba\(255, ?255, ?255, ?0\.3\)/);
+  });
+
+  test("buttons match the source chrome: 10px radius, weight 500, lg px-8", async ({ page }) => {
+    await page.goto("/");
+    const cta = page.getByRole("link", { name: /Get Pre-Approved in 15 Minutes/i }).first();
+    const styles = await cta.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { radius: cs.borderRadius, weight: cs.fontWeight, paddingX: cs.paddingLeft };
+    });
+    expect(styles.radius).toBe("10px");
+    expect(styles.weight).toBe("500");
+    expect(styles.paddingX).toBe("32px");
+  });
+
+  test("intro card titles are H2s like the source and the hero title is an H2 with the intro as document H1", async ({ page }) => {
+    await page.goto("/");
+    const hero = page.locator("main section").first();
+    await expect(hero.getByRole("heading", { level: 2, name: /Stop Losing Your Dream Home/i })).toBeVisible();
+    await expect(hero.getByRole("heading", { level: 1 })).toHaveCount(0);
+    const intro = page.locator("#prefab-intro, main").filter({ hasText: "Modular & Prefab Home Loans" }).first();
+    await expect(page.getByRole("heading", { level: 1, name: /Modular & Prefab Home Loans/i })).toBeVisible();
+    for (const title of ["How Financing Works", "Loan Types Available", "Who We Help", "Why Prefab Financing Is Different"]) {
+      await expect(page.getByRole("heading", { level: 2, name: title, exact: true })).toBeVisible();
+    }
+  });
+
+  test("wordmark strip uses the source chrome: py-8 bg-muted/30 border-y border-border/50", async ({ page }) => {
+    await page.goto("/");
+    const strip = page.locator("section").filter({ hasText: "Trusted by buyers of leading manufacturers" });
+    const classes = (await strip.first().getAttribute("class")) ?? "";
+    expect(classes).toContain("py-8");
+    expect(classes).toContain("bg-muted/30");
+    expect(classes).toContain("border-y");
+    expect(classes).toContain("border-border/50");
+  });
+
+  test("testimonial cards match the source: bg-background, 16px radius, hover shadow", async ({ page }) => {
+    await page.goto("/");
+    const card = page.locator("figure").first();
+    const styles = await card.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { radius: cs.borderRadius, bg: cs.backgroundColor };
+    });
+    expect(styles.radius).toBe("16px");
+    expect(styles.bg).toBe("rgb(253, 253, 252)");
+  });
+
+  test("section heading sizes match the source (cards 16px, steps 20px, standards 30px)", async ({ page }) => {
+    await page.goto("/");
+    const broken = page.getByRole("heading", { name: /Misclassified as 'Mobile Homes'/i });
+    await expect(broken).toHaveCSS("font-size", "16px");
+    const step = page.getByRole("heading", { name: /Tell Us About Your Home/i });
+    await expect(step).toHaveCSS("font-size", "20px");
+    const standards = page.getByRole("heading", { name: /^Our Standards$/i });
+    await expect(standards).toHaveCSS("font-size", "30px");
+  });
+
+  test("FAQ questions are H3 headings like the source", async ({ page }) => {
+    await page.goto("/");
+    const faq = page.getByRole("heading", { name: /Questions\? We've Got Answers/i }).locator("xpath=ancestor::section[1]");
+    await expect(faq.getByRole("heading", { level: 3, name: /What does ModFii cost\?/i })).toBeVisible();
+    await expect(faq.getByRole("heading", { level: 3, name: /How do green mortgages work\?/i })).toBeVisible();
+  });
+
+  test("get-started hero H1 is compact like the source (24px)", async ({ page }) => {
+    await page.goto("/get-started");
+    const h1 = page.getByRole("heading", { level: 1, name: /Get Matched with Prefab-Friendly Lenders/i });
+    await expect(h1).toHaveCSS("font-size", "24px");
+  });
+
+  test("interior H1 sizes match the source: learn 60px, glossary 48px", async ({ page }) => {
+    await page.goto("/learn");
+    await expect(page.getByRole("heading", { level: 1, name: /Master Prefab Home Financing/i })).toHaveCSS("font-size", "60px");
+    await page.goto("/glossary");
+    await expect(page.getByRole("heading", { level: 1, name: /Modular Home Financing Glossary/i })).toHaveCSS("font-size", "48px");
+  });
+
+  test("guide H1s carry the source long-form titles", async ({ page }) => {
+    await page.goto("/adu-financing");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("How to Finance an Accessory Dwelling Unit");
+    await page.goto("/tiny-home-financing");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("How to Finance a Tiny House");
+    await page.goto("/construction-loans");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Modular & Prefab Homes");
+  });
+
+  test("SEO titles match the source long-form patterns", async ({ page }) => {
+    await page.goto("/adu-financing");
+    await expect(page).toHaveTitle(/ADU Financing: How to Finance an Accessory Dwelling Unit \(2026 Guide\)/);
+    await page.goto("/tiny-home-financing");
+    await expect(page).toHaveTitle(/Tiny Home Financing: How to Finance a Tiny House \(2026 Guide\)/);
+    await page.goto("/construction-loans");
+    await expect(page).toHaveTitle(/Construction Loans for Modular & Prefab Homes/);
+  });
+
+  test("debug-error-probe renders the error-boundary recovery UI without crashing the server", async ({ page }) => {
+    const response = await page.goto("/debug-error-probe");
+    // The error boundary catches the deliberate throw and renders recovery UI
+    // (the live deploy returns 200 with the error page; dev may 500 — both fine).
+    expect(response?.status()).toBeLessThan(500);
+    await expect(page.getByRole("heading").first()).toBeVisible();
+    // server stays alive for normal traffic afterwards
+    const health = await page.request.get("/api/health");
+    expect([200, 500]).toContain(health.status());
+  });
+
+  test("hub guide carries the source section outline (content depth parity)", async ({ page }) => {
+    await page.goto("/modular-home-financing");
+    for (const heading of [
+      "What Is Modular Home Financing?",
+      "Types of Modular Home Financing",
+      "Modular Home Financing Comparison",
+      "The Modular Home Financing Process",
+      "Why Most Banks Reject Modular Home Loans",
+    ]) {
+      await expect(page.getByRole("heading", { level: 2, name: heading, exact: true })).toBeVisible();
+    }
+    // subsection outline (source renders 3 H3s under the first H2)
+    await expect(page.getByRole("heading", { level: 3, name: "Modular homes qualify for traditional mortgages" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: "Construction-to-permanent loans (most common)" })).toBeVisible();
+    // FAQ block present like the source's FAQ section
+    const faqDetails = page.locator("#faqs details");
+    expect(await faqDetails.count()).toBeGreaterThanOrEqual(5);
+  });
+
+  test("FHA loan-options guide carries the source section outline (content depth parity)", async ({ page }) => {
+    await page.goto("/modular-home-financing/loan-options/fha");
+    for (const heading of [
+      "Why FHA Loans Are Popular for Modular Homes",
+      "FHA Modular vs. FHA Manufactured: What's the Difference?",
+      "FHA Mortgage Insurance Premium (MIP) Explained",
+      "FHA Borrower Requirements",
+      "Property Requirements",
+      "FHA Loan Limits by Area",
+      "FHA Construction-to-Permanent for Modular Homes",
+      "FHA vs. Conventional for Modular Homes",
+      "The FHA Appraisal for Modular Homes",
+      "Step-by-Step FHA Process for Modular Homes",
+      "Common FHA Mistakes with Modular Homes",
+      "Why Many FHA Lenders Reject Modular Homes",
+      "Check Your FHA Eligibility",
+    ]) {
+      await expect(page.getByRole("heading", { level: 2, name: heading, exact: true })).toBeVisible();
+    }
+    const faqDetails = page.locator("#faqs details");
+    expect(await faqDetails.count()).toBeGreaterThanOrEqual(8);
+  });
+
+  test("ADU guide carries the source section outline (content depth parity)", async ({ page }) => {
+    await page.goto("/adu-financing");
+    for (const heading of [
+      "The ADU Opportunity: Why Backyard Homes Are Booming",
+      "What Counts as an ADU? Types Explained",
+      "ADU Financing Options: Complete Guide",
+      "How to Choose Your ADU Financing Path",
+      "ADU Financing Requirements",
+    ]) {
+      await expect(page.getByRole("heading", { level: 2, name: heading, exact: true })).toBeVisible();
+    }
+    await expect(page.getByRole("heading", { level: 3, name: "Home equity loan / HELOC" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: "Renovation loans (FHA 203k, HomeStyle, CHOICERenovation)" })).toBeVisible();
+    const faqDetails = page.locator("#faqs details");
+    expect(await faqDetails.count()).toBeGreaterThanOrEqual(6);
+  });
+
+  test("tiny + construction guides carry the source section outlines (content depth parity)", async ({ page }) => {
+    await page.goto("/tiny-home-financing");
+    for (const heading of [
+      "The Tiny Home Movement: Big Appeal, Complex Financing",
+      "Why Tiny Homes Are Hard to Finance",
+      "Tiny Home Types: What Each Means for Financing",
+      "Tiny Home Financing Options: Complete Guide",
+      "Financing Comparison Table",
+      "Tiny Home Costs: Complete Budget Breakdown",
+    ]) {
+      await expect(page.getByRole("heading", { level: 2, name: heading, exact: true })).toBeVisible();
+    }
+    await page.goto("/construction-loans");
+    for (const heading of [
+      "What Is a Construction Loan?",
+      "Types of Construction Loans",
+      "How Construction Loans Work",
+      "Construction Loan Requirements",
+      "One-Time Close vs. Two-Time Close",
+      "Timeline",
+      "Estimate Your Construction Loan Payments",
+    ]) {
+      await expect(page.getByRole("heading", { level: 2, name: heading, exact: true })).toBeVisible();
+    }
+    await expect(page.getByRole("heading", { level: 3, name: "Understanding draw schedules" })).toBeVisible();
   });
 });

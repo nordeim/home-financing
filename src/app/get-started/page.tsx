@@ -67,7 +67,7 @@ export default function GetStartedPage() {
               <Sparkles className="h-4 w-4 text-accent" aria-hidden />
               Free Pre-Qualification
             </p>
-            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.1] md:text-5xl">
+            <h1 className="mt-5 font-display text-2xl font-bold leading-[1.15]">
               Get Matched with <span className="text-accent">Prefab-Friendly Lenders</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg text-white/85">
