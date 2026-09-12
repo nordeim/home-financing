@@ -1,35 +1,97 @@
 $ git pull
-remote: Enumerating objects: 68, done.
-remote: Counting objects: 100% (68/68), done.
-remote: Compressing objects: 100% (9/9), done.
-remote: Total 37 (delta 26), reused 37 (delta 26), pack-reused 0 (from 0)
-Unpacking objects: 100% (37/37), 304.63 KiB | 653.00 KiB/s, done.
+remote: Enumerating objects: 143, done.
+remote: Counting objects: 100% (143/143), done.
+remote: Compressing objects: 100% (35/35), done.
+remote: Total 97 (delta 54), reused 97 (delta 54), pack-reused 0 (from 0)
+Unpacking objects: 100% (97/97), 86.40 KiB | 333.00 KiB/s, done.
 From github.com:nordeim/home-financing
-   5981cc9..cb9f145  main       -> origin/main
-Updating 5981cc9..cb9f145
+   f74b369..2ca290e  main       -> origin/main
+Updating f74b369..2ca290e
 Fast-forward
- .env.example                            |   3 ++-
- AGENTS.md                               |   8 ++++----
- CLAUDE.md                               |  21 ++++++++++---------
- Project_Architecture_Document.md        |  24 +++++++++++-----------
- README.md                               |  14 ++++++-------
- docs/REMEDIATION_PLAN_pass4.md          |  82 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- e2e/parity.spec.ts                      |  69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- e2e/seo.spec.ts                         |   4 ++--
- home-financing_SKILL.md                 |  18 ++++++++--------
- public/images/hero-prefab.jpg           | Bin 144408 -> 296557 bytes
- scripts/live-audit.mts                  | 184 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/app/calculator/page.tsx             |  17 ++++++++++++---
- src/app/globals.css                     |   2 ++
- src/app/modular-home-financing/page.tsx |   1 +
- src/app/page.tsx                        |  38 +++++++++++++++++-----------------
- src/components/calculator-app.tsx       |  19 +++++++++--------
- src/components/guide-screen.tsx         |   4 +++-
- src/components/learn-explorer.tsx       |   4 ++--
- src/components/page-shell.tsx           | 150 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------------
- src/components/prequal-form.tsx         |   4 ++--
- src/components/site-header.tsx          |   2 +-
- src/lib/guides.ts                       | 110 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----------------
- 22 files changed, 663 insertions(+), 115 deletions(-)
- create mode 100644 docs/REMEDIATION_PLAN_pass4.md
- create mode 100644 scripts/live-audit.mts
+ AGENTS.md                               |  13 ++--
+ CLAUDE.md                               |  28 +++----
+ Project_Architecture_Document.md        |  63 ++++++++-------
+ README.md                               |  18 ++---
+ docs/AUDIT_REPORT_pass5.md              | 100 ++++++++++++++++++++++++
+ docs/REMEDIATION_PLAN_pass5.md          | 107 ++++++++++++++++++++++++++
+ docs/REMEDIATION_PLAN_pass6.md          |  31 ++++++++
+ e2e/funnel.spec.ts                      |  26 +++++++
+ e2e/parity.spec.ts                      | 308 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ e2e/smoke.spec.ts                       |  18 +++++
+ home-financing_SKILL.md                 |  26 +++----
+ next.config.ts                          |  36 +++++++++
+ scripts/badge-text-probe.mts            |  11 +++
+ scripts/clone-compare.mts               | 143 +++++++++++++++++++++++++++++++++++
+ scripts/color-probe.mts                 |  22 ++++++
+ scripts/faq-debug.mts                   |  19 +++++
+ scripts/footer-logo-probe.mts           |  13 ++++
+ scripts/hero-badge-probe.mts            |  18 +++++
+ scripts/hero-check.mts                  |  21 +++++
+ scripts/hero-check2.mts                 |  20 +++++
+ scripts/hero-overlay-probe.mts          |  25 ++++++
+ scripts/hero-width-probe.mts            |  24 ++++++
+ scripts/home-deep-diff.mts              | 141 ++++++++++++++++++++++++++++++++++
+ scripts/interior-diff.mts               |  96 +++++++++++++++++++++++
+ scripts/local-verify.mts                |  39 ++++++++++
+ scripts/logo-probe.mts                  |  26 +++++++
+ scripts/logo-probe2.mts                 |  20 +++++
+ scripts/radius-probe.mts                |  24 ++++++
+ scripts/radius-probe2.mts               |  16 ++++
+ scripts/radius-probe3.mts               |  14 ++++
+ scripts/resolve-conflicts.mts           |  98 ++++++++++++++++++++++++
+ scripts/section-diff.mts                |  98 ++++++++++++++++++++++++
+ scripts/section-shots.mts               |  52 +++++++++++++
+ scripts/source-details.mts              |  58 ++++++++++++++
+ scripts/source-outline.mts              |  52 +++++++++++++
+ scripts/source-recon.mts                | 103 +++++++++++++++++++++++++
+ scripts/verify-db-outage.sh             |  45 +++++++++++
+ src/app/about/page.tsx                  |   2 +-
+ src/app/adu-financing/page.tsx          |   2 +-
+ src/app/api/applications/route.ts       |  80 +++++++++++---------
+ src/app/calculator/page.tsx             |   4 +-
+ src/app/construction-loans/page.tsx     |   2 +-
+ src/app/get-started/page.tsx            |   2 +-
+ src/app/globals.css                     |  11 ++-
+ src/app/glossary/page.tsx               |   5 +-
+ src/app/learn/page.tsx                  |   2 +-
+ src/app/modular-home-financing/page.tsx |   2 +-
+ src/app/page.tsx                        |  62 ++++++++-------
+ src/app/tiny-home-financing/page.tsx    |   2 +-
+ src/components/page-shell.tsx           |  31 +++++++-
+ src/components/site-footer.tsx          |   9 ++-
+ src/components/site-header.tsx          |  25 +++---
+ src/components/ui.tsx                   |  12 ++-
+ src/lib/guides.ts                       | 681 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----------
+ src/lib/markdown.test.ts                |  18 +++++
+ src/lib/markdown.tsx                    |  33 +++++---
+ src/lib/rate-limit.test.ts              |  35 ++++++++-
+ src/lib/rate-limit.ts                   |  18 +++++
+ 58 files changed, 2784 insertions(+), 226 deletions(-)
+ create mode 100644 docs/AUDIT_REPORT_pass5.md
+ create mode 100644 docs/REMEDIATION_PLAN_pass5.md
+ create mode 100644 docs/REMEDIATION_PLAN_pass6.md
+ create mode 100644 scripts/badge-text-probe.mts
+ create mode 100644 scripts/clone-compare.mts
+ create mode 100644 scripts/color-probe.mts
+ create mode 100644 scripts/faq-debug.mts
+ create mode 100644 scripts/footer-logo-probe.mts
+ create mode 100644 scripts/hero-badge-probe.mts
+ create mode 100644 scripts/hero-check.mts
+ create mode 100644 scripts/hero-check2.mts
+ create mode 100644 scripts/hero-overlay-probe.mts
+ create mode 100644 scripts/hero-width-probe.mts
+ create mode 100644 scripts/home-deep-diff.mts
+ create mode 100644 scripts/interior-diff.mts
+ create mode 100644 scripts/local-verify.mts
+ create mode 100644 scripts/logo-probe.mts
+ create mode 100644 scripts/logo-probe2.mts
+ create mode 100644 scripts/radius-probe.mts
+ create mode 100644 scripts/radius-probe2.mts
+ create mode 100644 scripts/radius-probe3.mts
+ create mode 100644 scripts/resolve-conflicts.mts
+ create mode 100644 scripts/section-diff.mts
+ create mode 100644 scripts/section-shots.mts
+ create mode 100644 scripts/source-details.mts
+ create mode 100644 scripts/source-outline.mts
+ create mode 100644 scripts/source-recon.mts
+ create mode 100644 scripts/verify-db-outage.sh
