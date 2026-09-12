@@ -404,6 +404,18 @@ test.describe("live-source parity (pass 5)", () => {
     await expect(faq.getByRole("heading", { level: 3, name: /How do green mortgages work\?/i })).toBeVisible();
   });
 
+  test("FAQ accordions are exclusive like the source (opening one closes the others)", async ({ page }) => {
+    await page.goto("/");
+    const items = page.locator("section#faq details");
+    await items.nth(0).locator("summary").click();
+    await expect(items.nth(0)).toHaveAttribute("open", "");
+    await items.nth(1).locator("summary").click();
+    await expect(items.nth(1)).toHaveAttribute("open", "");
+    // Exclusive accordion (pass-6 A-04): the first item must close when the
+    // second opens — mirrors the source's Radix accordion behavior.
+    await expect(items.nth(0)).not.toHaveAttribute("open", "");
+  });
+
   test("get-started hero H1 is compact like the source (24px)", async ({ page }) => {
     await page.goto("/get-started");
     const h1 = page.getByRole("heading", { level: 1, name: /Get Matched with Prefab-Friendly Lenders/i });

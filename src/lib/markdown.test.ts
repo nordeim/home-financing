@@ -71,3 +71,21 @@ describe("Markdown full corpus", () => {
     }
   });
 });
+
+describe("Markdown link href allow-list (pass-6 A-02)", () => {
+  it("renders http, https, mailto, and relative hrefs as anchors", () => {
+    const html = render("See [site](https://example.com/a) and [rel](/guide) and [mail](mailto:x@example.com).");
+    expect(html).toContain('href="https://example.com/a"');
+    expect(html).toContain('href="/guide"');
+    expect(html).toContain('href="mailto:x@example.com"');
+  });
+
+  it("strips javascript: and data: hrefs down to plain text", () => {
+    const html = render("Click [here](javascript:alert(1)) or [that](data:text/html,hi).");
+    expect(html).not.toContain("javascript:");
+    expect(html).not.toContain("data:text/html");
+    // label text survives, rendered as plain text (escaped)
+    expect(html).toContain("here");
+    expect(html).toContain("that");
+  });
+});

@@ -300,7 +300,7 @@ export function GuideView({
               <h2 className="mb-6 font-display text-2xl font-bold">Frequently asked questions</h2>
               <div className="space-y-4">
                 {guide.faqs.map((faq) => (
-                  <details key={faq.question} className="group rounded-xl border border-border bg-card px-5 py-4">
+                  <details key={faq.question} name="guide-faq" className="group rounded-xl border border-border bg-card px-5 py-4">
                     <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold [&::-webkit-details-marker]:hidden">
                       {faq.question}
                       <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden />

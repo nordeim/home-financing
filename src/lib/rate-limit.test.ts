@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { clientKey, rateLimit } from "./rate-limit";
+import { __bucketSizeForTest, clientKey, rateLimit } from "./rate-limit";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -34,6 +34,39 @@ describe("rateLimit", () => {
     for (let i = 0; i < 4; i += 1) rateLimit(a, 4, 60_000);
     expect(rateLimit(a, 4, 60_000)).toBe(false);
     expect(rateLimit(b, 4, 60_000)).toBe(true);
+  });
+});
+
+describe("rateLimit bucket eviction (pass-6 A-01)", () => {
+  it("evicts expired buckets once the map exceeds the cap", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    // Fill the map past the cap with short-window keys that all expire.
+    for (let i = 0; i < 12_000; i += 1) {
+      rateLimit(`spoofed-${i}`, 1, 100);
+    }
+    vi.setSystemTime(200);
+    // One more unique key after expiry should sweep the stale entries and
+    // keep the map bounded instead of growing without limit.
+    rateLimit(`spoofed-next`, 1, 100);
+    const size = __bucketSizeForTest();
+    expect(size).toBeGreaterThan(0);
+    expect(size).toBeLessThan(1_000);
+  });
+
+  it("never evicts buckets that are still inside their window", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    const active = `active-${Math.random()}`;
+    rateLimit(active, 2, 60_000);
+    for (let i = 0; i < 12_000; i += 1) {
+      rateLimit(`churn-${i}`, 1, 100);
+    }
+    vi.setSystemTime(200);
+    rateLimit(`churn-next`, 1, 100);
+    // The active long-window bucket must survive the sweep and keep counting.
+    expect(rateLimit(active, 2, 60_000)).toBe(true);
+    expect(rateLimit(active, 2, 60_000)).toBe(false);
   });
 });
 

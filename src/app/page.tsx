@@ -534,7 +534,7 @@ export default function HomePage() {
           </div>
           <div className="mx-auto max-w-3xl space-y-4">
             {FAQS.map((item) => (
-              <details key={item.q} className="group rounded-xl border border-border bg-card px-6">
+              <details key={item.q} name="home-faq" className="group rounded-xl border border-border bg-card px-6">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-6 text-left hover:text-primary [&::-webkit-details-marker]:hidden">
                   <h3 className="text-base font-normal">{item.q}</h3>
                   <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden />

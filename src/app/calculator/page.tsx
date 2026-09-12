@@ -154,7 +154,7 @@ export default function CalculatorPage() {
           <h2 className="text-center font-display text-3xl font-bold md:text-4xl">Frequently Asked Questions</h2>
           <div className="mx-auto mt-10 max-w-3xl space-y-4">
             {CALCULATOR_FAQS.map((faq) => (
-              <details key={faq.q} className="group rounded-xl border border-border bg-card px-6">
+              <details key={faq.q} name="calc-faq" className="group rounded-xl border border-border bg-card px-6">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-left font-semibold hover:text-primary [&::-webkit-details-marker]:hidden">
                   {faq.q}
                   <ChevronDown

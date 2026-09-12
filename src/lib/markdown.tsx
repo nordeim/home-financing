@@ -1,5 +1,11 @@
 import type { ReactNode } from "react";
 
+// Pass-6 audit A-02: article markdown link hrefs are restricted to safe
+// schemes (http/https/mailto) and root-relative paths. Content is
+// developer-authored, but the renderer hardens the sink anyway — a stray
+// `javascript:` or `data:` URL degrades to plain text instead of an anchor.
+const SAFE_HREF = /^(https?:\/\/|mailto:|\/)/i;
+
 function inline(text: string): ReactNode[] {
   const nodes: ReactNode[] = [];
   const pattern = /(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g;
@@ -21,17 +27,22 @@ function inline(text: string): ReactNode[] {
       const link = token.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
       if (link) {
         const href = link[2];
-        const external = href.startsWith("http");
-        nodes.push(
-          <a
-            key={key}
-            href={href}
-            className="text-primary underline-offset-4 hover:underline"
-            {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-          >
-            {link[1]}
-          </a>,
-        );
+        if (SAFE_HREF.test(href)) {
+          const external = href.startsWith("http");
+          nodes.push(
+            <a
+              key={key}
+              href={href}
+              className="text-primary underline-offset-4 hover:underline"
+              {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+            >
+              {link[1]}
+            </a>,
+          );
+        } else {
+          // Unsafe scheme — render the label as inert text.
+          nodes.push(link[1]);
+        }
       }
     }
     key += 1;
