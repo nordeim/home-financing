@@ -5,7 +5,7 @@ IMPORTANT: File is read fresh for every conversation. Be brief and practical.
 # ModFii — Home Financing (Prefab Mortgage Marketplace)
 
 > **Brand:** ModFii — "The #1 Prefab Home Mortgage Platform" — prefab/modular/ADU/tiny-home financing marketplace matching borrowers to prefab-specialist lenders.
-> **Stack:** Next.js 16.3 (App Router) + React 19.3 + TypeScript 5.9 strict + Tailwind CSS v4.3 CSS-first `@theme` + Drizzle ORM 0.45 + PostgreSQL 17 + `pg` + `next/font` (DM Sans + Outfit) + lucide-react + Drizzle Kit 0.31 / `tsx` 4.23 + Vitest 3.2 (unit, 41 tests) + Playwright 1.63 + `@axe-core/playwright` 4.13 (E2E, 121 tests per project — 103 declarations incl. data-driven loops). Package manager: npm (package-lock.json).
+> **Stack:** Next.js 16.3 (App Router) + React 19.3 + TypeScript 5.9 strict + Tailwind CSS v4.3 CSS-first `@theme` + Drizzle ORM 0.45 + PostgreSQL 17 + `pg` + `next/font` (DM Sans + Outfit) + lucide-react + Drizzle Kit 0.31 / `tsx` 4.23 + Vitest 4.1.11 (unit, 41 tests — pass-8 audit bump) + Playwright 1.63 + `@axe-core/playwright` 4.13 (E2E, 121 tests per project — 103 declarations incl. data-driven loops). Package manager: npm (package-lock.json).
 > **Repo:** `home-financing` (package.json name `nextjs-postgresql-template` — legacy; brand is **ModFii**). Single app, no monorepo/turborepo.
 
 ---

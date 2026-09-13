@@ -3,7 +3,7 @@
 **Classification:** Internal Engineering Reference — Reusable Skill Document
 **Status:** DEFINITIVE, PRODUCTION-LOCKED
 **Companion Documents:** `Project_Architecture_Document.md` v1.0 (blueprint) · `CLAUDE.md` (agent spec, ~600 lines) · `AGENTS.md` (cheat-sheet) · `README.md` (operator guide) · `docs/REMEDIATION_PLAN_pass4.md` (pass-4 evidence)
-**Last Updated:** 2026-09-13 (v1.6 — pass 7 live-source parity audit + TDD remediation; counts 41 unit / 121 E2E per project. Pass 6: audit remediation; pass 5: security headers, funnel JSON-500, source-exact header/logo/buttons, heading hierarchy, guide content depth)
+**Last Updated:** 2026-09-13 (v1.7 — pass 8 audit remediation: `.env` untracked + hygiene guard, vitest ^4.1.11; counts 41 unit / 121 E2E per project. Pass 7: live-source parity audit + TDD remediation; pass 6: audit remediation; pass 5: security headers, funnel JSON-500, source-exact header/logo/buttons, heading hierarchy, guide content depth)
 **Project State:** 41 Vitest (11+13+9+8, incl. H4/OOM regression) + 121 Playwright per project (121/121 with DB, 120/121 DB-less — 103 declarations + data-driven loops: smoke 8 + seo 16 + funnel 5 + assets 19 + parity 73) · 43/43 Next build · PG 17 `8/40/50/23/59/5` seeded · `lint 0/0` · `typecheck` pass
 **Audience:** AI Coding Agents, Senior Engineers, Tech Leads, DevOps, Onboarding Engineers
 **Rule:** Every rule in this document traces to a specific file, test, or live probe. Nothing is here "because it's popular."
@@ -95,7 +95,7 @@ Pinned from `package.json` (`package-lock.json` is the lockfile, not pnpm) + `do
 | Type Support | `@types/node`, `@types/react`, `@types/react-dom` | `^22.20.2`, `^19.3.0`, `^19.3.0` | Completes `tsc --noEmit`. |
 | Scripting | `tsx` | `^4.23.13` | Runs `src/scripts/migrate|seed|reset` as ESM. |
 | Lint | ESLint + `eslint-config-next` | `^9.39.5` + `^16.3.4` | Flat config `eslint.config.mjs` + `defineConfig` + `globalIgnores(.next,out,build,next-env,skills,infrastructure)`. |
-| Unit | Vitest | `^3.2.7` (`vitest/config`, `node` env, `include: src/**/*.test.ts`) | Co-located `src/lib/*.test.ts` pure only (calculator 11 + matching 13 + rate-limit 9 + markdown 8 = 37). `41/41` green. |
+| Unit | Vitest | `^4.1.11` (pass-8 audit bump — GHSA-82fw-gwwq-j7x9 fix; `vitest/config`, `node` env, `include: src/**/*.test.ts`) | Co-located `src/lib/*.test.ts` pure only (calculator 11 + matching 13 + rate-limit 9 + markdown 8 = 41). `41/41` green. |
 | E2E | Playwright + `@axe-core/playwright` | `^1.63.0` + `^4.13.0` | Prod `npx next start --port 3002` (not `dev`), `reuseExistingServer:true`, `chromium+webkit`, `x-forwarded-for` isolation. `61 per project` — 53 declarations + data-driven loops (122 with webkit, `82/82` with DB, `81/82` DB-less). `assets 19 runtime` + `parity 45 runtime` + `smoke 8` + `seo 5` + `funnel 5`. |
 | Package Manager | npm | `package-lock.json` | Single app, no monorepo/turborepo. Gate: `db:setup → lint → typecheck → test → build → e2e`. |
 
