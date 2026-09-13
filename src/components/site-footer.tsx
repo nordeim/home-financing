@@ -92,13 +92,24 @@ const COLUMNS = [
       { href: `mailto:${SITE.email}`, label: "Contact" },
     ],
   },
+  {
+    title: "Legal",
+    links: [
+      { href: "/privacy-policy", label: "Privacy Policy" },
+      { href: "/terms", label: "Terms of Service" },
+      { href: "https://www.nmlsconsumeraccess.org/", label: "NMLS Consumer Access" },
+    ],
+  },
 ];
 
 export function SiteFooter() {
   return (
     <footer className="border-t border-border bg-card">
-      <div className="mx-auto grid max-w-[1400px] gap-10 px-4 py-16 md:grid-cols-2 md:px-8 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] xl:grid-cols-[minmax(0,1.4fr)_repeat(6,minmax(0,1fr))]">
-        <div>
+      {/* Pass-7 source chrome: container px-4 + grid-cols-2 md:grid-cols-8 with a
+          col-span-2 brand column, H4 column headings, filled w-10 social pills
+          (docs/REMEDIATION_PLAN_pass7.md F-11). */}
+      <div className="mx-auto grid max-w-[1400px] grid-cols-2 gap-8 px-4 py-16 md:grid-cols-8 md:mb-12">
+        <div className="col-span-2">
           <Link href="/" className="mb-4 inline-flex items-center gap-2">
             {/* Source badge (pass-5): rotated gradient square + inner bg square + gradient core */}
             <span className="relative block h-8 w-8" aria-hidden>
@@ -124,18 +135,18 @@ export function SiteFooter() {
               {SITE.hq}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <a
               href="#"
               aria-label="ModFii on Twitter"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
             >
               <TwitterIcon className="h-4 w-4" />
             </a>
             <a
               href="#"
               aria-label="ModFii on Facebook"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
             >
               <FacebookIcon className="h-4 w-4" />
             </a>
@@ -144,14 +155,14 @@ export function SiteFooter() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="ModFii on LinkedIn"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
             >
               <LinkedInIcon className="h-4 w-4" />
             </a>
             <a
               href="#"
               aria-label="ModFii on YouTube"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
             >
               <YouTubeIcon className="h-4 w-4" />
             </a>
@@ -159,48 +170,36 @@ export function SiteFooter() {
         </div>
         {COLUMNS.map((column) => (
           <div key={column.title}>
-            <p className="mb-3 text-sm font-semibold text-foreground">{column.title}</p>
+            <h4 className="mb-3 text-sm font-semibold text-foreground">{column.title}</h4>
             <ul className="space-y-2">
-              {column.links.map((link) => (
-                <li key={link.label}>
-                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              {column.links.map((link) =>
+                link.href.startsWith("http") ? (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-muted-foreground hover:text-foreground"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ) : (
+                  <li key={link.label}>
+                    <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground">
+                      {link.label}
+                    </Link>
+                  </li>
+                ),
+              )}
             </ul>
           </div>
         ))}
       </div>
-      <div className="mx-auto max-w-[1400px] px-4 pb-10 md:px-8">
-        <p className="mb-3 text-sm font-semibold text-foreground">Legal</p>
-        <ul className="space-y-2">
-          <li>
-            <Link href="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground">
-              Privacy Policy
-            </Link>
-          </li>
-          <li>
-            <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground">
-              Terms of Service
-            </Link>
-          </li>
-          <li>
-            <a
-              href="https://www.nmlsconsumeraccess.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              NMLS Consumer Access
-            </a>
-          </li>
-        </ul>
-      </div>
-      <div className="border-t border-border">
-        <div className="mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-6 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between md:px-8">
+      <div className="mx-auto max-w-[1400px] px-4">
+        <div className="flex flex-col justify-between gap-3 border-t border-border py-6 text-sm text-muted-foreground md:flex-row md:items-center">
           <p>© 2026 ModFii. All rights reserved.</p>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap justify-center gap-4">
             <Link href="/about" className="hover:text-foreground">
               About Us
             </Link>
@@ -215,7 +214,7 @@ export function SiteFooter() {
             </Link>
           </div>
         </div>
-        <p className="mx-auto max-w-[1400px] px-4 pb-8 text-xs leading-relaxed text-muted-foreground md:px-8">
+        <p className="max-w-3xl pb-8 text-left text-xs leading-relaxed text-muted-foreground md:text-left">
           ModFii is a mortgage marketplace, not a lender. We connect borrowers with lenders who specialize in modular
           and prefab home financing. Equal Housing Opportunity.{" "}
           <a

@@ -20,9 +20,9 @@ const variants: Record<ButtonVariant, string> = {
 const sizes: Record<ButtonSize, string> = {
   sm: "h-9 px-3 text-sm",
   md: "h-11 px-5 text-sm",
-  lg: "h-12 px-8 text-base",
-  lgSm: "h-12 px-8 text-sm",
-  xl: "h-14 px-8 text-lg",
+  lg: "h-11 px-8 text-base",
+  lgSm: "h-11 px-8 text-sm",
+  xl: "h-11 px-8 text-lg",
 };
 
 export function cn(...parts: Array<string | false | null | undefined>): string {
@@ -81,7 +81,9 @@ export function ButtonLink({
 }
 
 export function Container({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("mx-auto w-full max-w-[1400px] px-4 md:px-8", className)}>{children}</div>;
+  // Pass-7: the source uses Tailwind `container mx-auto px-4` — a flat 16px
+  // horizontal inset at every width (probes: docs/REMEDIATION_PLAN_pass7.md F-1).
+  return <div className={cn("mx-auto w-full max-w-[1400px] px-4", className)}>{children}</div>;
 }
 
 export function Badge({ children, className }: { children: ReactNode; className?: string }) {

@@ -75,3 +75,31 @@ test.describe("metadata", () => {
     }
   });
 });
+
+/**
+ * Pass-7 SEO title pins (2026-09-13) — exact `<title>` patterns measured on
+ * https://modfii.com (source of truth) per route. Evidence:
+ * /home/z/my-project/audit/live-parity/outline.json + docs/REMEDIATION_PLAN_pass7.md (F-9).
+ */
+test.describe("source title patterns (pass 7)", () => {
+  const cases: Array<[string, string]> = [
+    ["/", "ModFii | Modular & Prefab Home Loans"],
+    ["/get-started", "ModFii - Prefab Home Mortgage Marketplace | Get Approved in 7 Days"],
+    ["/modular-home-financing/loan-options/fha", "FHA Modular Home Loans | 3.5% Down Payment | ModFii"],
+    ["/mortgage", "Modular Home Mortgage | Compare Rates from 50+ Lenders | ModFii"],
+    ["/financing", "Modular Home Financing | Pre-Qualify in 2 Minutes | ModFii"],
+    ["/about", "About ModFii | Prefab Home Mortgage Marketplace"],
+    ["/modular-home-financing/manufacturers", "Prefab Home Manufacturers | Approved Lenders for Modular Homes | ModFii"],
+    ["/modular-home-financing/states", "Modular Home Financing by State | All 50 States | ModFii"],
+    ["/modular-home-financing/rates", "Modular Home Mortgage Rates | Current Prefab Home Loan Rates September 2026"],
+    ["/modular-home-financing/cost", "Modular Home Cost Guide | Prefab Home Prices 2026 | ModFii"],
+    ["/modular-home-financing/down-payment", "Modular Home Down Payment Options | 0% Down Available | ModFii"],
+  ];
+
+  for (const [route, expected] of cases) {
+    test(`${route} title matches the source pattern`, async ({ page }) => {
+      await page.goto(route);
+      expect(await page.title()).toBe(expected);
+    });
+  }
+});

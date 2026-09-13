@@ -51,8 +51,9 @@ test.describe("home smoke", () => {
   test("404 renders recovery paths", async ({ page }) => {
     const response = await page.goto("/this-page-does-not-exist-xyz");
     expect(response?.status()).toBe(404);
-    // Not-found.tsx should show a heading
-    await expect(page.getByRole("heading")).toBeVisible();
+    // Not-found.tsx should show a heading (level=1 — the footer's H4 column
+    // headings introduced in pass-7 are also headings now).
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
   test("no axe violations on home (critical)", async ({ page }) => {

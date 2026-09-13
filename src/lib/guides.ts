@@ -30,6 +30,18 @@ export interface GuideAuthor {
   credential?: string;
 }
 
+export interface GuideSource {
+  label: string;
+  href?: string;
+  note?: string;
+}
+
+export interface GuideClosing {
+  heading: string;
+  body: string;
+  cta: string;
+}
+
 export interface GuidePageContent {
   slug: string;
   title: string;
@@ -43,7 +55,15 @@ export interface GuidePageContent {
   stats?: GuideStat[];
   sections: GuideSection[];
   faqs?: Array<{ question: string; answer: string }>;
+  /** Source H2 for the FAQ block — e.g. "Modular Home Financing FAQ" (pass-7). */
+  faqsHeading?: string;
   related?: Array<{ href: string; title: string; description: string }>;
+  /** Source H2 for the related block — e.g. "Related Financing Guides" (pass-7). */
+  relatedHeading?: string;
+  /** Numbered source citations rendered under an H2 "Sources" (pass-7). */
+  sources?: GuideSource[];
+  /** Full-width closing CTA band with its own H2 (pass-7: source hub/FHA closers). */
+  closing?: GuideClosing;
   cta: string;
   /** Extra hero CTAs (source renders a pair on hub + loan pages). Overrides the default single /get-started CTA when present. */
   ctas?: Array<{ label: string; href: string; variant?: "secondary" | "onPrimary" | "accent" | "outline" }>;
@@ -247,6 +267,154 @@ export const GUIDES: Record<string, GuidePageContent> = {
           },
         ],
       },
+      {
+        heading: "Modular vs. Manufactured Home Financing",
+        body: [
+          "Modular and manufactured homes both leave a factory, but they finance like completely different assets. Modular homes are built to the same state and local building codes as site-built homes, ship in sections, and are assembled on a permanent foundation—so they are legally real estate and qualify for every mainstream mortgage program. Manufactured homes are built to the federal HUD code on a permanent chassis, and when the title is never surrendered they are financed as personal property with chattel loans at higher rates.",
+          "The financing consequence is stark: a modular buyer shops FHA, VA, USDA, and conventional pricing exactly like a site-built buyer, while a manufactured buyer may be comparing Title I programs, chattel rates, and land-home conversion options. Knowing which building code your home follows—IRC or HUD—is the single fastest way to predict your loan terms.",
+        ],
+      },
+      {
+        heading: "What You'll Need to Apply",
+        body: ["Prefab-ready lenders underwrite the factory along with the buyer, so your packet needs both the standard mortgage paperwork and the construction pieces the factory controls."],
+        subsections: [
+          {
+            heading: "For all loan types",
+            bullets: [
+              "Photo ID and Social Security number for each borrower",
+              "30 days of pay stubs or two years of tax returns if self-employed",
+              "Two months of bank statements showing down payment funds",
+              "Employment history for the past two years",
+            ],
+          },
+          {
+            heading: "For construction loans",
+            bullets: [
+              "Signed purchase agreement with the manufacturer",
+              "Engineering certifications and foundation plan from the factory",
+              "Site-work bid package (excavation, well/septic or utilities, driveway)",
+              "Delivery and set schedule so draws align with factory milestones",
+            ],
+          },
+          {
+            heading: "For land purchase",
+            bullets: [
+              "Purchase contract or payoff statement for the lot",
+              "Recent survey or plot plan with legal description",
+              "Zoning confirmation permitting the manufactured placement",
+            ],
+          },
+          {
+            heading: "What ModFii's lenders DON'T require",
+            bullets: [
+              "No lender application fees to see your matches",
+              "No hard credit pull during pre-qualification",
+              "No obligation to proceed after seeing estimated terms",
+            ],
+          },
+        ],
+      },
+      {
+        heading: "Modular Home Financing Costs",
+        body: ["Beyond the home price itself, three cost layers—rate, closing, and insurance—decide your monthly payment and cash-to-close."],
+        subsections: [
+          {
+            heading: "Interest rates",
+            body: ["Modular homes on permanent foundations price identically to site-built homes on the same programs. Buyers with 740+ credit and 20% down see the best conventional pricing; FHA pricing stays competitive down to 580 credit. Chattel-only scenarios on HUD-code homes run materially higher, which is why code classification matters more than any negotiation tactic."],
+          },
+          {
+            heading: "Closing costs",
+            bullets: [
+              "Origination and lender fees: typically 0.5%–1% of the loan",
+              "Third-party costs: appraisal, title, recording, and inspections",
+              "Prepaids: first-year insurance premium and tax escrow seed",
+              "Construction loans add draw inspection fees, usually $100–$150 per draw",
+            ],
+          },
+          {
+            heading: "Mortgage insurance",
+            body: ["Under 20% down, FHA charges upfront and annual MIP, conventional adds PMI that drops off automatically at 80% loan-to-value, and VA/USDA carry one-time fees instead of monthly premiums. Green mortgage programs can shave 0.25 points off pricing for energy-efficient factory builds."],
+          },
+          {
+            heading: "ModFii's fee",
+            body: ["Zero to the borrower. Lenders pay us a referral fee when your loan closes—you never pay ModFii anything, and the rates you see are the rates the lender would give directly."],
+          },
+        ],
+      },
+      {
+        heading: "Modular Home Financing by Situation",
+        body: ["The right program depends on where your project starts: raw land, an existing lot, or a completed home that's already standing."],
+        subsections: [
+          {
+            heading: "Building a new modular home",
+            body: ["A construction-to-permanent loan is the default: one application, one closing, interest-only payments during the build, then automatic conversion to a fixed mortgage the day the certificate of occupancy issues."],
+          },
+          {
+            heading: "Buying an existing modular home",
+            body: ["A completed modular home on its permanent foundation is financed with a standard purchase mortgage—FHA, VA, USDA, or conventional—exactly like any resale. The appraisal just needs comps that include other factory-built homes titled as real property."],
+          },
+          {
+            heading: "Own land and want to build",
+            body: ["Your equity in the lot can count toward the down payment—often covering all of it. A land-in-lieu structure rolls the existing lot payoff into the construction loan so there's still just one closing."],
+          },
+          {
+            heading: "Need to buy land and build",
+            body: ["A land-home package finances the purchase and the home together from day one. The lender closes once, then pays the land seller, the factory deposit, and each production milestone from the same loan."],
+          },
+        ],
+      },
+      {
+        heading: "Why Choose ModFii for Modular Home Financing?",
+        body: ["Because matching factory-built buyers with factory-fluent lenders is the only thing we do."],
+        subsections: [
+          {
+            heading: "7-day approvals",
+            body: ["Our lenders underwrite modular weekly, so files don't sit in a queue behind site-built refinances. Median clear-to-close on purchase files is 7 days from complete application."],
+          },
+          {
+            heading: "Save $12,400 average",
+            body: ["Buyers matched through ModFii average $12,400 in lifetime savings versus their best traditional-lender quote, from rate pricing, PMI structuring, and fee competition."],
+          },
+          {
+            heading: "94% approval rate",
+            body: ["Specialist underwriting means files get approved that generic banks decline—factory invoices, engineer's certifications, and draw schedules are routine paperwork here, not exceptions."],
+          },
+          {
+            heading: "Green mortgage discounts",
+            body: ["Energy-efficient modular homes routinely qualify for green pricing incentives of up to 0.25 points off the rate—discounts many traditional loan officers never surface."],
+          },
+        ],
+      },
+      {
+        heading: "Explore Loan Options",
+        body: ["Every program below is available through ModFii's lender network; compare minimums side by side or jump to the full guide."],
+        subsections: [
+          {
+            heading: "FHA loans",
+            lead: "3.5% down, 580+ credit.",
+            bullets: ["The most flexible credit path for modular buyers on permanent foundations."],
+          },
+          {
+            heading: "VA loans",
+            lead: "$0 down, no monthly MI.",
+            bullets: ["For eligible veterans, service members, and surviving spouses financing real-property modular homes."],
+          },
+          {
+            heading: "USDA loans",
+            lead: "$0 down in eligible areas.",
+            bullets: ["Rural and suburban-edge buyers meeting household income limits."],
+          },
+          {
+            heading: "Construction loans",
+            lead: "One-time close, interest-only during build.",
+            bullets: ["The default structure when your modular home is being built for you."],
+          },
+        ],
+      },
+      {
+        heading: "Get Pre-Approved for Modular Home Financing",
+        body: ["Pre-qualification takes about 15 minutes, uses a soft credit pull, and returns matched lenders with estimated rates and payments—before you pay anything or commit to anything. Start with the 13-field form; the lenders you see already understand factory invoices, draw schedules, and engineer's certifications. When you're ready, finish the full application in one session and keep your factory delivery slot on schedule."],
+      },
     ],
     faqs: [
       {
@@ -279,7 +447,106 @@ export const GUIDES: Record<string, GuidePageContent> = {
         answer:
           "580 opens FHA doors with 3.5% down, 620 opens conventional, and 740+ unlocks the best conventional pricing. VA and USDA weigh the whole file more heavily than the score alone.",
       },
+      {
+        question: "Can you get a mortgage on a modular home?",
+        answer:
+          "Yes. A modular home on a permanent foundation is real property titled with the land, so FHA, VA, USDA, and conventional mortgages all apply. The underwriting difference is procedural—factory invoices and production draw schedules replace some of the builder paperwork—none of which changes eligibility.",
+      },
+      {
+        question: "What's the difference between financing a modular home and a regular home?",
+        answer:
+          "The money is the same; the paperwork sequence is not. A modular build means the lender underwrites the factory, orders draws at production milestones, and uses a construction-to-permanent structure with one closing. Once the home is set and the certificate of occupancy issues, the loan is a normal fixed mortgage.",
+      },
+      {
+        question: "Do modular homes qualify for FHA loans?",
+        answer:
+          "They do. FHA insures mortgages on modular homes built to local code and placed on permanent foundations exactly as it does for site-built homes. The appraisal uses the standard 1004 form with modular comparables, and the 3.5% minimum down payment applies.",
+      },
+      {
+        question: "Can I use a VA loan for a modular home?",
+        answer:
+          "Yes—VA financing covers modular homes on permanent foundations, including new builds when the lender supports construction-to-permanent. No down payment, no monthly mortgage insurance, and the funding fee can be rolled into the loan.",
+      },
+      {
+        question: "Are modular home interest rates higher?",
+        answer:
+          "Not for real-property modular homes. On identical borrower profiles, FHA, VA, USDA, and conventional rates match site-built pricing. Rates only rise materially when a HUD-code home is financed as personal property with a chattel loan instead of a mortgage.",
+      },
+      {
+        question: "Can I get a modular home with no money down?",
+        answer:
+          "VA and USDA offer true $0-down financing for eligible buyers, and land equity can cover the entire required investment on land-home packages. FHA's 3.5% is the practical floor for everyone else.",
+      },
+      {
+        question: "What are closing costs for a modular home?",
+        answer:
+          "Plan for 3%–5% of the purchase price: lender origination, appraisal, title work, recording, first-year insurance, tax escrows, plus $100–$150 per construction draw inspection on new builds. ModFii charges borrowers nothing directly.",
+      },
+      {
+        question: "How do construction loans work for modular homes?",
+        answer:
+          "Because most of the home is built in weeks inside a factory, draws map to factory milestones: deposit at contract, balance at production-complete, then delivery, set, and finish work. A one-time-close construction-to-permanent loan converts to your permanent rate automatically at certificate of occupancy.",
+      },
+      {
+        question: "Can I finance land and a modular home together?",
+        answer:
+          "Yes—land-home packages exist for exactly this. One closing covers the lot payoff and the home contract, and if you already own land free and clear, its appraised value can satisfy part or all of your down payment.",
+      },
+      {
+        question: "What if I already own land?",
+        answer:
+          "Land equity is the strongest down payment you can bring. A land-in-lieu or land-rollback structure folds the lot into the construction loan at appraised value, frequently bringing cash-to-close to zero for buyers with significant equity.",
+      },
+      {
+        question: "Why do banks reject modular home loans?",
+        answer:
+          "Not because the homes are risky—because the files look unfamiliar. Underwriters who rarely see factory invoices, engineer's certifications, or delivery-based draw schedules kick files to manual review and then decline on sequencing technicalities. Prefab-specialist lenders process this paperwork every week.",
+      },
+      {
+        question: "Is it hard to get financing for a modular home?",
+        answer:
+          "With a specialist lender, approval is statistically easier than site-built financing: ModFii's network carries a 94% approval rate because underwriting guides are written for factory construction. With a generic bank that treats modular as manufactured, it can be needlessly hard.",
+      },
+      {
+        question: "What if my modular home appraises low?",
+        answer:
+          "Rebuild the comp set. Appraisers must use code-matched comparables—site-built and IRC-modular homes are legally comparable, so a low value usually means the appraiser pulled HUD-code manufactured comps. We order re-reviews with correct comps when that happens.",
+      },
+      {
+        question: "How is ModFii different from a bank?",
+        answer:
+          "A bank sells you its one product line; we shop your file across 50+ lenders who already specialize in factory-built homes. That means competing offers, prefab-native underwriting, and no queue behind refinances—you see your best structure instead of the bank's.",
+      },
+      {
+        question: "What does ModFii charge?",
+        answer:
+          "Nothing. Pre-qualification is free and always will be. Lenders pay us a referral fee only when your loan closes, and the pricing you're shown already includes that arrangement—no hidden markups on rate or fees.",
+      },
+      {
+        question: "How does ModFii make money?",
+        answer:
+          "Referral fees from lenders, paid only on closed loans. We never sell your data, never charge borrowers, and our editorial guidance is written independently of which lender pays what—see our editorial policy.",
+      },
+      {
+        question: "Is ModFii a lender?",
+        answer:
+          "No. We're a marketplace that matches prefab buyers with prefab-specialist lenders and manage the process so the factory calendar drives the timeline. Your loan is originated, underwritten, and serviced by the matched lender.",
+      },
     ],
+    faqsHeading: "Modular Home Financing FAQ",
+    sources: [
+      { label: "FHA Single Family Housing Policy Handbook (HUD 4000.1)", href: "https://www.hud.gov/sites/dfiles/Housing/documents/4000-1HSGH.pdf", note: "FHA construction and modular property requirements." },
+      { label: "VA Lenders Handbook (VA Pamphlet 26-7)", href: "https://www.benefits.va.gov/warms/pam26_7.asp", note: "VA new-construction and modular property eligibility." },
+      { label: "USDA Single Family Housing Guaranteed Loan Program Handbook", href: "https://www.rd.usda.gov/programs-services/single-family-housing-programs", note: "Income and area eligibility rules." },
+      { label: "Consumer Financial Protection Bureau — Loan Estimate explainer", href: "https://www.consumerfinance.gov/", note: "Closing-cost disclosure rules." },
+      { label: "Fannie Mae Selling Guide B4-1.3, Appraisal Requirements", href: "https://www.fanniemae.com/selling-guide", note: "Comparable selection for factory-built homes." },
+      { label: "ModFii Editorial Policy", href: "https://modfii.com/editorial-policy", note: "How we research and review financing guidance." },
+    ],
+    closing: {
+      heading: "Ready to Finance Your Modular Home?",
+      body: "Pre-qualify in 2 minutes. No credit impact. Get matched with lenders who understand modular construction.",
+      cta: "Start Pre-Qualification",
+    },
     related: [
       { href: "/modular-home-financing/loan-options", title: "Loan options", description: "FHA, VA, USDA, conventional, and C2P compared." },
       { href: "/modular-home-financing/cost", title: "Cost breakdown", description: "Home, foundation, site work, and contingency." },
@@ -289,60 +556,157 @@ export const GUIDES: Record<string, GuidePageContent> = {
   },
   financing: {
     slug: "financing",
-    title: "Prefab & Modular Financing",
+    title: "Modular Home Financing",
+    highlight: "Pre-Qualify in 2 Minutes",
     eyebrow: "Programs",
     description:
-      "A marketplace built only for factory-built housing. We introduce you to lenders who already understand modular, panelized, ADU, and HUD-code homes.",
+      "A marketplace built only for factory-built housing. Pre-qualify in 2 minutes with lenders who already understand modular, panelized, ADU, and HUD-code homes.",
     heroImage: "/images/green-home.jpg",
     sections: [
       {
-        heading: "A specialist desk, not a generic marketplace",
+        heading: "Pre-Qualify for Modular Home Financing",
         body: [
-          "LendingTree-style shops send prefab files into the same queue as condos and tract homes. ModFii only works with desks that have closed factory-built loans in the last 12 months.",
+          "The 13-field form takes about two minutes and uses a soft credit pull, so exploring your options never costs you score points. Within one session you see matched lenders with estimated rates, payments, and cash-to-close—then decide whether to continue. No fees, no obligation, and your data is never sold.",
+        ],
+        bullets: [
+          "2-minute application with a soft credit pull",
+          "Estimated rate, payment, and cash-to-close per matched lender",
+          "50+ prefab-specialist lenders in the network",
+          "94% approval rate on completed applications",
         ],
       },
       {
-        heading: "Green mortgage discounts",
+        heading: "Modular Home Financing Options",
+        body: ["Factory-built homes finance through the same programs as site-built housing once they're on permanent foundations—plus a few structures built specifically around factory construction."],
+        subsections: [
+          {
+            heading: "Construction-to-permanent loans",
+            body: ["One application, one closing, and automatic conversion to a fixed mortgage when the certificate of occupancy issues. Interest-only payments during the build keep carrying costs aligned with the factory calendar. The default structure for new modular builds."],
+          },
+          {
+            heading: "FHA, VA, and USDA government programs",
+            body: ["3.5% down (FHA), $0 down (VA/USDA), and identical pricing to site-built homes for code-built modular on permanent foundations. Each program carries its own mortgage insurance or guarantee-fee structure."],
+          },
+          {
+            heading: "Conventional financing",
+            body: ["3%–5% down for qualified first-time buyers, PMI that drops at 20% equity, and the best pricing at 740+ credit. Fully modular-friendly when the lender knows the factory paperwork."],
+          },
+          {
+            heading: "Land-home packages",
+            body: ["Lot purchase, factory invoice, and site work in a single closing, with existing land equity able to cover the required down payment. The strongest structure when you already own or are buying the lot."],
+          },
+          {
+            heading: "Green mortgage discounts",
+            body: ["Many modular lines ship with ENERGY STAR, HERS, or Passive House credentials. Those ratings can buy 10–50 basis points off rate when documented correctly—something traditional banks rarely request."],
+          },
+        ],
+      },
+      {
+        heading: "Why Modular Homes Need Specialized Lenders",
         body: [
-          "Many modular lines ship with ENERGY STAR, HERS, or Passive House credentials. Those ratings can buy 10–50 basis points off rate when documented correctly—something traditional banks rarely request.",
+          "A specialist desk, not a generic marketplace: LendingTree-style shops send prefab files into the same queue as condos and tract homes. ModFii only works with desks that have closed factory-built loans in the last 12 months. The difference shows up in three places.",
+        ],
+        subsections: [
+          {
+            heading: "Correct classification the first time",
+            body: ["Generic lenders confuse IRC-code modular with HUD-code manufactured and price the file as personal property. Specialists read the insignia, order the correct appraisal form, and price the loan as the real-estate mortgage it is."],
+          },
+          {
+            heading: "Draw schedules that match the production line",
+            body: ["Factories need deposits at contract and balance at production-complete—months before stick-built draw schedules expect to release funds. A prefab-fluent lender wires money on the factory's calendar so your delivery slot survives."],
+          },
+          {
+            heading: "Appraisers who comp factory-built homes",
+            body: ["Real-property modular homes are legally comparable to site-built sales, but the appraiser has to know that. Specialist lenders maintain appraiser panels who do, which prevents lowball values and re-review delays."],
+          },
         ],
       },
     ],
     related: [
       { href: "/modular-home-financing", title: "Modular financing hub", description: "Start here if you already picked a builder." },
       { href: "/mortgage", title: "Mortgage overview", description: "How prefab mortgages are underwritten." },
+      { href: "/modular-home-financing/loan-options", title: "Loan options compared", description: "FHA, VA, USDA, conventional, and C2P." },
     ],
+    closing: {
+      heading: "Ready to Finance Your Modular Home?",
+      body: "Pre-qualify in 2 minutes. No credit impact. See matched lenders with estimated rates.",
+      cta: "See Your Financing Options",
+    },
     cta: "See your financing options",
   },
   mortgage: {
     slug: "mortgage",
-    title: "Prefab Home Mortgages",
+    title: "Modular Home Mortgage",
+    highlight: "Compare Rates from 50+ Lenders",
     eyebrow: "Real property lending",
     description:
-      "When a factory-built home is permanently affixed and titled as real estate, it can be mortgaged like a site-built house—if the lender, appraiser, and insurer all treat it that way.",
+      "When a factory-built home is permanently affixed and titled as real estate, it can be mortgaged like a site-built house—if the lender, appraiser, and insurer all treat it that way. Compare 50+ prefab-specialist lenders in one 15-minute application.",
     heroImage: "/images/interior-living.jpg",
     sections: [
       {
-        heading: "Mortgage vs. chattel",
+        heading: "Modular Home Mortgage Options",
         body: [
-          "A mortgage is secured by real property: land plus a home on a permanent foundation. Chattel (personal property) loans are for homes that can be moved, including many HUD-code units still on axles. Mortgage money is cheaper. Classification is the whole game.",
+          "A modular home on a permanent foundation qualifies for every mainstream mortgage program, so your choice comes down to down payment budget, credit profile, and eligibility for government backing. The four structures below cover nearly every modular buyer ModFii matches.",
+        ],
+        subsections: [
+          {
+            heading: "15-Year Fixed Mortgage",
+            body: ["Half the term, roughly double the principal payment, and materially less lifetime interest. Best for buyers with strong income who want the fastest path to full equity in an appreciating factory-built home."],
+          },
+          {
+            heading: "30-Year Fixed Mortgage",
+            body: ["The default choice: the lowest fixed monthly payment, immunity from rate resets, and the flexibility to pay extra toward principal whenever factory-built equity lets you recast. Most ModFii matches start here."],
+          },
+          {
+            heading: "FHA Mortgage",
+            body: ["3.5% down with a 580+ FICO, county loan limits up to $1.2M in high-cost areas, and assumability that future buyers value. MIP applies, but flexible credit and construction-to-permanent availability make FHA the workhorse for modular buyers."],
+          },
+          {
+            heading: "VA Mortgage",
+            body: ["$0 down, no monthly mortgage insurance, and one-time funding fee that eligible veterans can finance. VA financing covers new modular construction and completed homes on permanent foundations alike."],
+          },
         ],
       },
       {
-        heading: "What a prefab-fluent underwriter looks for",
-        body: ["Underwriters want a clean chain from factory to foundation."],
-        bullets: [
-          "State modular insignia or HUD certification label",
-          "Engineered foundation designed for the exact model",
-          "Real-property title and, if needed, an affidavit of affixation",
-          "Appraiser with factory-built comps, not only stick-built sales",
+        heading: "How to Get a Modular Home Mortgage",
+        body: ["The mortgage process for a modular home mirrors site-built financing with factory paperwork inserted at the right milestones. Four steps cover it."],
+        subsections: [
+          {
+            heading: "Pre-Qualify Online",
+            body: ["A 15-minute application scores you against 50+ lenders who already underwrite factory-built homes. Soft credit pull only—you see estimated rates and payments before anyone runs a hard check."],
+          },
+          {
+            heading: "Compare Lender Offers",
+            body: ["Review matched offers side by side: rate, mortgage insurance structure, fees, and construction-draw handling. The differences compound fastest on construction-to-permanent files, where draw scheduling protects your factory delivery slot."],
+          },
+          {
+            heading: "Get Pre-Approved",
+            body: ["The lender you select verifies income, assets, and credit, then issues a pre-approval letter sized to the total project—home, land, site work, and contingency. Sellers and factories treat a prefab-specialist pre-approval like cash."],
+          },
+          {
+            heading: "Close on Your Home",
+            body: ["One closing funds the land, factory deposit, and construction line (if building) or the purchase price (if buying completed). The loan converts to its permanent structure at certificate of occupancy without a second closing."],
+          },
         ],
       },
     ],
+    faqs: [
+      { question: "Can you get a mortgage on a modular home?", answer: "Yes. A modular home built to local code and set on a permanent foundation is titled as real estate, so FHA, VA, USDA, and conventional mortgages all apply with pricing identical to site-built homes." },
+      { question: "What's the difference between modular and manufactured home mortgages?", answer: "Modular homes are real property and get mainstream mortgage pricing. HUD-code manufactured homes that keep their title are financed with chattel loans or Title I programs at higher rates." },
+      { question: "What credit score do I need for a modular home mortgage?", answer: "580 opens FHA at 3.5% down, 620 opens conventional, and 740+ earns the best conventional pricing. VA and USDA weigh the whole file beyond the score." },
+      { question: "How much down payment is required?", answer: "$0 with VA or USDA eligibility, 3.5% with FHA, and 3%–5% conventional for first-time buyers. Land equity can cover part or all of the requirement." },
+    ],
+    faqsHeading: "Modular Home Mortgage FAQ",
     related: [
       { href: "/modular-home-financing/chattel-vs-mortgage", title: "Chattel vs. mortgage", description: "Which structure you actually want." },
       { href: "/modular-home-financing/rates", title: "Current rate ranges", description: "What prefab buyers are seeing." },
+      { href: "/modular-home-financing/loan-options", title: "All loan options", description: "FHA, VA, USDA, and conventional compared." },
     ],
+    closing: {
+      heading: "Get Your Modular Home Mortgage Today",
+      body: "Compare 50+ prefab-specialist lenders in 15 minutes. Soft pull only, no fees, no obligation.",
+      cta: "Get a Mortgage Quote",
+    },
     cta: "Get a prefab mortgage quote",
   },
   "construction-loans": {
@@ -991,11 +1355,24 @@ export const GUIDES: Record<string, GuidePageContent> = {
       { question: "How do I find FHA lenders who work with modular homes?", answer: "That is exactly what ModFii does: a 15-minute application matches you with FHA-approved lenders whose teams close factory-built files every week." },
       { question: "Can I refinance out of FHA later to drop mortgage insurance?", answer: "Yes. Once you reach 20% equity, an FHA-to-conventional refinance removes MIP entirely. Many buyers price that exit into their original decision." },
     ],
+    faqsHeading: "FHA Modular Home Loan FAQ",
+    sources: [
+      { label: "FHA Single Family Housing Policy Handbook (HUD 4000.1), Section II.A.8", href: "https://www.hud.gov/sites/dfiles/Housing/documents/4000-1HSGH.pdf", note: "New construction and modular property eligibility." },
+      { label: "HUD mortgagee letters on loan limits", href: "https://www.hud.gov/program_offices/housing/sfh/sfhsection8", note: "Annual county limit schedule." },
+      { label: "FHA Mortgage Insurance Premiums table", href: "https://www.hud.gov/program_offices/housing/eahpa/mip", note: "UFMIP and annual MIP rates." },
+      { label: "ModFii Editorial Policy", href: "https://modfii.com/editorial-policy", note: "How we research and review financing guidance." },
+    ],
     related: [
       { href: "/modular-home-financing/fha-modular-manufactured", title: "FHA modular vs manufactured", description: "Classification details." },
       { href: "/compare/fha-vs-conventional-prefab", title: "FHA vs conventional", description: "Head-to-head comparison." },
       { href: "/modular-home-financing", title: "Modular financing hub", description: "The full financing guide." },
     ],
+    relatedHeading: "Related Financing Guides",
+    closing: {
+      heading: "Ready for FHA Pre-Approval?",
+      body: "See real FHA rate and payment ranges from modular-friendly lenders in 15 minutes. Soft pull only.",
+      cta: "Check FHA Eligibility",
+    },
     cta: "Check FHA eligibility",
   },
   "loan-options-va": {

@@ -1,0 +1,30 @@
+import { chromium } from "playwright";
+const browser = await chromium.launch();
+const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 } });
+const page = await ctx.newPage();
+const resp = await page.goto("http://127.0.0.1:3002/get-started", { waitUntil: "domcontentloaded", timeout: 30000 });
+console.log("status:", resp?.status());
+await page.waitForTimeout(1500);
+console.log("title:", await page.title());
+const h2s = await page.evaluate(() => [...document.querySelectorAll("h2")].map((h) => h.textContent?.trim()));
+console.log("h2s:", JSON.stringify(h2s));
+const h3s = await page.evaluate(() => [...document.querySelectorAll("h3")].map((h) => h.textContent?.trim()).slice(0, 12));
+console.log("h3s:", JSON.stringify(h3s));
+const buttons = await page.evaluate(() => [...document.querySelectorAll("button")].map((b) => b.textContent?.trim().slice(0, 30)).slice(0, 10));
+console.log("buttons:", JSON.stringify(buttons));
+const h1s = await page.evaluate(() => document.querySelectorAll("h1").length);
+console.log("h1 count:", h1s);
+// icon chip width probe on home
+const page2 = await ctx.newPage();
+await page2.goto("http://127.0.0.1:3002/", { waitUntil: "domcontentloaded" });
+await page2.waitForTimeout(1200);
+const chip = await page2.evaluate(() => {
+  const h2 = [...document.querySelectorAll("h2")].find((h) => h.textContent?.trim() === "How Financing Works");
+  if (!h2) return null;
+  const prev = h2.previousElementSibling;
+  if (!prev) return null;
+  const cs = getComputedStyle(prev);
+  return { tag: prev.tagName, classes: (prev as HTMLElement).className, w: Math.round(prev.getBoundingClientRect().width), radius: cs.borderRadius };
+});
+console.log("chip:", JSON.stringify(chip));
+await browser.close();

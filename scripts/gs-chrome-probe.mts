@@ -1,0 +1,11 @@
+import { chromium } from "playwright";
+import { writeFileSync } from "node:fs";
+const browser = await chromium.launch();
+const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+const page = await ctx.newPage();
+await page.goto("https://modfii.com/get-started", { waitUntil: "networkidle", timeout: 60000 });
+await page.waitForTimeout(2000);
+const html = await page.content();
+writeFileSync("/home/z/my-project/audit/live-parity/src-get-started.html", html);
+console.log("saved", html.length);
+await browser.close();

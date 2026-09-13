@@ -2,7 +2,7 @@ import { GuideScreen } from "@/components/guide-screen";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "FHA Loans for Modular Homes",
+  title: "FHA Modular Home Loans | 3.5% Down Payment",
   description: "Low down payment FHA financing for modular and manufactured homes on permanent foundations.",
 };
 

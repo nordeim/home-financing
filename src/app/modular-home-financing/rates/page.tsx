@@ -2,7 +2,7 @@ import { GuideScreen } from "@/components/guide-screen";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Modular Home Mortgage Rates",
+  title: { absolute: "Modular Home Mortgage Rates | Current Prefab Home Loan Rates September 2026" },
   description: "What prefab buyers are seeing on real-property modular files versus HUD-code chattel notes.",
 };
 

@@ -3,8 +3,8 @@
 **Classification:** Internal Engineering Reference — Reusable Skill Document
 **Status:** DEFINITIVE, PRODUCTION-LOCKED
 **Companion Documents:** `Project_Architecture_Document.md` v1.0 (blueprint) · `CLAUDE.md` (agent spec, ~600 lines) · `AGENTS.md` (cheat-sheet) · `README.md` (operator guide) · `docs/REMEDIATION_PLAN_pass4.md` (pass-4 evidence)
-**Last Updated:** 2026-09-12 (v1.5 — pass 6 audit remediation; counts 41 unit / 82 E2E per project. Pass 5: security headers, funnel JSON-500, source-exact header/logo/buttons, heading hierarchy, guide content depth, counts 37 unit / 82 E2E per project)
-**Project State:** 37 Vitest (11+13+7+6, incl. H4/OOM regression) + 61 Playwright per project (82/82 with DB, 81/82 DB-less — 53 declarations + data-driven loops) · 43/43 Next build · PG 17 `8/40/50/23/59/5` seeded · `lint 0/0` · `typecheck` pass
+**Last Updated:** 2026-09-13 (v1.6 — pass 7 live-source parity audit + TDD remediation; counts 41 unit / 121 E2E per project. Pass 6: audit remediation; pass 5: security headers, funnel JSON-500, source-exact header/logo/buttons, heading hierarchy, guide content depth)
+**Project State:** 41 Vitest (11+13+9+8, incl. H4/OOM regression) + 121 Playwright per project (121/121 with DB, 120/121 DB-less — 103 declarations + data-driven loops: smoke 8 + seo 16 + funnel 5 + assets 19 + parity 73) · 43/43 Next build · PG 17 `8/40/50/23/59/5` seeded · `lint 0/0` · `typecheck` pass
 **Audience:** AI Coding Agents, Senior Engineers, Tech Leads, DevOps, Onboarding Engineers
 **Rule:** Every rule in this document traces to a specific file, test, or live probe. Nothing is here "because it's popular."
 

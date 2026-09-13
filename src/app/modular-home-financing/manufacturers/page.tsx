@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Prefab Home Manufacturers",
+  title: "Prefab Home Manufacturers | Approved Lenders for Modular Homes",
   description:
     "Connect with approved lenders for America's top modular and manufactured home builders. Find the right financing for your dream prefab home.",
 };

@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Modular Home Financing by State",
+  title: "Modular Home Financing by State | All 50 States",
   description: "State-by-state modular and prefab home financing guides covering lending climate, USDA maps, and local manufacturers.",
 };
 

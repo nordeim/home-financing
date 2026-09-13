@@ -416,10 +416,16 @@ test.describe("live-source parity (pass 5)", () => {
     await expect(items.nth(0)).not.toHaveAttribute("open", "");
   });
 
-  test("get-started hero H1 is compact like the source (24px)", async ({ page }) => {
+  test("get-started hero H1 follows the source's desktop ramp (48px at lg)", async ({ page }) => {
     await page.goto("/get-started");
     const h1 = page.getByRole("heading", { level: 1, name: /Get Matched with Prefab-Friendly Lenders/i });
-    await expect(h1).toHaveCSS("font-size", "24px");
+    // Pass-7 re-probe (2026-09-13): the source renders TWO H1s — a mobile-only
+    // `text-2xl` (24px) one and the visible desktop `text-3xl md:text-4xl
+    // lg:text-5xl` one (48px at 1280). The clone keeps a single semantic H1
+    // with the desktop ramp (24px at mobile, 36px at md, 48px at lg+).
+    await expect(h1).toHaveCSS("font-size", "48px");
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(h1).toHaveCSS("font-size", "30px");
   });
 
   test("interior H1 sizes match the source: learn 60px, glossary 48px", async ({ page }) => {
@@ -542,5 +548,409 @@ test.describe("live-source parity (pass 5)", () => {
       await expect(page.getByRole("heading", { level: 2, name: heading, exact: true })).toBeVisible();
     }
     await expect(page.getByRole("heading", { level: 3, name: "Understanding draw schedules" })).toBeVisible();
+  });
+});
+
+/**
+ * Pass-7 live-source parity pins (2026-09-13).
+ *
+ * Evidence: computed-style recon of https://modfii.com vs the deployed clone
+ * (scripts/live-parity-audit.mts + probe2-6 + src-home.html dumps in
+ * /home/z/my-project/audit/live-parity/). docs/REMEDIATION_PLAN_pass7.md
+ * holds the finding table (F-1..F-12). Default viewport is Desktop Chrome
+ * 1280x720; mobile/tablet cases override the viewport inline.
+ */
+test.describe("live-source parity (pass 7)", () => {
+  test("header inner bar renders 64px on mobile and 80px at md+ like the source (h-16 md:h-20)", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    const header = page.locator("header");
+    const innerHeight = await header.evaluate((el) => getComputedStyle(el.firstElementChild as Element).height);
+    // Source probe (390px): inner bar h-16 → 64px.
+    expect(innerHeight).toBe("64px");
+  });
+
+  test("header desktop nav is visible from md (768px) with the source's 32px item gap", async ({ page }) => {
+    await page.setViewportSize({ width: 800, height: 900 });
+    await page.goto("/");
+    const nav = page.locator("header nav").first();
+    await expect(nav).toBeVisible();
+    const styles = await nav.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { gap: cs.columnGap };
+    });
+    // Source probe: nav gap-8 → 32px.
+    expect(styles.gap).toBe("32px");
+  });
+
+  test("header container uses the source's 16px horizontal inset (container px-4)", async ({ page }) => {
+    await page.goto("/");
+    const container = page.locator("header > div").first();
+    const padding = await container.evaluate((el) => getComputedStyle(el).paddingLeft);
+    // Source probe (1280/1440): container px-4 → 16px (clone rendered md:px-8 → 32px).
+    expect(padding).toBe("16px");
+  });
+
+  test("intro heading block spans the source's max-w-5xl column (1024px) with the md:text-4xl H1 ramp", async ({ page }) => {
+    await page.goto("/");
+    const h1 = page.getByRole("heading", { level: 1, name: "Modular & Prefab Home Loans" });
+    const col = await h1.evaluate((el) => el.closest("div.max-w-5xl, section div")?.getBoundingClientRect().width ?? 0);
+    // Source probe (1440): everything in the intro sits inside max-w-5xl (1024px).
+    expect(Math.round(col)).toBeLessThanOrEqual(1024);
+    const tablet = await page.viewportSize();
+    expect(tablet?.width).toBe(1280); // sanity: Desktop Chrome default
+    const ramp = await h1.evaluate((el) => getComputedStyle(el).fontSize);
+    // At 1280 the source renders lg:text-5xl (48px) — same as before; the md
+    // ramp is pinned separately at 800px below.
+    expect(ramp).toBe("48px");
+    const page800 = await page.context().browser()?.newContext({ viewport: { width: 800, height: 900 } });
+    const p800 = await page800?.newPage();
+    await p800?.goto("/");
+    const h1At800 = await p800?.getByRole("heading", { level: 1, name: "Modular & Prefab Home Loans" });
+    const sizeAt800 = await h1At800?.evaluate((el) => getComputedStyle(el).fontSize);
+    // Source probe (768-1023): md:text-4xl → 36px (clone jumped 30→48 at md).
+    expect(sizeAt800).toBe("36px");
+    await page800?.close();
+  });
+
+  test("intro eyebrow pill carries the source House icon", async ({ page }) => {
+    await page.goto("/");
+    const eyebrow = page.getByText("Your Prefab Financing Partner", { exact: true });
+    const icon = await eyebrow.locator("svg").first().evaluate((el) => el.getAttribute("class") ?? "");
+    // Source renders lucide-house w-4 h-4 inside the pill.
+    expect(icon).toMatch(/w-4/);
+  });
+
+  test("intro cards match the source chrome: 12px radius, 20px padding, shadow, 14px body", async ({ page }) => {
+    await page.goto("/");
+    const card = page
+      .getByRole("heading", { level: 2, name: "How Financing Works" })
+      .locator("xpath=ancestor::div[contains(@class, 'rounded')][1]");
+    const styles = await card.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { radius: cs.borderRadius, padding: cs.paddingTop, shadow: cs.boxShadow, borderAlpha: cs.borderTopColor };
+    });
+    // Source probe: rounded-xl p-5 md:p-6 (24px at md+) border-border/50 shadow-sm.
+    expect(styles.radius).toBe("12px");
+    expect(styles.padding).toBe("24px");
+    expect(styles.shadow).not.toBe("none");
+    expect(styles.borderAlpha).toMatch(/\/ 0\.5\)|, ?0\.5\)/);
+    const body = card.locator("p").first();
+    const bodySize = await body.evaluate((el) => getComputedStyle(el).fontSize);
+    expect(bodySize).toBe("14px");
+  });
+
+  test("intro card icon chips use the source's 40px gradient tile", async ({ page }) => {
+    await page.goto("/");
+    const chip = page
+      .getByRole("heading", { level: 2, name: "How Financing Works" })
+      .locator("xpath=preceding-sibling::span[1]");
+    // scroll the card into view so the Reveal wrapper finishes its scale-95 →
+    // scale-100 animation before measuring (pre-reveal the 40px chip reads 38px).
+    await chip.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(600);
+    const styles = await chip.first().evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      return { w: Math.round(r.width), radius: cs.borderRadius, bg: cs.backgroundImage.slice(0, 60) };
+    });
+    // Source probe: w-10 h-10 rounded-lg (12px in the source scale) + gradient tile.
+    expect(styles.w).toBe(40);
+    expect(styles.radius).toBe("12px");
+    expect(styles.bg).toContain("linear-gradient");
+  });
+
+  test("intro chips grid renders two columns on mobile like the source", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    const chipsGrid = page.getByText("FHA Loans", { exact: true }).first().locator("xpath=ancestor::div[contains(@class, 'grid')][1]");
+    const cols = await chipsGrid.evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length);
+    // Source probe (390): chips grid grid-cols-2 → 2 tracks (clone rendered 1).
+    expect(cols).toBe(2);
+  });
+
+  test("problem/solution section renders the source's md:py-28 rhythm and source card chrome", async ({ page }) => {
+    await page.goto("/");
+    const section = page.getByRole("heading", { level: 2, name: /Prefab Financing is Broken/i }).locator("xpath=ancestor::section[1]");
+    const padTop = await section.evaluate((el) => getComputedStyle(el).paddingTop);
+    // Source probe (1280): py-20 md:py-28 → 112px (clone rendered py-24 → 96px).
+    expect(padTop).toBe("112px");
+    const problemCard = page
+      .getByRole("heading", { level: 3, name: /Misclassified/i })
+      .locator("xpath=ancestor::div[contains(@class, 'rounded')][1]");
+    const pStyles = await problemCard.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { padding: cs.paddingTop, borderColor: cs.borderTopColor };
+    });
+    // Source: p-5 + border-destructive/20.
+    expect(pStyles.padding).toBe("20px");
+    expect(pStyles.borderColor).toMatch(/\/ 0\.2\)|, ?0\.2\)/);
+    const solutionCard = page
+      .getByRole("heading", { level: 3, name: /7-Day Approvals/i })
+      .locator("xpath=ancestor::div[contains(@class, 'rounded')][1]");
+    const sBg = await solutionCard.evaluate((el) => getComputedStyle(el).backgroundColor);
+    // Source solution card: bg-primary/5 (green wash), NOT bg-secondary.
+    expect(sBg).toMatch(/oklab\(0\.[0-9.]+/); // sanity: not plain rgb
+    const h3 = page.getByRole("heading", { level: 3, name: /Misclassified/i });
+    const font = await h3.evaluate((el) => getComputedStyle(el).fontFamily);
+    // Source base CSS applies Outfit to all h1–h6 (probed assets/index-*.css) —
+    // the clone's h3s render Outfit too; the pass-7 delta was weight/size only.
+    expect(font).toContain("Outfit");
+  });
+
+  test("steps numerals carry the source's primary/10 tint and 56px icon chips with gradient connectors", async ({ page }) => {
+    await page.goto("/");
+    const numeral = page.getByText("01", { exact: true }).first();
+    const nColor = await numeral.evaluate((el) => getComputedStyle(el).color);
+    // Source: text-primary/10 → forest green at 10% alpha.
+    expect(nColor).toMatch(/oklab\(0\.[0-9]+ [0-9.-]+ [0-9.-]+ \/ 0\.1\)/);
+    const stepHeading = page.getByRole("heading", { level: 3, name: /Tell Us About Your Home/i });
+    const chip = await stepHeading.locator("xpath=preceding-sibling::span[1]").evaluate((el) =>
+      Math.round(el.getBoundingClientRect().width),
+    );
+    // Source: w-14 h-14 icon chip (56px).
+    expect(chip).toBe(56);
+    const connector = stepHeading.locator("xpath=ancestor::div[2]").locator("span[class*=top-16], span[class*='h-px']").first();
+    const connBg = await connector.evaluate((el) => getComputedStyle(el).backgroundImage);
+    // Source connector: gradient from-primary/50 to transparent.
+    expect(connBg).toContain("linear-gradient");
+  });
+
+  test("testimonials section carries the source's card→background gradient and md:text-4xl H2 ramp", async ({ page }) => {
+    await page.goto("/");
+    const section = page.getByRole("heading", { level: 2, name: /Trusted by 2,000\+/i }).locator("xpath=ancestor::section[1]");
+    const bg = await section.evaluate((el) => getComputedStyle(el).backgroundImage);
+    // Source: bg-gradient-to-b from-card to-background.
+    expect(bg).toContain("linear-gradient");
+    const tablet = await page.context().browser()?.newContext({ viewport: { width: 900, height: 900 } });
+    const p = await tablet?.newPage();
+    await p?.goto("/");
+    const h2 = await p?.getByRole("heading", { level: 2, name: /Trusted by 2,000\+/i });
+    const size = await h2?.evaluate((el) => getComputedStyle(el).fontSize);
+    // Source (768-1023): md:text-4xl → 36px (clone jumped to 48px at md).
+    expect(size).toBe("36px");
+    await tablet?.close();
+  });
+
+  test("standards section uses the source's muted/30 band with border-y and 24px cards", async ({ page }) => {
+    await page.goto("/");
+    const section = page.getByRole("heading", { level: 2, name: "Our Standards" }).locator("xpath=ancestor::section[1]");
+    const styles = await section.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { bg: cs.backgroundColor, borderTop: cs.borderTopWidth, padding: cs.paddingTop };
+    });
+    // Source: bg-muted/30 (not /50) + border-y + py-16.
+    expect(styles.bg).toMatch(/\/ 0\.3\)|, ?0\.3\)/);
+    expect(styles.borderTop).toBe("1px");
+    expect(styles.padding).toBe("64px");
+    const card = page.getByRole("heading", { level: 3, name: "Editorially Independent" }).locator("xpath=ancestor::div[contains(@class, 'rounded')][1]");
+    const cStyles = await card.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      const icon = el.querySelector("span, div");
+      return {
+        radius: cs.borderRadius,
+        padding: cs.paddingTop,
+        iconW: icon ? Math.round(icon.getBoundingClientRect().width) : 0,
+      };
+    });
+    // Source: rounded-xl p-6 cards + w-12 (48px) round icon chip.
+    expect(cStyles.radius).toBe("12px");
+    expect(cStyles.padding).toBe("24px");
+    expect(cStyles.iconW).toBe(48);
+  });
+
+  test("hero CTA and closing CTA render the source's 44px height (h-11)", async ({ page }) => {
+    await page.goto("/");
+    const heroCta = page.getByRole("link", { name: /Get Pre-Approved in 15 Minutes/i }).first();
+    const heroH = await heroCta.evaluate((el) => Math.round(el.getBoundingClientRect().height));
+    expect(heroH).toBe(44);
+    const closingCta = page.getByRole("link", { name: /Get Pre-Approved Free/i }).first();
+    const closingH = await closingCta.evaluate((el) => Math.round(el.getBoundingClientRect().height));
+    expect(closingH).toBe(44);
+  });
+
+  test("hero checks use the source's CircleCheck icons with 20px gap rhythm", async ({ page }) => {
+    await page.goto("/");
+    const checks = page.getByText("No credit impact", { exact: true }).first();
+    const ul = checks.locator("xpath=ancestor::ul[1]");
+    const gap = await ul.evaluate((el) => getComputedStyle(el).rowGap);
+    // Source: flex flex-wrap items-center gap-5 → 20px (clone rendered gap-x-8).
+    expect(gap).toBe("20px");
+    const iconSvg = await page.locator("main section").first().evaluate((el) =>
+      [...el.querySelectorAll("svg")].some((s) => /lucide-circle-check/.test(s.getAttribute("class") ?? "")),
+    );
+    // Source hero checks render lucide-circle-check (clone used a ring span + Check).
+    expect(iconSvg).toBe(true);
+  });
+
+  test("wordmark strip uses the source's mobile 32px gap", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    const strip = page.getByText("Trusted by buyers of leading manufacturers").locator("xpath=following-sibling::div[1]");
+    const gap = await strip.evaluate((el) => getComputedStyle(el).columnGap);
+    // Source (390): gap-8 → 32px (clone rendered gap-x-12 → 48px).
+    expect(gap).toBe("32px");
+  });
+
+  test("FAQ questions render semibold (600) and answers render 14px like the source", async ({ page }) => {
+    await page.goto("/#faq");
+    const first = page.locator("#faq details").first();
+    const qWeight = await first.locator("summary h3, summary").first().evaluate((el) => getComputedStyle(el).fontWeight);
+    expect(qWeight).toBe("600");
+    await first.locator("summary").click();
+    const answer = first.locator("p").last();
+    const aSize = await answer.evaluate((el) => getComputedStyle(el).fontSize);
+    // Source: accordion content text-sm → 14px (clone rendered 16px).
+    expect(aSize).toBe("14px");
+  });
+
+  test("get-started renders exactly one H1 through the wizard steps (source uses labels)", async ({ page }) => {
+    await page.goto("/get-started");
+    expect(await page.locator("h1").count()).toBe(1);
+    // advance to step 1: intent + ZIP (the Choice list renders aria-pressed buttons)
+    await page.getByRole("button", { name: /buy a prefab home/i }).first().click();
+    await page.getByLabel(/property zip code/i).fill("80202");
+    await page.getByRole("button", { name: "Continue" }).first().click();
+    await page.waitForTimeout(400);
+    expect(await page.locator("h1").count()).toBe(1);
+  });
+
+  test("get-started carries the source's trust chips, Why Choose ModFii?, and Common Questions blocks", async ({ page }) => {
+    await page.goto("/get-started");
+    // Hero trust chips render as H3s on every viewport (source pattern).
+    await expect(page.getByRole("heading", { level: 3, name: "2-Minute Application" }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: "No Credit Impact" }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: "Prefab Specialists Only" }).first()).toBeVisible();
+    // Source renders Why Choose ModFii? + Common Questions in an lg:hidden light
+    // band (desktop keeps the benefits inside the dark hero column). CSS
+    // locators — getByRole cannot see display:none elements.
+    await expect(page.locator("h2", { hasText: "Why Choose ModFii?" })).toBeAttached();
+    await expect(page.locator("h3", { hasText: "Free Service" })).toBeAttached();
+    await expect(page.locator("h3", { hasText: "Common Questions" })).toBeAttached();
+    // At mobile width the band becomes visible.
+    const mobile = await page.context().browser()?.newContext({ viewport: { width: 390, height: 844 } });
+    const m = await mobile?.newPage();
+    if (m) {
+      await m.goto("/get-started");
+      await expect(m.getByRole("heading", { level: 2, name: "Why Choose ModFii?" })).toBeVisible();
+      await expect(m.getByRole("heading", { level: 3, name: "Common Questions" })).toBeVisible();
+    }
+    await mobile?.close();
+  });
+
+  test("footer column headings are H4s like the source", async ({ page }) => {
+    await page.goto("/");
+    const footer = page.getByRole("contentinfo");
+    const h4Count = await footer.locator("h4").count();
+    // Source: 7 column headings (Loan Options..Legal) render as H4.
+    expect(h4Count).toBeGreaterThanOrEqual(6);
+  });
+
+  test("footer grid renders the source's 8-column md layout with 40px filled social buttons", async ({ page }) => {
+    await page.goto("/");
+    const grid = page.getByRole("contentinfo").locator("div").first();
+    const cols = await grid.evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length);
+    // Source (≥768): md:grid-cols-8 → 8 tracks.
+    expect(cols).toBe(8);
+    const social = page.getByRole("contentinfo").getByLabel("ModFii on Twitter");
+    const s = await social.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { w: Math.round(el.getBoundingClientRect().width), bg: cs.backgroundColor };
+    });
+    // Source: w-10 h-10 rounded-full bg-muted (filled, not bordered).
+    expect(s.w).toBe(40);
+    expect(s.bg).not.toBe("rgba(0, 0, 0, 0)");
+  });
+
+  test("glossary terms render as H3s with the source's two closing H2 sections", async ({ page }) => {
+    await page.goto("/glossary");
+    // expect() retries — a bare count() raced the static page's a11y tree in
+    // sequential runs (pass-7 flake).
+    await expect(page.getByRole("heading", { level: 3, name: "Chattel Loan" })).toHaveCount(1);
+    await expect(page.getByRole("heading", { level: 2, name: "Chattel Loan" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 2, name: "Related Resources" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: /Have Questions About Financing\?/i })).toBeVisible();
+  });
+
+  test("hub guide carries the source's full section set incl. 20-question FAQ and Sources", async ({ page }) => {
+    await page.goto("/modular-home-financing");
+    for (const heading of [
+      "Modular vs. Manufactured Home Financing",
+      "What You'll Need to Apply",
+      "Modular Home Financing Costs",
+      "Modular Home Financing by Situation",
+      "Why Choose ModFii for Modular Home Financing?",
+      "Explore Loan Options",
+      "Get Pre-Approved for Modular Home Financing",
+      "Modular Home Financing FAQ",
+      "Sources",
+    ]) {
+      await expect(page.getByRole("heading", { level: 2, name: heading, exact: true })).toBeVisible();
+    }
+    const faqH3 = await page.locator("#faq h3, details h3").count();
+    // Source renders a 20-question FAQ on the hub (clone had 8).
+    expect(faqH3).toBeGreaterThanOrEqual(20);
+  });
+
+  test("mortgage page carries the source's section outline", async ({ page }) => {
+    await page.goto("/mortgage");
+    for (const heading of [
+      "Modular Home Mortgage Options",
+      "How to Get a Modular Home Mortgage",
+      "Modular Home Mortgage FAQ",
+      "Get Your Modular Home Mortgage Today",
+    ]) {
+      await expect(page.getByRole("heading", { level: 2, name: heading, exact: true })).toBeVisible();
+    }
+    await expect(page.getByRole("heading", { level: 3, name: "15-Year Fixed Mortgage" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: "30-Year Fixed Mortgage" })).toBeVisible();
+  });
+
+  test("financing page carries the source's section outline", async ({ page }) => {
+    await page.goto("/financing");
+    for (const heading of [
+      "Pre-Qualify for Modular Home Financing",
+      "Modular Home Financing Options",
+      "Why Modular Homes Need Specialized Lenders",
+      "Ready to Finance Your Modular Home?",
+    ]) {
+      await expect(page.getByRole("heading", { level: 2, name: heading, exact: true })).toBeVisible();
+    }
+  });
+
+  test("about page carries the source's six-section outline", async ({ page }) => {
+    await page.goto("/about");
+    for (const heading of [
+      "Our Story",
+      "How We're Different",
+      "How We Make Money",
+      "Our Editorial Standards",
+      "Our Team",
+      "Contact Us",
+    ]) {
+      await expect(page.getByRole("heading", { level: 2, name: heading, exact: true })).toBeVisible();
+    }
+  });
+
+  test("resources page carries the source's Popular Guides and starter sections", async ({ page }) => {
+    await page.goto("/resources");
+    await expect(page.getByRole("heading", { level: 2, name: "Most Popular Guides" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Not Sure Where to Start?" })).toBeVisible();
+  });
+
+  test("calculator page carries the source's FAQ + related trio + CTA sections", async ({ page }) => {
+    await page.goto("/calculator");
+    await expect(page.getByRole("heading", { level: 3, name: "How do I calculate my modular home payment?" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: /What is PMI and when is it required\?/i })).toBeVisible();
+    await expect(page.getByText("Current Rates", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Down Payment Guide", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Cost Breakdown", { exact: true }).first()).toBeVisible();
+  });
+
+  test("FHA guide carries the source's closing sections (FAQ, Sources, Ready)", async ({ page }) => {
+    await page.goto("/modular-home-financing/loan-options/fha");
+    await expect(page.getByRole("heading", { level: 2, name: "FHA Modular Home Loan FAQ" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Sources" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: /Ready for FHA Pre-Approval\?/i })).toBeVisible();
   });
 });

@@ -4,7 +4,7 @@
 ![React](https://img.shields.io/badge/React-19.3-149eca?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9_strict-3178c6?logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.3-38bdf8?logo=tailwindcss)
-![Vitest](https://img.shields.io/badge/Vitest-3.2_37_tests-6e9f18?logo=vitest)
+![Vitest](https://img.shields.io/badge/Vitest-3.2_41_tests-6e9f18?logo=vitest)
 ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-0.45-C5F277?logo=drizzle)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?logo=postgresql)
 ![License](https://img.shields.io/badge/license-Private-lightgrey)
@@ -45,8 +45,8 @@
 | Database | PostgreSQL | 17-alpine | 8 tables, `pgcrypto`/`pg_trgm` extensions |
 | Fonts | `next/font/google` | — | `Outfit` (display) + `DM Sans` (body), `variable` + `swap` |
 | Tooling | ESLint + `tsx` | 9.39.5 / 4.23 | Flat config + `eslint-config-next/core-web-vitals` + `tsx` for scripts |
-| Unit | Vitest | 3.2 | 37 tests over `src/lib/{calculator,matching,rate-limit,markdown}` (`npm run test`) |
-| E2E | Playwright + `@axe-core` | 1.63 + 4.13 | 81 tests (chromium), `playwright.config.ts` prod `next start` on 3002 |
+| Unit | Vitest | 3.2 | 41 tests over `src/lib/{calculator,matching,rate-limit,markdown}` (`npm run test`) |
+| E2E | Playwright + `@axe-core` | 1.63 + 4.13 | 121 tests per project (120 pass DB-less; +39 pass-7 parity/SEO pins), `playwright.config.ts` prod `next start` on 3002 |
 
 ```mermaid
 flowchart TB
@@ -130,7 +130,7 @@ sequenceDiagram
   📂 scripts/                     # DB lifecycle (local-guarded)
     📄 local-db.ts / migrate.ts / seed.ts / reset.ts
 📂 drizzle/                       # Migrations (0000 8 tables + 0001 founded 8→32, meta/_journal.json)
-📂 e2e/                           # Playwright: smoke / seo / funnel / assets / parity specs (81 tests)
+📂 e2e/                           # Playwright: smoke / seo / funnel / assets / parity specs (121 tests per project)
 📄 playwright.config.ts           # E2E config (prod next start on 3002, reuseExistingServer)
 📄 drizzle.config.ts / .json      # TS primary + JSON fallback (keep in sync, url 5434)
 📂 infrastructure/postgres/init/  # pgcrypto + pg_trgm extensions
@@ -193,9 +193,9 @@ curl -s http://localhost:3000/api/health | jq
 npm run lint        # flat ESLint (0 errors / 0 warnings)
 npm run lint:fix    # auto-fix
 npm run typecheck   # tsc --noEmit (skills excluded via tsconfig)
-npm run test        # vitest unit suite (37 tests: calculator 11 + matching 13 + rate-limit 9 + markdown 8)
+npm run test        # vitest unit suite (41 tests: calculator 11 + matching 13 + rate-limit 9 + markdown 8)
 npm run build       # validates next.config.ts:redirects + RSC boundaries + skills excluded
-npm run e2e         # Playwright chromium (82 tests per project — prod next start on 3002) — needs build; funnel happy-path also needs db:setup
+npm run e2e         # Playwright chromium (121 tests per project — prod next start on 3002) — needs build; funnel happy-path also needs db:setup
 ```
 ```bash
 # Quick E2E without manual build (Playwright starts prod server itself)
@@ -265,27 +265,27 @@ Tokens live **only** in `src/app/globals.css:@theme` — never add `tailwind.con
 | `--color-accent` | `hsl(38 92% 50%)` | CTAs, highlights |
 | `--color-card` / `--color-secondary` / `--color-muted` | `40 25% 97%` / `150 20% 92%` / `150 15% 93%` | Surfaces |
 | `--color-border` / `--color-ring` | `150 15% 88%` / `155 45% 28%` | Borders / focus ring |
-| `--radius-sm → 2xl` | `0.5rem → 1.5rem` | Radii scale |
+| `--radius-sm → 2xl` | `0.5rem → 1rem` (md 10px / xl 12px / 2xl 16px — pass-7 source CSS probe) | Radii scale |
 | `--shadow-lift` | `0 18px 40px -24px hsl(155 30% 12% / 0.35)` | Elevated cards |
 | `--ease-brand` | `cubic-bezier(0.22,1,0.36,1)` | Brand easing |
 
 **Typography:** `Outfit` (display/headings, `var(--font-outfit)`) + `DM Sans` (body, `var(--font-dm-sans)`) via `next/font/google` with `variable` + `display:swap`. Always use `font-sans` / `font-display` utilities.
 
-**Layout rhythm:** `Container` max `1400px` `px-4 md:px-8`, header `h-16` fixed + `backdrop-blur-xl` + `border-b` (source bar drift — modfii.com renders `h-20`/81px + `backdrop-blur-lg`/16px + `bg-background/80`; alignment queued), `cn()` helper in `src/components/ui.tsx` for variant merging (`primary | secondary | accent | outline | ghost | onPrimary`).
+**Layout rhythm:** `Container` max `1400px` flat `px-4` (pass-7 — source uses `container px-4`), header `h-16 md:h-20` fixed + `bg-background/80` + `backdrop-blur-lg` (16px) + `border-b border-border/50` (64px mobile / 81px rendered desktop; desktop nav visible from `md` at `gap-8`), `cn()` helper in `src/components/ui.tsx` for variant merging (`primary | secondary | accent | outline | ghost | onPrimary`).
 
 ---
 
 ## Testing & Verification
 
-**Unit:** Vitest 3.2 (`vitest.config.ts`, `@` alias), co-located `src/lib/{calculator,matching,rate-limit,markdown}.test.ts` — **37 tests** over the pure domains (amortization/PMI, scoring/validation, in-memory limiter, markdown rendering incl. the 2026-09-11 H4/OOM regression). `npm run test` / `test:watch` / `test:coverage`.
+**Unit:** Vitest 3.2 (`vitest.config.ts`, `@` alias), co-located `src/lib/{calculator,matching,rate-limit,markdown}.test.ts` — **41 tests** over the pure domains (amortization/PMI, scoring/validation, in-memory limiter, markdown rendering incl. the 2026-09-11 H4/OOM regression). `npm run test` / `test:watch` / `test:coverage`.
 
-**E2E:** Playwright 1.63 + `@axe-core/playwright` 4.13, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), `e2e/` **81 tests** (chromium) — `smoke` (home/nav/footer, get-started, calculator, health, 404, axe critical) + `seo` (sitemap absolute locs + host-rewrite, robots, title/OG) + `funnel` (POST `/api/applications` 400/200 with `x-forwarded-for` isolation, burst 429) + `assets` (fourteen image assets 200, no broken `<img>` on the image-led pages, `/compare/*` parity aliases resolve) + `parity` (markdown-OOM regression on the two H4 articles, wordmark logos + testimonial avatars on home, learn-hub search/filter/featured/tools, calculator breakdown bar + PMI alert, footer socials + Legal column, get-started step chip/ZIP helper/privacy note, the pass-3 live-source pins (pass-5-corrected): rotated-square brand badge + two-tone wordmark, always-light header on desktop and mobile, intro eyebrow RESTORED (source renders it), closing trust line, no green band, single steps CTA, 2-item More dropdown, footer copyright + legal-line NMLS link, get-started 3-step band, calculator amber band, and the pass-4 pins: source hero overlay recipe + bottom fade + no hero-grid, hub Last-Updated line + truth callout + dual CTA + 4 chips, FHA/VA highlight + dual CTA + author strip, learn no-"read read", calculator Free-Calculator pill + middle crumb). With Postgres: **82/82**; without a DB: 81/82 (funnel happy-path persistence is the only DB-dependent test).
+**E2E:** Playwright 1.63 + `@axe-core/playwright` 4.13, `playwright.config.ts` (prod `next start` on 3002, `reuseExistingServer:true`), `e2e/` **121 tests per project** (chromium) — `smoke` (home/nav/footer, get-started, calculator, health, 404, security headers, axe critical) + `seo` (sitemap absolute locs + host-rewrite, robots, title/OG) + `funnel` (POST `/api/applications` 400/200 with `x-forwarded-for` isolation, burst 429, DB-outage JSON-500) + `assets` (fourteen image assets 200, no broken `<img>` on the image-led pages, `/compare/*` parity aliases resolve) + `parity` (markdown-OOM regression on the two H4 articles, wordmark logos + testimonial avatars on home, learn-hub search/filter/featured/tools, calculator breakdown bar + PMI alert, footer socials + Legal column, get-started step chip/ZIP helper/privacy note, the pass-3 live-source pins (pass-5-corrected): rotated-square brand badge + two-tone wordmark, always-light header on desktop and mobile, intro eyebrow RESTORED (source renders it), closing trust line, no green band, single steps CTA, 2-item More dropdown, footer copyright + legal-line NMLS link, get-started 3-step band, calculator amber band, the pass-4 pins: source hero overlay recipe + bottom fade + no hero-grid, hub Last-Updated line + truth callout + dual CTA + 4 chips, FHA/VA highlight + dual CTA + author strip, learn no-"read read", calculator Free-Calculator pill + middle crumb, and the pass-5 pins: header bar metrics, hero paddings + `max-w-xl` grid, button chrome, wordmark strip + testimonial cards, heading hierarchy hero-H2/intro-H1 + FAQ H3, exclusive FAQ accordions, interior H1 sizes, SEO titles, guide content-depth outlines, `/debug-error-probe` error boundary). With Postgres: **121/121**; without a DB: 120/121 (funnel happy-path persistence is the only DB-dependent test).
 
 **Current verification:**
 ```bash
 npm run lint       # ESLint flat config (0 errors / 0 warnings)
 npm run typecheck  # tsc --noEmit (skills excluded)
-npm run test       # vitest (37 tests: calculator 11 + matching 13 + rate-limit 9 + markdown 8)
+npm run test       # vitest (41 tests: calculator 11 + matching 13 + rate-limit 9 + markdown 8)
 npm run build      # Next.js production build (requires skills excluded)
 npm run e2e        # Playwright chromium (prod build)
 curl http://localhost:3000/api/health   # readiness probe (also triggers ensureSeeded)
@@ -340,7 +340,7 @@ curl http://localhost:3000/api/health   # readiness probe (also triggers ensureS
 
 - `CLAUDE.md` — full agent spec (~600 lines): 6-phase workflow, schema tables, env table, DB lifecycle (`src/scripts/*` + `drizzle/`), E2E, design-system, anti-patterns.
 - `AGENTS.md` — compact cheat-sheet (~100 lines): commands (`db:*` + `e2e`), architecture (guarded lifecycle + prod E2E), never-do list.
-- `playwright.config.ts` + `e2e/` — E2E harness (3002, 82 tests per project) · `vitest.config.ts` + `src/lib/*.test.ts` — unit suite (37 tests = 11+13+7+6).
+- `playwright.config.ts` + `e2e/` — E2E harness (3002, 121 tests per project) · `vitest.config.ts` + `src/lib/*.test.ts` — unit suite (41 tests = 11+13+9+8).
 - `docs/` — prompt archives & `build_error.txt` (not a deployment guide).
 
 ---
@@ -351,4 +351,4 @@ Private — `package.json:private: true`, no `LICENSE` file. Not licensed for pu
 
 ---
 
-*Last verified 2026-09-12 (remediation pass 6 — audit remediation: rate-limit bucket eviction, markdown href allow-list, exclusive FAQ accordions; 41 unit = 11+13+9+8, 82 E2E per project; audit GO (docs/AUDIT_REPORT_pass5.md). Pass 5 — security headers app-emitted (`next.config.ts:headers()`), funnel JSON-500 contract, header bar + rotated-square badge aligned to source (`bg-background/80 backdrop-blur-lg border-border/50 h-20`), button chrome + radius tokens (md 10px / 2xl 16px / font-medium / px-8), hero `max-w-xl` grid + source paddings, intro eyebrow `Your Prefab Financing Partner` restored (pass-4 removal was a wrong pin), heading hierarchy corrected (hero H2 + intro H1), wordmark strip + testimonial card chrome, FAQ H3 questions, interior H1 sizes + long-form titles + source-pattern SEO titles, guide content depth ×2-3 via `GuideSection.subsections`; counts: 37 unit = 11+13+7+6, 82 E2E per project = smoke 8 + seo 5 + funnel 5 + assets 19 + parity 45 (53 declarations + data-driven loops); earlier pass 4 — source-exact home hero; hub hero Last-Updated line + "Here's the truth" glass callout + dual CTA + 4th stat chip + breadcrumbs above the photo panel; FHA/VA/USDA/construction loan pages: source copy, amber-first CTA + white-outline second CTA, contextual eyebrow icons, author/reviewer strips; learn hub "15 min read read" duplication fixed; calculator Free-Calculator pill + middle crumb + blue tax segment (`--color-chart-tax`); header blur aligned to the source's 16px; hero photo + skyline wordmark swapped to source assets; counts: 37 unit = 11+13+7+6, 61 E2E per project = smoke 8 + seo 5 + funnel 5 + assets 19 + parity 45 (53 declarations + data-driven loops); `turbo.json` doc claims fixed; evidence: `docs/REMEDIATION_PLAN_pass4.md`) against `package.json` (Next 16.3 + React 19.3 + Tailwind 4.3 + Vitest 3.2 + Playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills + infrastructure excluded), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (41 unit tests), `public/images/*` + `public/brand/*` (all referenced assets present), `playwright.config.ts` (3002), `e2e/*` 82 tests per project, `src/app/page.tsx` + `src/components/*` (modfii.com parity design), `.env.example`, `.gitignore`.*
+*Last verified 2026-09-13 (pass 7 — live-source parity audit + TDD remediation: 40 new E2E pins; header responsive h-16 md:h-20 + md nav gap-8 + px-4 container; home intro max-w-5xl + source card chrome; FAQ 600 + text-sm; wizard single-H1; footer H4 8-col grid; glossary H3 + Related Resources; 11 exact source SEO titles; hub 20-FAQ + Sources + closers; mortgage/financing/about/resources outlines; radius xl 12px. Gate: lint 0/0, typecheck, 41/41 unit, build 43/43, 120/121 E2E chromium DB-less; home page 7251 vs 7355px (−1.4%). E2E 121 per project = smoke 8 + seo 16 + funnel 5 + assets 19 + parity 73. Evidence: docs/REMEDIATION_PLAN_pass7.md. Super Z clean-clone re-validation — full gate re-measured: `lint 0/0`, `typecheck` clean, `41/41` unit, `build` 43/43 static pages (42 static + 8 dynamic routes), `81/82` E2E chromium DB-less (funnel persistence needs Postgres); doc typos corrected (37→41 unit, 53→68 declarations, smoke 7→8, funnel 4→5, parity 26→45 runtime, header-chrome note updated to the pass-5-aligned state). Remediation pass 6 — audit remediation: rate-limit bucket eviction, markdown href allow-list, exclusive FAQ accordions; 41 unit = 11+13+9+8, 82 E2E per project; audit GO (docs/AUDIT_REPORT_pass5.md). Pass 5 — security headers app-emitted (`next.config.ts:headers()`), funnel JSON-500 contract, header bar + rotated-square badge aligned to source (`bg-background/80 backdrop-blur-lg border-border/50 h-20`), button chrome + radius tokens (md 10px / 2xl 16px / font-medium / px-8), hero `max-w-xl` grid + source paddings, intro eyebrow `Your Prefab Financing Partner` restored (pass-4 removal was a wrong pin), heading hierarchy corrected (hero H2 + intro H1), wordmark strip + testimonial card chrome, FAQ H3 questions, interior H1 sizes + long-form titles + source-pattern SEO titles, guide content depth ×2-3 via `GuideSection.subsections`; counts: 41 unit = 11+13+9+8, 82 E2E per project = smoke 8 + seo 5 + funnel 5 + assets 19 + parity 45 (68 declarations + data-driven loops); earlier pass 4 — source-exact home hero; hub hero Last-Updated line + "Here's the truth" glass callout + dual CTA + 4th stat chip + breadcrumbs above the photo panel; FHA/VA/USDA/construction loan pages: source copy, amber-first CTA + white-outline second CTA, contextual eyebrow icons, author/reviewer strips; learn hub "15 min read read" duplication fixed; calculator Free-Calculator pill + middle crumb + blue tax segment (`--color-chart-tax`); header blur aligned to the source's 16px; hero photo + skyline wordmark swapped to source assets; evidence: `docs/REMEDIATION_PLAN_pass4.md`) against `package.json` (Next 16.3 + React 19.3 + Tailwind 4.3 + Vitest 3.2 + Playwright 1.63), `tsconfig.json` + `eslint.config.mjs` (skills + infrastructure excluded), `next.config.ts` (11 redirects), `drizzle.config.ts/.json` (5434, strict/verbose), `docker-compose.yml` (home_financing_*), `src/db/schema.ts` (8 tables), `src/lib/*` (41 unit tests), `public/images/*` + `public/brand/*` (all referenced assets present), `playwright.config.ts` (3002), `e2e/*` 82 tests per project, `src/app/page.tsx` + `src/components/*` (modfii.com parity design), `.env.example`, `.gitignore`.*

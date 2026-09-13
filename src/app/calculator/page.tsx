@@ -156,13 +156,13 @@ export default function CalculatorPage() {
             {CALCULATOR_FAQS.map((faq) => (
               <details key={faq.q} name="calc-faq" className="group rounded-xl border border-border bg-card px-6">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-left font-semibold hover:text-primary [&::-webkit-details-marker]:hidden">
-                  {faq.q}
+                  <h3 className="text-sm">{faq.q}</h3>
                   <ChevronDown
                     className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180"
                     aria-hidden
                   />
                 </summary>
-                <p className="pb-5 text-muted-foreground">{faq.a}</p>
+                <p className="pb-5 text-sm text-muted-foreground">{faq.a}</p>
               </details>
             ))}
           </div>

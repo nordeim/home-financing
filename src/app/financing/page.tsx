@@ -2,7 +2,7 @@ import { GuideScreen } from "@/components/guide-screen";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Prefab & Modular Financing",
+  title: "Modular Home Financing | Pre-Qualify in 2 Minutes",
   description: "A marketplace built only for factory-built housing, with green mortgage discounts and specialist desks.",
 };
 

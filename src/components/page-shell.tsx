@@ -1,6 +1,6 @@
 import { ButtonLink, Container, cn } from "@/components/ui";
 import type { GuidePageContent } from "@/lib/guides";
-import { ArrowRight, Calendar, ChevronDown, ChevronRight, Star } from "lucide-react";
+import { ArrowRight, BookOpen, Calendar, ChevronDown, ChevronRight, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
@@ -297,17 +297,67 @@ export function GuideView({
           ))}
           {guide.faqs ? (
             <section className="mt-12" id="faqs">
-              <h2 className="mb-6 font-display text-2xl font-bold">Frequently asked questions</h2>
+              <h2 className="mb-6 font-display text-2xl font-bold">{guide.faqsHeading ?? "Frequently asked questions"}</h2>
               <div className="space-y-4">
                 {guide.faqs.map((faq) => (
                   <details key={faq.question} name="guide-faq" className="group rounded-xl border border-border bg-card px-5 py-4">
                     <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold [&::-webkit-details-marker]:hidden">
-                      {faq.question}
+                      <h3 className="text-sm">{faq.question}</h3>
                       <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden />
                     </summary>
-                    <p className="mt-3 text-muted-foreground">{faq.answer}</p>
+                    <p className="mt-3 text-sm text-muted-foreground">{faq.answer}</p>
                   </details>
                 ))}
+              </div>
+            </section>
+          ) : null}
+          {guide.sources ? (
+            <section id="sources" className="mt-12 border-t border-border pt-8" aria-labelledby="sources-heading">
+              <h2 id="sources-heading" className="mb-4 flex items-center gap-2 text-lg font-semibold">
+                <BookOpen className="h-5 w-5 text-primary" aria-hidden />
+                Sources
+              </h2>
+              <ol className="list-none space-y-3">
+                {guide.sources.map((source, index) => (
+                  <li key={source.label} className="flex items-start gap-3 text-sm">
+                    <span
+                      aria-hidden
+                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-muted text-xs font-medium text-muted-foreground"
+                    >
+                      {index + 1}
+                    </span>
+                    <span className="flex flex-col">
+                      {source.href ? (
+                        <a
+                          href={source.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-primary hover:underline"
+                        >
+                          {source.label}
+                        </a>
+                      ) : (
+                        <span className="font-medium">{source.label}</span>
+                      )}
+                      {source.note ? <span className="text-muted-foreground">{source.note}</span> : null}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
+          {guide.closing ? (
+            <section className="relative mt-12 overflow-hidden py-20">
+              <div aria-hidden className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary-600" />
+              <div className="relative z-10 mx-auto max-w-2xl text-center">
+                <h2 className="mb-6 font-display text-3xl font-bold text-primary-foreground md:text-4xl">
+                  {guide.closing.heading}
+                </h2>
+                <p className="mb-8 text-xl text-primary-foreground/80">{guide.closing.body}</p>
+                <ButtonLink href="/get-started" variant="secondary" size="lgSm">
+                  {guide.closing.cta}
+                  <ArrowRight className="h-4 w-4" />
+                </ButtonLink>
               </div>
             </section>
           ) : null}
@@ -326,7 +376,7 @@ export function GuideView({
       </Container>
       {guide.related ? (
         <Container className="pb-20">
-          <h2 className="mb-6 font-display text-2xl font-bold">Related resources</h2>
+          <h2 className="mb-6 font-display text-2xl font-bold">{guide.relatedHeading ?? "Related resources"}</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {guide.related.map((item) => (
               <Link

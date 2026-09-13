@@ -236,7 +236,7 @@ export function PrequalForm() {
       {step === 0 ? (
         <div className="space-y-8">
           <div>
-            <h1 className="font-display text-2xl font-bold md:text-3xl">What are you looking to do?</h1>
+            <p className="font-display text-2xl font-bold md:text-3xl">What are you looking to do?</p>
             <p className="mt-2 text-muted-foreground">Takes about 2 minutes. Estimates are fine.</p>
           </div>
           <div className="space-y-3">
@@ -301,7 +301,7 @@ export function PrequalForm() {
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
           <div className="text-center">
-            <h1 className="font-display text-2xl font-bold md:text-3xl">Tell us about the home</h1>
+            <p className="font-display text-2xl font-bold md:text-3xl">Tell us about the home</p>
             <p className="mt-2 text-muted-foreground">This helps us match you with the right financing options.</p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
@@ -346,7 +346,7 @@ export function PrequalForm() {
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
           <div className="text-center">
-            <h1 className="font-display text-2xl font-bold md:text-3xl">A few quick details</h1>
+            <p className="font-display text-2xl font-bold md:text-3xl">A few quick details</p>
             <p className="mt-2 text-muted-foreground">Estimates are fine. This helps match you with the right lenders.</p>
           </div>
           <div>
@@ -415,7 +415,7 @@ export function PrequalForm() {
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
           <div className="text-center">
-            <h1 className="font-display text-2xl font-bold md:text-3xl">Where should we send your options?</h1>
+            <p className="font-display text-2xl font-bold md:text-3xl">Where should we send your options?</p>
             <p className="mt-2 text-muted-foreground">We only use this to match you with lenders. No spam.</p>
           </div>
           <label className="block">

@@ -1,0 +1,10 @@
+import { chromium } from "playwright";
+import { writeFileSync } from "node:fs";
+const browser = await chromium.launch();
+const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+const page = await ctx.newPage();
+await page.goto("https://modfii.com/modular-home-financing", { waitUntil: "networkidle", timeout: 60000 });
+await page.waitForTimeout(2500);
+writeFileSync("/home/z/my-project/audit/live-parity/src-hub.html", await page.content());
+console.log("saved");
+await browser.close();

@@ -23,9 +23,13 @@ const MORE = [
  * Live modfii.com renders a light frosted header in every state — over the
  * homepage hero, after scroll, and on mobile. Pass-5 metrics (2026-09-12):
  * bg-background/80 + backdrop-blur-lg (16px) + border-border/50 + h-20 inner
- * bar (81px rendered). Brand mark: source renders a CSS rotated-square
- * gradient badge (32×32 rotate-3 rounded-lg, inner bg-background square,
- * 16×16 gradient center) — the circle-ring SVG is only the favicon.
+ * bar (81px rendered). Pass-7 (2026-09-13): source inner bar is
+ * `h-16 md:h-20` (64px mobile / 80px md+), nav is `hidden md:flex gap-8`, CTA
+ * group `hidden md:flex gap-4`, burger `md:hidden`, container `px-4` (no
+ * md:px-8) — probes in docs/REMEDIATION_PLAN_pass7.md. Brand mark: source
+ * renders a CSS rotated-square gradient badge (32×32 rotate-3 rounded-lg,
+ * inner bg-background square, 16×16 gradient center) — the circle-ring SVG is
+ * only the favicon.
  */
 export function SiteHeader() {
   const pathname = usePathname();
@@ -52,7 +56,7 @@ export function SiteHeader() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-lg">
-      <div className="mx-auto flex h-20 max-w-[1400px] items-center justify-between px-4 md:px-8">
+      <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 md:h-20">
         <Link href="/" className="flex items-center gap-2" aria-label="ModFii home">
           {/* Source badge: rotated gradient square + inner bg square + gradient core */}
           <div className="relative h-8 w-8" aria-hidden>
@@ -66,7 +70,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-8 md:flex" aria-label="Primary">
           {NAV.map((item) => (
             <Link
               key={item.href}
@@ -107,7 +111,7 @@ export function SiteHeader() {
           </div>
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden items-center gap-4 md:flex">
           <ButtonLink href="/get-started" variant="primary" size="sm">
             Get Started
           </ButtonLink>
@@ -115,7 +119,7 @@ export function SiteHeader() {
 
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border text-foreground transition-colors lg:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border text-foreground transition-colors md:hidden"
           aria-expanded={open}
           aria-controls={menuId}
           aria-label={open ? "Close menu" : "Open menu"}
@@ -126,7 +130,7 @@ export function SiteHeader() {
       </div>
 
       {open ? (
-        <div id={menuId} className="border-t border-border bg-background lg:hidden">
+        <div id={menuId} className="border-t border-border bg-background md:hidden">
           <nav className="mx-auto flex max-w-[1400px] flex-col gap-1 px-4 py-4" aria-label="Mobile">
             {[...NAV, ...MORE].map((item) => (
               <Link

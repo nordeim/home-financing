@@ -8,11 +8,13 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
+  CircleCheck,
   Clock,
   DollarSign,
   FileText,
   HelpCircle,
   Home,
+  House,
   Leaf,
   Shield,
   ShieldCheck,
@@ -25,7 +27,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "ModFii - Prefab Home Mortgage Marketplace | Get Approved in 7 Days",
+  title: { absolute: "ModFii | Modular & Prefab Home Loans" },
   description: SITE.description,
 };
 
@@ -228,26 +230,24 @@ export default function HomePage() {
               <Star className="h-4 w-4 fill-accent text-accent" aria-hidden />
               The #1 Prefab Home Mortgage Platform
             </p>
-            <h2 className="font-display text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
+            <h2 className="mb-6 font-display text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
               Stop Losing Your Dream Home to <span className="text-accent">Financing Nightmares</span>
             </h2>
-            <p className="mt-6 max-w-xl text-lg text-white/90 md:text-xl">
+            <p className="mb-8 text-lg leading-relaxed text-white/90 md:text-xl">
               Most lenders don&apos;t understand prefab homes—killing deals even when you&apos;re pre-approved. ModFii
               connects you with specialized lenders who get it, cutting approval times by 50%.
             </p>
-            <div className="mt-8">
+            <div className="mb-10 flex flex-col gap-4 sm:flex-row">
               <ButtonLink href="/get-started" variant="secondary" size="lg">
                 Get Pre-Approved in 15 Minutes
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </ButtonLink>
             </div>
-            <ul className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-white/85">
+            <ul className="flex flex-wrap items-center gap-5">
               {HERO_CHECKS.map((item) => (
                 <li key={item} className="flex items-center gap-2">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full border border-accent/70">
-                    <Check className="h-3 w-3 text-accent" aria-hidden />
-                  </span>
-                  {item}
+                  <CircleCheck className="h-5 w-5 text-accent" aria-hidden />
+                  <span className="text-sm text-white/80">{item}</span>
                 </li>
               ))}
             </ul>
@@ -258,9 +258,11 @@ export default function HomePage() {
               🏆 Rated #1 by Prefab Buyers
             </div>
             <div className="rounded-2xl border border-white/20 bg-white/10 p-8 backdrop-blur-md">
-              <h3 className="text-center font-display text-xl font-bold">Why Homeowners Choose ModFii</h3>
-              <p className="mt-1 text-center text-sm text-white/70">Specialized lenders, better outcomes</p>
-              <div className="mt-6 grid grid-cols-3 gap-4">
+              <div className="mb-6 text-center">
+                <h3 className="mb-2 font-display text-xl font-bold">Why Homeowners Choose ModFii</h3>
+                <p className="text-sm text-white/70">Specialized lenders, better outcomes</p>
+              </div>
+              <div className="mb-6 grid grid-cols-3 gap-4">
                 {[
                   { value: "$12K", label: "Avg. savings", accent: true },
                   { value: "7", label: "Day approval", accent: false },
@@ -285,7 +287,7 @@ export default function HomePage() {
       <section className="border-y border-border/50 bg-muted/30 py-8">
         <Container>
           <p className="text-center text-sm text-muted-foreground">Trusted by buyers of leading manufacturers</p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-8 md:gap-12">
             {PARTNER_WORDMARKS.map((mark) => (
               <span key={mark.alt} className="flex items-center justify-center opacity-80 transition-opacity hover:opacity-100">
                 <Image src={mark.src} alt={mark.alt} width={168} height={32} className="h-8 w-auto object-contain" />
@@ -296,63 +298,72 @@ export default function HomePage() {
       </section>
 
       {/* Intro — Modular & Prefab Home Loans (lazy-revealed on the source).
-          Pass-5: source renders the "Your Prefab Financing Partner" pill above the
-          document H1 and washes the section with a muted gradient. */}
+          Pass-7: everything sits in a max-w-5xl column like the source; heading
+          block mb-10/md:mb-12; H1 ramp text-3xl/md:text-4xl/lg:text-5xl; cards
+          use the source chrome (rounded-xl p-5 md:p-6 border-border/50
+          shadow-sm + gradient icon chips + text-sm bodies). */}
       <section className="overflow-hidden bg-gradient-to-b from-background via-muted/20 to-background py-12 md:py-16">
         <Container>
-          <Reveal className="mx-auto mb-14 max-w-3xl text-center">
-            <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-              Your Prefab Financing Partner
-            </span>
-            <h1 className="font-display text-3xl font-bold md:text-5xl">Modular &amp; Prefab Home Loans</h1>
-            <p className="mt-6 text-lg text-muted-foreground">
-              ModFii is the leading marketplace connecting prefab, modular, and tiny home buyers with lenders who
-              specialize in factory-built construction financing. We help you get approved faster, with better rates,
-              and without the confusion that comes from working with traditional mortgage lenders.
-            </p>
-          </Reveal>
-          <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
-            {INTRO_CARDS.map((card, index) => (
-              <Reveal key={card.title} variant="card" delay={index * 75}>
-                <div className="h-full rounded-2xl border border-border bg-card p-8">
-                  <div className="flex items-center gap-4">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary">
-                      <card.icon className="h-5 w-5" aria-hidden />
-                    </span>
-                    <h2 className="font-display text-xl font-semibold">{card.title}</h2>
-                  </div>
-                  <p className="mt-4 leading-relaxed text-muted-foreground">{card.body}</p>
-                  {card.chips ? (
-                    <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      {card.chips.map((chip) => (
-                        <span
-                          key={chip}
-                          className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-sm font-medium text-foreground"
-                        >
-                          <CheckCircle2 className="h-4 w-4 text-primary" aria-hidden />
-                          {chip}
-                        </span>
-                      ))}
+          <div className="mx-auto max-w-5xl">
+            <Reveal className="text-center">
+              <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+                <House className="h-4 w-4" aria-hidden />
+                Your Prefab Financing Partner
+              </span>
+              <h1 className="mb-6 font-display text-3xl font-bold md:text-4xl lg:text-5xl">
+                Modular &amp; Prefab Home Loans
+              </h1>
+              <p className="mx-auto max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+                ModFii is the leading marketplace connecting prefab, modular, and tiny home buyers with lenders who
+                specialize in factory-built construction financing. We help you get approved faster, with better rates,
+                and without the confusion that comes from working with traditional mortgage lenders.
+              </p>
+            </Reveal>
+            <div className="mb-8 grid gap-4 md:grid-cols-2 lg:gap-6">
+              {INTRO_CARDS.map((card, index) => (
+                <Reveal key={card.title} variant="card" delay={index * 75}>
+                  <div className="group h-full rounded-xl border border-border/50 bg-card p-5 shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-md md:p-6">
+                    <div className="mb-3 flex items-center gap-3">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 transition-transform duration-300 group-hover:scale-110">
+                        <card.icon className="h-5 w-5 text-primary" aria-hidden />
+                      </span>
+                      <h2 className="font-display text-lg font-semibold md:text-xl">{card.title}</h2>
                     </div>
-                  ) : null}
-                </div>
-              </Reveal>
-            ))}
-          </div>
-          <div className="mt-12 text-center">
-            <ButtonLink href="/modular-home-financing/loan-options" size="lgSm">
-              Explore All Loan Options
-              <ArrowRight className="h-4 w-4" />
-            </ButtonLink>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{card.body}</p>
+                    {card.chips ? (
+                      <div className="mt-4 grid grid-cols-2 gap-2">
+                        {card.chips.map((chip) => (
+                          <span
+                            key={chip}
+                            className="flex items-center gap-2 rounded-lg bg-muted/50 p-2 text-sm font-medium text-foreground transition-colors hover:bg-primary/5"
+                          >
+                            <CheckCircle2 className="h-4 w-4 text-primary" aria-hidden />
+                            {chip}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+            <div className="text-center">
+              <ButtonLink href="/modular-home-financing/loan-options" size="lgSm">
+                Explore All Loan Options
+                <ArrowRight className="h-4 w-4" />
+              </ButtonLink>
+            </div>
           </div>
         </Container>
       </section>
 
-      {/* Problem / Solution */}
-      <section className="py-20 md:py-24">
+      {/* Problem / Solution — pass-7: source py-20 md:py-28, grid gap-8 max-w-5xl,
+          cards p-5 with border-destructive/primary 20% + tinted 5% washes, 40px
+          rounded-lg icon chips, DM Sans H3s, text-sm bodies. */}
+      <section className="py-20 md:py-28">
         <Container>
           <div className="mx-auto mb-16 max-w-3xl text-center">
-            <h2 className="font-display text-3xl font-bold md:text-5xl">
+            <h2 className="font-display text-3xl font-bold md:text-4xl lg:text-5xl">
               Prefab Financing is Broken. <span className="text-primary">We Fixed It.</span>
             </h2>
             <p className="mt-6 text-lg text-muted-foreground">
@@ -360,18 +371,18 @@ export default function HomePage() {
               who do.
             </p>
           </div>
-          <div className="mx-auto grid max-w-5xl gap-x-8 gap-y-10 lg:grid-cols-2">
+          <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-2">
             <div>
               <p className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-destructive">The Problem</p>
               <div className="space-y-4">
                 {PROBLEMS.map((item) => (
-                  <div key={item.title} className="flex gap-4 rounded-xl border border-destructive/15 bg-destructive/5 p-6">
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
+                  <div key={item.title} className="flex gap-4 rounded-xl border border-destructive/20 bg-destructive/5 p-5">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
                       <item.icon className="h-5 w-5" aria-hidden />
                     </span>
                     <div>
-                      <h3 className="font-display text-base font-semibold">{item.title}</h3>
-                      <p className="mt-1 text-muted-foreground">{item.description}</p>
+                      <h3 className="mb-1 font-semibold text-foreground">{item.title}</h3>
+                      <p className="text-sm text-muted-foreground">{item.description}</p>
                     </div>
                   </div>
                 ))}
@@ -383,14 +394,14 @@ export default function HomePage() {
                 {FIXES.map((item) => (
                   <div
                     key={item.title}
-                    className="group flex gap-4 rounded-xl border border-primary/15 bg-secondary/60 p-6"
+                    className="group flex gap-4 rounded-xl border border-primary/20 bg-primary/5 p-5"
                   >
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition group-hover:scale-110">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110">
                       <item.icon className="h-5 w-5" aria-hidden />
                     </span>
                     <div>
-                      <h3 className="font-display text-base font-semibold">{item.title}</h3>
-                      <p className="mt-1 text-muted-foreground">{item.description}</p>
+                      <h3 className="mb-1 font-semibold text-foreground">{item.title}</h3>
+                      <p className="text-sm text-muted-foreground">{item.description}</p>
                     </div>
                   </div>
                 ))}
@@ -406,36 +417,41 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* How it works */}
+      {/* How it works — pass-7: source grid max-w-5xl md:grid-cols-3 gap-8; cards
+          hover:border-primary/50 + hover:shadow-lg; numerals text-6xl
+          text-primary/10 at top-4 right-4; 56px rounded-2xl icon chips with w-7
+          icons + scale-110 on group-hover; gradient connector lines. */}
       <section id="how-it-works" className="bg-card py-20 md:py-32">
         <Container>
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <span className="text-sm font-medium uppercase tracking-wider text-primary">How It Works</span>
-            <h2 className="mt-4 font-display text-3xl font-bold md:text-5xl">
+            <h2 className="mt-4 font-display text-3xl font-bold md:text-4xl lg:text-5xl">
               From Application to Keys in 3 Simple Steps
             </h2>
             <p className="mt-6 text-lg text-muted-foreground">
               We&apos;ve transformed a 60-day nightmare into a 15-minute application and 7-day approval process.
             </p>
           </div>
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
             {STEPS.map((step, index) => (
-              <div key={step.number} className="relative rounded-2xl border border-border bg-background p-8">
+              <div key={step.number} className="relative">
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute right-6 top-4 font-display text-7xl font-bold text-secondary"
+                  className="absolute right-4 top-4 font-display text-6xl font-bold text-primary/10"
                 >
                   {step.number}
                 </span>
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <step.icon className="h-6 w-6" aria-hidden />
-                </span>
-                <h3 className="mt-6 font-display text-xl font-semibold">{step.title}</h3>
-                <p className="mt-3 text-muted-foreground">{step.description}</p>
+                <div className="group relative h-full rounded-2xl border border-border bg-background p-8 transition-all hover:border-primary/50 hover:shadow-lg">
+                  <span className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 transition-transform duration-300 group-hover:scale-110">
+                    <step.icon className="h-7 w-7 text-primary" aria-hidden />
+                  </span>
+                  <h3 className="mb-3 font-display text-xl font-semibold">{step.title}</h3>
+                  <p className="text-muted-foreground">{step.description}</p>
+                </div>
                 {index < STEPS.length - 1 ? (
                   <span
                     aria-hidden
-                    className="absolute -right-6 top-16 hidden h-px w-6 bg-border md:block"
+                    className="absolute left-[60%] top-16 hidden h-px w-[80%] bg-gradient-to-r from-primary/50 to-transparent md:block"
                   />
                 ) : null}
               </div>
@@ -444,12 +460,15 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* Success stories */}
-      <section className="py-20 md:py-28">
+      {/* Success stories — pass-7: source section py-20 md:py-32 with the
+          card→background gradient wash; H2 ramp text-3xl/md:text-4xl/lg:text-5xl. */}
+      <section className="bg-gradient-to-b from-card to-background py-20 md:py-32">
         <Container>
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <span className="text-sm font-medium uppercase tracking-wider text-primary">Success Stories</span>
-            <h2 className="mt-4 font-display text-3xl font-bold md:text-5xl">Trusted by 2,000+ Prefab Homeowners</h2>
+            <h2 className="mt-4 font-display text-3xl font-bold md:text-4xl lg:text-5xl">
+              Trusted by 2,000+ Prefab Homeowners
+            </h2>
             <p className="mt-6 text-lg text-muted-foreground">
               Real stories from buyers who finally got the financing they deserved.
             </p>
@@ -457,7 +476,9 @@ export default function HomePage() {
           <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">
             {STORIES.map((story) => (
               <figure key={story.name} className="flex flex-col rounded-2xl border border-border bg-background p-8 transition-shadow hover:shadow-lg">
-                <Stars />
+                <div className="mb-4">
+                  <Stars />
+                </div>
                 <blockquote className="mt-5 flex-1 text-muted-foreground">&ldquo;{story.quote}&rdquo;</blockquote>
                 <figcaption className="mt-6 flex items-center gap-4">
                   <Image
@@ -483,32 +504,34 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* Our Standards */}
-      <section className="bg-muted/50 py-16">
+      {/* Our Standards — pass-7: source band py-16 bg-muted/30 border-y
+          border-border with a max-w-4xl header; cards bg-card rounded-xl p-6
+          text-center with 48px round icon chips and DM Sans H3s. */}
+      <section className="border-y border-border bg-muted/30 py-16">
         <Container>
-          <div className="mx-auto mb-12 max-w-2xl text-center">
-            <h2 className="font-display text-3xl font-bold">Our Standards</h2>
-            <p className="mt-4 text-lg text-muted-foreground">
+          <div className="mx-auto mb-10 max-w-4xl text-center">
+            <h2 className="mb-3 font-display text-2xl font-bold md:text-3xl">Our Standards</h2>
+            <p className="text-muted-foreground">
               ModFii is committed to providing accurate, unbiased information to help you make informed decisions about
               prefab home financing.
             </p>
           </div>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="mb-8 grid gap-6 md:grid-cols-3">
             {[
               { icon: ShieldCheck, title: "Editorially Independent", body: "Our recommendations are based on research, not lender relationships. We earn referral fees, but this never influences our guidance." },
               { icon: BookOpen, title: "Government Sources", body: "Information is sourced from official programs: FHA.gov, VA.gov, USDA.gov, CFPB, Fannie Mae, and Freddie Mac." },
               { icon: Users, title: "Expert Reviewed", body: "Content is written and reviewed by mortgage professionals with specialized experience in modular and prefab financing." },
             ].map((item) => (
-              <div key={item.title} className="rounded-2xl border border-border bg-card p-8 text-center">
-                <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <div key={item.title} className="rounded-xl border border-border bg-card p-6 text-center">
+                <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
                   <item.icon className="h-6 w-6" aria-hidden />
                 </span>
-                <h3 className="mt-5 font-display text-base font-semibold">{item.title}</h3>
-                <p className="mt-3 text-sm text-muted-foreground">{item.body}</p>
+                <h3 className="mb-2 font-semibold text-foreground">{item.title}</h3>
+                <p className="text-sm text-muted-foreground">{item.body}</p>
               </div>
             ))}
           </div>
-          <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm">
+          <div className="flex flex-wrap justify-center gap-4 text-sm">
             <Link href="/editorial-policy" className="text-primary hover:underline">
               Read Our Editorial Policy
             </Link>
@@ -535,11 +558,11 @@ export default function HomePage() {
           <div className="mx-auto max-w-3xl space-y-4">
             {FAQS.map((item) => (
               <details key={item.q} name="home-faq" className="group rounded-xl border border-border bg-card px-6">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-6 text-left hover:text-primary [&::-webkit-details-marker]:hidden">
-                  <h3 className="text-base font-normal">{item.q}</h3>
-                  <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden />
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-6 text-left font-semibold hover:text-primary [&::-webkit-details-marker]:hidden">
+                  <h3 className="text-base">{item.q}</h3>
+                  <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180" aria-hidden />
                 </summary>
-                <p className="pb-6 text-muted-foreground">{item.a}</p>
+                <p className="pb-6 text-sm text-muted-foreground">{item.a}</p>
               </details>
             ))}
           </div>
@@ -559,18 +582,18 @@ export default function HomePage() {
         />
         <Container className="relative max-w-3xl text-center text-primary-foreground">
           <h2 className="font-display text-3xl font-bold md:text-5xl">Your Dream Prefab Home Deserves the Right Financing</h2>
-          <p className="mt-6 text-xl text-primary-foreground/80">
+          <p className="mb-10 mt-6 text-xl leading-relaxed text-primary-foreground/80">
             Stop letting outdated lenders kill your deal. Join 2,000+ happy homeowners who got approved in days, not
             months—at rates that reward sustainability.
           </p>
-          <div className="mt-10 flex justify-center">
+          <div className="mb-10 flex flex-col justify-center gap-4 sm:flex-row">
             <ButtonLink href="/get-started" variant="secondary" size="xl">
               Get Pre-Approved Free
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </ButtonLink>
           </div>
-          <p className="mt-5 flex items-center justify-center gap-2 text-sm text-primary-foreground/75">
-            <Shield className="h-4 w-4" aria-hidden />
+          <p className="flex items-center justify-center gap-3 text-primary-foreground/80">
+            <Shield className="h-5 w-5" aria-hidden />
             No credit impact • 15-minute application • Cancel anytime
           </p>
         </Container>

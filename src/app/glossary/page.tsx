@@ -58,7 +58,7 @@ export default function GlossaryPage() {
               <div className="space-y-6 border-l-2 border-muted pl-4">
                 {group.terms.map((term) => (
                   <div key={term.term} className="pl-4">
-                    <h2 className="text-lg font-semibold">{term.term}</h2>
+                    <h3 className="text-lg font-semibold">{term.term}</h3>
                     <p className="mt-2 leading-relaxed text-muted-foreground">{term.definition}</p>
                   </div>
                 ))}
@@ -67,7 +67,7 @@ export default function GlossaryPage() {
           ))}
         </div>
         <div className="mt-16 rounded-2xl border border-accent/20 bg-accent/10 p-8 text-center">
-          <h2 className="font-display text-2xl font-bold">Have questions about financing?</h2>
+          <h2 className="font-display text-2xl font-bold">Have Questions About Financing?</h2>
           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
             Get matched with lenders who specialize in modular and prefab home financing.
           </p>
@@ -75,11 +75,44 @@ export default function GlossaryPage() {
             Get Pre-Qualified
           </ButtonLink>
         </div>
-        <div className="mt-8 text-center text-sm">
-          <Link href="/modular-home-financing" className="text-primary hover:underline">
-            Modular Home Financing Guide
-          </Link>
-        </div>
+        {/* Source pass-7 glossary closers: Related Resources card grid + the
+            Have Questions CTA above (docs/REMEDIATION_PLAN_pass7.md F-8). */}
+        <section className="mt-16 border-t border-border pt-8">
+          <h2 className="mb-6 text-2xl font-bold">Related Resources</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              {
+                href: "/modular-home-financing",
+                title: "Modular Home Financing Guide",
+                body: "Complete guide to financing your prefab or modular home purchase.",
+              },
+              {
+                href: "/modular-home-financing/loan-options/construction-loan",
+                title: "Construction Loans",
+                body: "Learn how construction-to-permanent loans work for modular homes.",
+              },
+              {
+                href: "/modular-home-financing/loan-options",
+                title: "Loan Options",
+                body: "Compare FHA, VA, USDA, and conventional loan programs.",
+              },
+              {
+                href: "/calculator",
+                title: "Payment Calculator",
+                body: "Estimate your monthly mortgage payment and affordability.",
+              },
+            ].map((card) => (
+              <Link
+                key={card.href}
+                href={card.href}
+                className="group rounded-lg border border-border p-4 transition-colors hover:border-accent"
+              >
+                <h3 className="font-semibold transition-colors group-hover:text-accent">{card.title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{card.body}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
       </Container>
     </main>
   );

@@ -172,6 +172,55 @@ export default function ResourcesPage() {
             </ButtonLink>
           </div>
         </div>
+
+        {/* Source pass-7 additions: Most Popular Guides + Not Sure Where to
+            Start? (docs/REMEDIATION_PLAN_pass7.md F-10). */}
+        <section className="mt-16">
+          <h2 className="mb-6 text-2xl font-bold">Most Popular Guides</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              {
+                href: "/modular-home-financing",
+                title: "Modular Home Financing: The Complete Guide",
+                description: "Everything you need to know about financing a modular or prefab home.",
+              },
+              {
+                href: "/modular-home-financing/loan-options/fha",
+                title: "FHA Loans for Modular Homes",
+                description: "3.5% down payments and flexible credit requirements for modular buyers.",
+              },
+              {
+                href: "/construction-loans",
+                title: "Construction Loans for Prefab Homes",
+                description: "How one-time-close construction loans work with factory timelines.",
+              },
+              {
+                href: "/modular-home-financing/down-payment",
+                title: "Modular Home Down Payment Guide",
+                description: "From $0 down options to using land equity for your entire down payment.",
+              },
+            ].map((guide) => (
+              <Link
+                key={guide.href}
+                href={guide.href}
+                className="group rounded-lg border border-border p-5 transition-colors hover:border-accent"
+              >
+                <p className="font-semibold transition-colors group-hover:text-accent">{guide.title}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{guide.description}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+        <section className="mt-12 rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center">
+          <h2 className="text-2xl font-bold">Not Sure Where to Start?</h2>
+          <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+            Answer a few questions about your project and we&apos;ll point you to the right guide and the right lenders.
+          </p>
+          <ButtonLink href="/get-started" variant="primary" className="mt-6">
+            Get Pre-Qualified
+            <span aria-hidden>→</span>
+          </ButtonLink>
+        </section>
       </Container>
     </main>
   );
