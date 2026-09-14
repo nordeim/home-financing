@@ -1,0 +1,107 @@
+$ npm install
+
+up to date, audited 429 packages in 4s
+
+161 packages are looking for funding
+  run `npm fund` for details
+
+4 moderate severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm warn install-scripts 1 package had install scripts blocked because they are not covered by allowScripts:
+npm warn install-scripts   unrs-resolver@1.12.2 (postinstall: node postinstall.js)
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+(venv) pete@pop-os:/Home1/project/home-financing
+$ npm run db:setup
+npm notice run db:setup
+npm notice run npm run db:migrate && npm run db:seed
+npm notice run db:migrate
+npm notice run tsx src/scripts/migrate.ts
+[db] migrations applied
+npm notice run db:seed
+npm notice run tsx src/scripts/seed.ts
+[db] seed complete (idempotent — re-running is safe)
+(venv) pete@pop-os:/Home1/project/home-financing
+$ npm run build
+npm notice run build
+npm notice run next build
+▲ Next.js 16.3.4 (Turbopack)
+- Environments: .env
+✓ Running next.config.ts took 112ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 13.5s
+✓ Finished TypeScript in 13.0s    
+✓ Collecting page data using 3 workers in 813ms    
+✓ Generating static pages using 3 workers (43/43) in 1028ms
+✓ Finalizing page optimization in 7ms    
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /about
+├ ○ /adu-financing
+├ ƒ /api/applications
+├ ƒ /api/calculator
+├ ƒ /api/health
+├ ƒ /authors/[authorSlug]
+├ ○ /calculator
+├ ○ /compare/fha-vs-conventional-prefab
+├ ○ /compare/modular-vs-manufactured-financing
+├ ○ /compare/prefab-vs-site-built-costs
+├ ○ /construction-loans
+├ ○ /construction-loans/fha
+├ ○ /construction-loans/usda
+├ ○ /construction-loans/va
+├ ○ /corrections
+├ ƒ /debug-error-probe
+├ ○ /editorial-policy
+├ ○ /financing
+├ ○ /get-started
+├ ○ /glossary
+├ ○ /learn
+├ ƒ /learn/[slug]
+├ ○ /modular-home-financing
+├ ○ /modular-home-financing/chattel-vs-mortgage
+├ ○ /modular-home-financing/construction-loans-modular
+├ ○ /modular-home-financing/cost
+├ ○ /modular-home-financing/down-payment
+├ ○ /modular-home-financing/fha-modular-manufactured
+├ ○ /modular-home-financing/loan-options
+├ ○ /modular-home-financing/loan-options/construction-loan
+├ ○ /modular-home-financing/loan-options/fha
+├ ○ /modular-home-financing/loan-options/usda
+├ ○ /modular-home-financing/loan-options/va
+├ ○ /modular-home-financing/manufacturers
+├ ƒ /modular-home-financing/manufacturers/[slug]
+├ ○ /modular-home-financing/rates
+├ ○ /modular-home-financing/states
+├ ƒ /modular-home-financing/states/[state]
+├ ○ /modular-home-financing/va-modular-prefab
+├ ○ /modular-home-financing/with-land
+├ ○ /modular-home-financing/without-land
+├ ○ /mortgage
+├ ○ /privacy-policy
+├ ○ /resources
+├ ○ /robots.txt
+├ ○ /sitemap.xml
+├ ○ /terms
+└ ○ /tiny-home-financing
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+(venv) pete@pop-os:/Home1/project/home-financing
+$ PORT=3004 npm run start -- --port=3004
+npm notice run start
+npm notice run next start --port=3004
+▲ Next.js 16.3.4
+- Local:         http://localhost:3004
+- Network:       http://192.168.1.2:3004
+✓ Ready in 188ms
+✓ Running next.config.ts took 44ms
