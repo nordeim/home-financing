@@ -1,7 +1,19 @@
-# home-financing (ModFii) — Engineering Skill v1.8
+---
+name: nextjs-postgresql-single-app
+description: >
+  Production-grade reference for building content-driven marketing sites and transactional funnel apps on Next.js 16 + React 19 + Tailwind CSS v4 (CSS-first @theme) + Drizzle ORM + PostgreSQL 17 in a single-app (npm, no monorepo) with TypeScript strict. Covers App Router RSC (force-dynamic), file corpus → catalog → idempotent ensureSeeded() projection → Pool singleton (globalThis), Drizzle pgTable migrations, 43 static/dynamic pages, lead-capture funnel (validate → match → persist), rate limiting, health/sitemap/redirects, editorial design tokens, and WCAG AAA. Includes reusable patterns for single-Pool persistence, file-backed seeding, content ingestion, and pre-ship gates (lint/typecheck/test/build/e2e). Applicable to any full-stack TypeScript marketing, funnel, lead-gen, or content-driven SaaS using this stack.
+version: 1.8.0
+tags: [nextjs16, react19, tailwind-v4, drizzle, postgres17, vitest, playwright, marketing, funnel, single-app]
+---
 
-**Classification:** Internal Engineering Reference — Reusable Skill Document
-**Status:** DEFINITIVE, PRODUCTION-LOCKED
+# home-financing (ModFii) — Production Web App Skill
+
+Refer to the codebase in `https://github.com/nordeim/home-financing.git` as the foundation/example to scaffold other projects using similar tech stacks.
+
+Reusable distillation for any Next.js 16 App Router + React 19 + TypeScript 5.9 strict + Tailwind CSS v4 CSS-first @theme + Drizzle ORM 0.45 + PostgreSQL 17 + pg Pool singleton + Vitest 4.1 + Playwright 1.63 project. Generalizes beyond mortgages to any content-driven marketing + transactional funnel app (editorial guides, calculators, lead capture, lender/product matching). What it teaches: 20-section production reference distilled via Six-Phase Archaeology — Project Identity & Design Philosophy (editorial + brutalist restraint, forest/cream/amber tokens), Tech Stack & Versions (pinned), Bootstrapping & Config (tsconfig strict, next.config redirects/images.unoptimized, eslint flat, drizzle.config dual, docker-compose PG17 + pgcrypto/pg_trgm), Design System (verbatim @theme + radii/shadow/ease + typography), 5-Layer Architecture (file corpus → catalog → ensureSeeded projection → Pool singleton → RSC/force-dynamic → redirects), Component Map (Server Components by default, 6 use-client islands), Hooks (inlined useId/adjust-during-render/passive: true/body-lock), Content Ingestion (file-backed JSON → ensureSeeded count>0 + onConflictDoNothing → PG, 152 sitemap locs), A11y (WCAG AAA contrast/focus/prefers-reduced-motion/axe critical: []), 14 Anti-Patterns + Debugging Guide (H4/OOM server kill, second Pool EMFILE, .env leak d572d73, missing hero images, setState-in-effect, tailwind.config drift), Pre-Ship Gate (db:setup → lint 0/0 → typecheck → test 41/41 → build 43/43 (35+8) → e2e 121/121), Lessons/Pitfalls/Best Practices, 6 Copy-Paste Patterns (canonical funnel rateLimit→json→validate→seed→match→persist, health probe, idempotent projection, PMI 0.0065 + 1.15×, sitemap), Responsive/Z-Index/Color (hex-exact) & 8-domain TypeScript Interfaces.
+
+Discoverability: Matches nextjs16, react19, app-router, rsc, tailwind4, drizzle, postgres17, vitest, playwright, server-components, drizzle-kit, pg-pool, next-font, lucide-react. Use to scaffold, debug, onboard, or ship any similar full-stack marketing/funnel app without repeating 2026-09-11 incidents.
+
 **Companion Documents:** `Project_Architecture_Document.md` v1.0 (blueprint) · `CLAUDE.md` (agent spec, ~600 lines) · `AGENTS.md` (cheat-sheet) · `README.md` (operator guide) · `docs/REMEDIATION_PLAN_pass4.md` (pass-4 evidence)
 **Last Updated:** 2026-09-15 (v1.8 — pass 9 drift alignment D-01→D-07: STATIC_PATHS 40→39, build 36+7/42+8→35+8, E2E 61/82→121, radii 1.25/1.5→0.625/0.75/1.0, MORE 4→2, blur-md→lg; validation `docs/VALIDATION_REPORT_SKILL_2026-09-15.md` 11 drifts patched. Pass 8: audit remediation `.env` hygiene + vitest 4.1.11; pass 7: live-source parity; pass 6: audit)
 **Project State:** 41 Vitest (11+13+9+8, incl. H4/OOM regression) + 121 Playwright per project (121/121 with DB, 120/121 DB-less — 103 declarations + data-driven loops: smoke 8 + seo 16 + funnel 5 + assets 19 + parity 73) · 43/43 Next build · PG 17 `8/40/50/23/59/5` seeded · `lint 0/0` · `typecheck` pass
